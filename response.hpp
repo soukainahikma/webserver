@@ -1,9 +1,9 @@
-/* in here i m gonna build the  request structre and class and its content*/
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+/* in here i m gonna build the  response structre and class and its content*/
+#ifndef RESPONSE_HPP
+#define RESPONSE_HPP
 #include <iostream>
 #include <fstream>
-class request
+class response
 {
 	private:
 		std::string buffer;
@@ -12,9 +12,9 @@ class request
 		std::string status_message;
 		std::string content_type;
 		std::string content_length;//we will see if its optional
-		std::string requested_page;
+		std::string response_page;
 	public:
-		request()
+		response()
 		{
 			buffer = "";
 			version = "HTTP/1.1 ";

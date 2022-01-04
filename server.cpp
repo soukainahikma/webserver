@@ -1,4 +1,4 @@
-#include "request.hpp"
+#include "response.hpp"
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -13,7 +13,7 @@ int main()
 	int opt  = 1;// i will need it in setsockopt
 	int addrlen = sizeof(address);// need it as a parameter in the function accept to accept the new socket
 	char buffer[1024] = {0};//to read from
-	request req;/// this the requested thing from the client to be sent
+	response resp;/// this the requested thing from the client to be sent
 	// AF_INET         2               /* internetwork: UDP, TCP, etc. */
 	  //SOCK_STREAM/* stream socket */
 	  // ask why we put 0 in the protocole argument
@@ -57,13 +57,14 @@ int main()
 		return(0);
 	}
 	valread = read(new_socket, buffer, 1024);
+	// Instance of the request class taking valread as 
 	// std::cout << buffer;
-	const char *hello = req.get_header("info.html").c_str();;
+	const char *hello = resp.get_header("info.html").c_str();;
 	// strcpy(hello, req.get_header("info.html").c_str());
 	send(new_socket, hello, strlen(hello), 0);
 	//reset the header
 	// reset hello
-	req.header_cleaner();
+	resp.header_cleaner();
 	// hello  = strdup("");
 	close(new_socket);
 	}
