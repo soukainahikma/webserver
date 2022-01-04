@@ -39,6 +39,14 @@ class request
 		{
 			return(version + status + status_message + content_type + get_file(filename));
 		}
+		void header_cleaner()
+		{
+			buffer = "";
+			version = "HTTP/1.1 ";
+			status = "200 ";
+			status_message = " OK\n";
+			content_type = "Content-Type: text/html\r\n\n\n";
+		}
 
 };
 #endif

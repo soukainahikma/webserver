@@ -57,9 +57,14 @@ int main()
 		return(0);
 	}
 	valread = read(new_socket, buffer, 1024);
-	std::cout << buffer;
-	const char *hello = req.get_header("info.html").c_str();
+	// std::cout << buffer;
+	const char *hello = req.get_header("info.html").c_str();;
+	// strcpy(hello, req.get_header("info.html").c_str());
 	send(new_socket, hello, strlen(hello), 0);
+	//reset the header
+	// reset hello
+	req.header_cleaner();
+	// hello  = strdup("");
 	close(new_socket);
 	}
 	return 0;
