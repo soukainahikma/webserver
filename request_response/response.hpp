@@ -3,18 +3,20 @@
 #define RESPONSE_HPP
 #include <iostream>
 #include <fstream>
-class response
+class Response
 {
 	private:
+		/* ****** Response Header paramters ***** */
 		std::string buffer;
 		std::string version;
 		std::string status;
 		std::string status_message;
 		std::string content_type;
-		std::string content_length;//we will see if its optional
+		std::string content_length;
 		std::string response_page;
+	
 	public:
-		response()
+		Response()
 		{
 			buffer = "";
 			version = "HTTP/1.1 ";
