@@ -33,10 +33,15 @@ int server_socket::set_server()
 		perror("binding failed");
 		return(0);
 	}
-	if(listen(server_fd,3) < 0)
+	//listen backlog to review
+	if(listen(server_fd,0) < 0)
 	{
 		perror("listening failed: ");
 		return(0);
 	}
 	return(1);
+}
+int server_socket::get_socket_fd() const
+{
+	return(server_fd);
 }

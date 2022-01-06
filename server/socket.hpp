@@ -26,6 +26,7 @@ class server_socket
 		void set_add_struct();
 		int set_server();
 		int accept_socket();
+		int get_socket_fd() const;
 
 };
 #endif
