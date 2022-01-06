@@ -23,3 +23,10 @@ int main()
 	}
 	return 0;
 }
+
+/* Tout en C++ 98. malloc, free, write, htons, htonl,
+ntohs, ntohl, select, poll, epoll (epoll_create,
+epoll_ctl, epoll_wait), kqueue (kqueue, kevent),
+socket, accept, listen, send, recv, bind, connect,
+inet_addr, setsockopt, getsockname, fcntl. */
+//select() only uses (at maximum) three bits of data per file descriptor, while poll() typically uses 64 bits per file descriptor. In each syscall invoke poll() thus needs to copy a lot more over to kernel space. A small win for select().
