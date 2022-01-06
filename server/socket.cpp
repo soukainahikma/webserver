@@ -10,7 +10,6 @@ void server_socket::set_add_struct()
 }
 int server_socket::accept_socket()
 {
-	std::cout<< "waiting for request" << std::endl;
 	client_fd = accept(server_fd,(struct sockaddr*)& address,(socklen_t *)&addrlen);
 	return(client_fd);
 }
@@ -34,6 +33,7 @@ int server_socket::set_server()
 		return(0);
 	}
 	//listen backlog to review
+	// how many connections can be waiting for this socket all at one time
 	if(listen(server_fd,0) < 0)
 	{
 		perror("listening failed: ");
