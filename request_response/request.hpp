@@ -12,6 +12,10 @@ class Request
 		typedef std::map<string,string> map_request;
 		typedef std::vector<string> vector_request;
 		Request(){};
+		Request(char *buffer){
+			fill_map(buffer);
+		};
+
 		vector_request split_buffer(const char *buffer,char c)
 		{
 			vector_request vec;
@@ -22,9 +26,9 @@ class Request
 				vec.push_back(line);
 			return(vec);
 		}
-		map_request fill_map(char *buffer)
+
+		void fill_map(char *buffer)
 		{
-			map_request map_;
 			vector_request vec = split_buffer(buffer, '\n');
 			vector_request head = split_buffer(vec[0].c_str(),' ');
 			map_["Method"] = head[0];
@@ -38,10 +42,13 @@ class Request
 					map_[vec[i].substr(0,found)] = vec[i].substr(found+1);
 				}
 			}
-			return(map_);
 		}
+
+		map_request	getRequest() {
+			return (map_);
+		}
+
 	private:
-		map_request req;
-		
+		map_request map_;
 };
 #endif

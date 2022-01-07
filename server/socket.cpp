@@ -2,7 +2,7 @@
 
 void server_socket::set_add_struct()
 {
-	int port  = 8080;
+	int port  = s._listen;
 	memset((char *)&address, 0, sizeof(address)); 
 	address.sin_family = AF_INET; 
 	address.sin_addr.s_addr = htonl(INADDR_ANY); 

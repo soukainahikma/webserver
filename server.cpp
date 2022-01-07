@@ -1,9 +1,49 @@
 #include "server/socket.hpp"
 #include "request_response/response.hpp"
+#include "request_response/request.hpp"
 #include <sys/select.h>
+
+void request_printer(Request req)
+{
+	Request::map_request map_ = req.getRequest();
+	for (std::map<std::string,std::string>::iterator it= map_.begin(); it!=map_.end(); ++it)
+    	std::cout << it->first << " => " << it->second << '\n';
+}
+
+t_location fill_location(std::string path, bool autoindex,std::vector<std::string> indexs,std::vector<std::string> allow_methods)
+{
+	t_location loc;
+	loc.path = path;
+	loc.autoindex = autoindex;
+	loc.indexs =  indexs;
+	loc.allow_methods =  allow_methods;
+	return(loc);
+}
+std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std::string> _server_names,
+									std::string client_max_body,std::vector<std::string> _err_pages,std::string _root)
+{
+	std::vector<t_location> location;
+	location.push_back(fill_location("/pages" ,false,std::vector<std::string>(1,"index.html"),std::vector<std::string>(1,"GET")));
+	t_server myserver;
+	myserver._listen = _listen;
+	myserver._host = _host;
+	myserver._server_names = _server_names;
+	myserver.client_max_body = client_max_body;
+	myserver._err_pages = _err_pages;
+	myserver._root = _root;
+	myserver.locations = location;
+	std::vector<t_server> vec_of_servers;
+	vec_of_servers.push_back(myserver);
+	return(vec_of_servers);
+}
 int main()
 {
-	server_socket mysocket;
+
+	/* here is the parsing */
+	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"/Users/shikma/Desktop/webserv/");
+
+	/* here is the parsing */
+	server_socket mysocket(parse_server[0]);
 	fd_set current_sockets;
 	fd_set ready_sockets;
 	Response resp;
@@ -32,7 +72,7 @@ int main()
 			{
 				if(i == server_socket)
 				{
-					if((new_socket = mysocket.accept_socket())<0)
+					if((new_socket = mysocket.accept_socket()) < 0)
 					{
 						perror("failed to accept: ");
 						return(0);
@@ -44,9 +84,13 @@ int main()
 				else
 				{
 					valread = read(i, buffer, 1024);
-					std::cout << buffer << std::endl;
+					// std::cout << buffer << std::endl;
+					Request req(buffer);
+					/* ****** Request Printer ******** */
+					request_printer(req);
+					/* ******************************* */
 					
-					const char *hello = resp.get_header("pages/info.html").c_str();;
+					const char *hello = resp.get_header("pages/index.html").c_str();
 					send(i, hello, strlen(hello), 0);
 					resp.header_cleaner();
 					close(i);
@@ -58,10 +102,3 @@ int main()
 	}
 	return 0;
 }
-
-/* Tout en C++ 98. malloc, free, write, htons, htonl,
-ntohs, ntohl, select, poll, epoll (epoll_create,
-epoll_ctl, epoll_wait), kqueue (kqueue, kevent),
-socket, accept, listen, send, recv, bind, connect,
-inet_addr, setsockopt, getsockname, fcntl. */
-//select() only uses (at maximum) three bits of data per file descriptor, while poll() typically uses 64 bits per file descriptor. In each syscall invoke poll() thus needs to copy a lot more over to kernel space. A small win for select().
