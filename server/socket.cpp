@@ -34,7 +34,7 @@ int server_socket::set_server()
 	}
 	//listen backlog to review
 	// how many connections can be waiting for this socket all at one time
-	if(listen(server_fd,0) < 0)
+	if(listen(server_fd,5) < 0)
 	{
 		perror("listening failed: ");
 		return(0);
