@@ -2,7 +2,7 @@
 
 void server_socket::set_add_struct()
 {
-	int port  = 8080;
+	int port  = s._listen;
 	memset((char *)&address, 0, sizeof(address)); 
 	address.sin_family = AF_INET; 
 	address.sin_addr.s_addr = htonl(INADDR_ANY); 
@@ -34,7 +34,7 @@ int server_socket::set_server()
 	}
 	//listen backlog to review
 	// how many connections can be waiting for this socket all at one time
-	if(listen(server_fd,0) < 0)
+	if(listen(server_fd,5) < 0)
 	{
 		perror("listening failed: ");
 		return(0);

@@ -1,72 +1,54 @@
-/* in here i m gonna build the  response structre and class and its content*/
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 #include <iostream>
-#include <fstream>
-#include <cstring>
-#include <iostream>
 #include <map>
-
+#include <vector>
+#include <cstring>
+#include <sstream>
 class Request
 {
-
 	public:
-		typedef typename std::map<std::string, std::string> req_map_parsing;
-		typedef typename std::string string;
-		
-	
-	private:
-		int counter;
-		string raw_request;
-		req_map_parsing parse;
-		/* ****** Request Header paramters ***** */
-		/* 
-		GET / HTTP/1.1
-		Host: localhost:8080
-		
+		typedef std::string string;
+		typedef std::map<string,string> map_request;
+		typedef std::vector<string> vector_request;
+		Request(){};
+		Request(char *buffer){
+			fill_map(buffer);
+		};
+
+		vector_request split_buffer(const char *buffer,char c)
 		{
-			method: GET,
-			path: /
-			protocole_version: HTTP/1.1
-			Host: localhost
-
+			vector_request vec;
+			std::string myText(buffer);
+			std::istringstream iss(myText);
+			std::string line;
+			while (std::getline(iss, line, c))
+				vec.push_back(line);
+			return(vec);
 		}
-		 */
 
-	public:
-		Request() {
-			counter = 0;
-			raw_request = "";
-		};
-
-		Request(char *s) {
-			counter = 0;
-			raw_request = string(s);
-		};
-		
-		Request(Request &req) {
-			counter = 0;
-			if (this != &req)
+		void fill_map(char *buffer)
+		{
+			vector_request vec = split_buffer(buffer, '\n');
+			vector_request head = split_buffer(vec[0].c_str(),' ');
+			map_["Method"] = head[0];
+			map_["URL"] = head[1];
+			map_["Protocol_version"] = head[2];
+			size_t found;
+			for (size_t i = 1; i < vec.size(); i++)
 			{
-				raw_request = req.raw_request;
-				parse = req.parse;
+				if((found = vec[i].find(":"))!= std::string::npos)
+				{
+					map_[vec[i].substr(0,found)] = vec[i].substr(found+1);
+				}
 			}
-		};
-
-		string getRawRequest() {
-			return (raw_request);
 		}
 
-		req_map_parsing getParsedRequest() {
-			return (parse);
+		map_request	getRequest() {
+			return (map_);
 		}
 
-		void setRawRequest(string str) {
-			raw_request = str;
-		}
-
-		void parse() {
-			std::cout << raw_request << std::endl;
-		}
+	private:
+		map_request map_;
 };
 #endif
