@@ -45,6 +45,7 @@ int main()
 				{
 					valread = read(i, buffer, 1024);
 					std::cout << buffer << std::endl;
+					
 					const char *hello = resp.get_header("pages/info.html").c_str();;
 					send(i, hello, strlen(hello), 0);
 					resp.header_cleaner();
