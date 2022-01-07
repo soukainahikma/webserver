@@ -7,6 +7,16 @@ class Response
 {
 	private:
 		/* ****** Response Header paramters ***** */
+
+		/* 
+			{
+				protocole_version: HTTP/1.1
+				status_code: 200,
+				status_message: OK
+				content_type: "Content-Type: text/html\r\n\n\n"
+				(OPTIONAL) content_type: "Content-Type: application/json\r\n\n\n"
+			}
+		 */
 		std::string buffer;
 		std::string version;
 		std::string status;

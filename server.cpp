@@ -44,8 +44,11 @@ int main()
 				else
 				{
 					valread = read(i, buffer, 1024);
+					std::cout << buffer << std::endl;
 					// std::cout << buffer << std::endl;
+					// Request Class instantiation
 					const char *hello = resp.get_header("pages/info.html").c_str();;
+					// Response Class instantiation
 					send(i, hello, strlen(hello), 0);
 					resp.header_cleaner();
 					close(i);
