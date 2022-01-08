@@ -84,8 +84,6 @@ int main()
 				else
 				{
 					valread = read(i, buffer, 1024);
-					std::cout << buffer << std::endl;
-					// std::cout << buffer << std::endl;
 					Request req(buffer);
 					/* ****** Request Printer ******** */
 					request_printer(req);

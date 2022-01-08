@@ -15,7 +15,12 @@ class Request
 		Request(char *buffer){
 			fill_map(buffer);
 		};
-
+		Request &operator= (Request &r) {
+			if (this != &r) {
+				map_ = r.map_;
+			}
+			return (*this);
+		}
 		vector_request split_buffer(const char *buffer,char c)
 		{
 			vector_request vec;

@@ -3,6 +3,7 @@
 #define RESPONSE_HPP
 #include <iostream>
 #include <fstream>
+
 class Response
 {
 	private:

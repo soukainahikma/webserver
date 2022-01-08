@@ -1,16 +1,25 @@
-class request_handler
+#ifndef REQUEST_HANDLER_HPP
+#define REQUEST_HANDLER_HPP
+#include "request.hpp"
+#include "response.hpp"
+
+class RequestHandler
 {
 private:
-	/* data */
+	Request req;
+	
 public:
-	request_handler(/* args */);
-	~request_handler();
+	RequestHandler(Request &req) {
+		this->req = req;
+	};
+
+	Response generateResponse () {
+		
+	}
+
+	~RequestHandler() {
+		
+	};
 };
 
-request_handler::request_handler(/* args */)
-{
-}
-
-request_handler::~request_handler()
-{
-}
+#endif
