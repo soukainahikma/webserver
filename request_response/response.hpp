@@ -25,6 +25,8 @@ class Response
 		std::string content_type;
 		std::string content_length;
 		std::string response_page;
+		std::string filename;
+
 	
 	public:
 		Response()
@@ -35,7 +37,30 @@ class Response
 			status_message = " OK\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
 		}
-		std::string get_file(std::string filename)
+
+		Response(int status_code, std::string root)
+		{
+			buffer = "";
+			version = "HTTP/1.1 ";
+			status = std::to_string(status_code) + " ";
+			status_message = " OK\n";
+			if (status_code >= 400)
+			{
+				status_message = " KO\n";
+				filename = root + std::to_string(status_code) + ".html";
+			}
+			content_type = "Content-Type: text/html\r\n\n\n";
+		}
+
+		Response(std::string filename)
+		{
+			buffer = "";
+			version = "HTTP/1.1 ";
+			status = "200 ";
+			status_message = " OK\n";
+			content_type = "Content-Type: text/html\r\n\n\n";
+		}
+		std::string get_file()
 		{
 			std::ifstream file;
 			std::string line;
@@ -48,9 +73,9 @@ class Response
 			file.close();
 			return(buffer);
 		}
-		std::string get_header(std::string filename)
+		std::string get_header()
 		{
-			return(version + status + status_message + content_type + get_file(filename));
+			return(version + status + status_message + content_type + get_file());
 		}
 		void header_cleaner()
 		{

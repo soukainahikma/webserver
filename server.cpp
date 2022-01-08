@@ -1,13 +1,34 @@
 #include "server/socket.hpp"
 #include "request_response/response.hpp"
 #include "request_response/request.hpp"
+#include "request_response/request_handler.hpp"
 #include <sys/select.h>
+#include <exception>
 
 void request_printer(Request req)
 {
+	std::cout << " ****** Request Printer ******** " << std::endl;
 	Request::map_request map_ = req.getRequest();
 	for (std::map<std::string,std::string>::iterator it= map_.begin(); it!=map_.end(); ++it)
     	std::cout << it->first << " => " << it->second << '\n';
+	std::cout << " ******************************* " << std::endl;
+}
+
+void location_printer(t_location loc) {
+	std::cout << " ------ Server Printer ------ " << std::endl;
+	std::cout << "listen :" << loc.path << std::endl;
+	std::cout << "host :" << loc.autoindex << std::endl;
+	std::cout << " ---------------------------- " << std::endl;
+}
+
+void server_printer(t_server serv) {
+	std::cout << " ****** Server Printer ********* " << std::endl;
+	std::cout << "listen :" << serv._listen << std::endl;
+	std::cout << "host :" << serv._host << std::endl;
+	std::cout << "root :" << serv._root << std::endl;
+	for (size_t i = 0; i < serv.locations.size(); i++)
+		location_printer(serv.locations[i]);
+	std::cout << " ******************************* " << std::endl;
 }
 
 t_location fill_location(std::string path, bool autoindex,std::vector<std::string> indexs,std::vector<std::string> allow_methods)
@@ -23,7 +44,7 @@ std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std
 									std::string client_max_body,std::vector<std::string> _err_pages,std::string _root)
 {
 	std::vector<t_location> location;
-	location.push_back(fill_location("/pages" ,false,std::vector<std::string>(1,"index.html"),std::vector<std::string>(1,"GET")));
+	location.push_back(fill_location("/" ,false,std::vector<std::string>(1,"index.html"),std::vector<std::string>(1,"GET")));
 	t_server myserver;
 	myserver._listen = _listen;
 	myserver._host = _host;
@@ -40,9 +61,9 @@ int main()
 {
 
 	/* here is the parsing */
-	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"/Users/shikma/Desktop/webserv/");
-
+	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"/Users/shikma/Desktop/webserv/pages");
 	/* here is the parsing */
+	RequestHandler req_handler (parse_server);
 	server_socket mysocket(parse_server[0]);
 	fd_set current_sockets;
 	fd_set ready_sockets;
@@ -87,9 +108,10 @@ int main()
 					Request req(buffer);
 					/* ****** Request Printer ******** */
 					request_printer(req);
+					server_printer(parse_server[0]);
 					/* ******************************* */
-					
-					const char *hello = resp.get_header("pages/index.html").c_str();
+					req_handler.setRequest(req);
+					const char *hello = resp.get_header().c_str();
 					send(i, hello, strlen(hello), 0);
 					resp.header_cleaner();
 					close(i);
