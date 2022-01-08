@@ -59,6 +59,7 @@ class Response
 			status = "200 ";
 			status_message = " OK\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
+			this->filename = filename;
 		}
 		std::string get_file()
 		{

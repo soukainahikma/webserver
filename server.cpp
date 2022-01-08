@@ -16,8 +16,8 @@ void request_printer(Request req)
 
 void location_printer(t_location loc) {
 	std::cout << " ------ Server Printer ------ " << std::endl;
-	std::cout << "listen :" << loc.path << std::endl;
-	std::cout << "host :" << loc.autoindex << std::endl;
+	std::cout << "path :" << loc.path << std::endl;
+	std::cout << "autoindex :" << loc.autoindex << std::endl;
 	std::cout << " ---------------------------- " << std::endl;
 }
 
@@ -44,7 +44,7 @@ std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std
 									std::string client_max_body,std::vector<std::string> _err_pages,std::string _root)
 {
 	std::vector<t_location> location;
-	location.push_back(fill_location("/" ,false,std::vector<std::string>(1,"index.html"),std::vector<std::string>(1,"GET")));
+	location.push_back(fill_location("/test" ,false,std::vector<std::string>(1,"index.html"),std::vector<std::string>(1,"GET")));
 	t_server myserver;
 	myserver._listen = _listen;
 	myserver._host = _host;
@@ -54,6 +54,7 @@ std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std
 	myserver._root = _root;
 	myserver.locations = location;
 	std::vector<t_server> vec_of_servers;
+	
 	vec_of_servers.push_back(myserver);
 	return(vec_of_servers);
 }
@@ -61,7 +62,7 @@ int main()
 {
 
 	/* here is the parsing */
-	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"/Users/shikma/Desktop/webserv/pages");
+	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"./pages");
 	/* here is the parsing */
 	RequestHandler req_handler (parse_server);
 	server_socket mysocket(parse_server[0]);
@@ -111,6 +112,7 @@ int main()
 					server_printer(parse_server[0]);
 					/* ******************************* */
 					req_handler.setRequest(req);
+					resp = req_handler.Bootstrap();
 					const char *hello = resp.get_header().c_str();
 					send(i, hello, strlen(hello), 0);
 					resp.header_cleaner();

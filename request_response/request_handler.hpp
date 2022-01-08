@@ -30,29 +30,26 @@ public:
 		return Response();
 	}
 	
-	Response GetRequesHandler () {
+	Response GETRequesHandler () {
 		Request::map_request req_map = req.getRequest();
 		for (size_t i = 0; i < servs.size(); i++)
 		{
-			/* if (std::find(servs[i]._server_names.begin(), servs[i]._server_names.end(), "abc") != servs[i]._server_names.end())
-			{
-
-			} */
 			for (size_t j = 0; j < servs[i].locations.size(); j++)
 			{
 				if (req_map["URL"] == servs[i].locations[j].path)
 				{
-					return Response(servs[i]._root + "/index.html");
+					std::cout << "<<<<< ENTERED HERE >>>>> => " << servs[i]._root + "/index.html" << std::endl;
+					return Response(servs[i]._root + servs[i].locations[j].path +"/index.html");
 				}
 			}
 		}
 		
-		return Response(404, servs[]._root);
+		return Response(404, servs[servs.size() - 1]._root);
 	}
 
 	Response Bootstrap() {	
 		// if (req_map["Method"] == "GET")
-			return GetRequesHandler();
+			return GETRequesHandler();
 	}
 
 	~RequestHandler() {
