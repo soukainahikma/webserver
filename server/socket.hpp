@@ -47,7 +47,7 @@ class server_socket
 			this->s = s;
 		}
 		void set_add_struct();
-		int set_server();
+		void set_server();
 		int accept_socket();
 		int get_socket_fd() const;
 

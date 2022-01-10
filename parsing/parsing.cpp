@@ -159,8 +159,8 @@ std::vector<Server> parsing(std::string file)
 	return (vec_serv);
 }
 
-int main()
+/* int main()
 {
 	parsing("webserv.conf");
 	return (0);
-}
+} */

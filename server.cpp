@@ -2,9 +2,23 @@
 #include "request_response/response.hpp"
 #include "request_response/request.hpp"
 #include "request_response/request_handler.hpp"
+#include "parsing/Server.hpp"
 #include <sys/select.h>
 #include <exception>
-
+void test_helper(int i,RequestHandler &req_handler)
+{
+	Response resp;
+	char buffer[1024] = {0};
+	read(i, buffer, 1024);
+	Request req(buffer);
+	std::cout<< buffer <<std::endl;
+	req_handler.setRequest(req);
+	resp = req_handler.Bootstrap();
+	const char *hello = resp.get_header().c_str();
+	send(i, hello, strlen(hello), 0);
+	resp.header_cleaner();
+	close(i);
+}
 void request_printer(Request req)
 {
 	std::cout << " ****** Request Printer ******** " << std::endl;
@@ -60,6 +74,7 @@ std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std
 }
 int main()
 {
+	try {
 
 	/* here is the parsing */
 	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"./pages");
@@ -84,10 +99,7 @@ int main()
 	{
 		ready_sockets = current_sockets;
 		if(select(max_fd_so_far +1 ,&ready_sockets,NULL,NULL,NULL) < 0)
-		{
-			perror("select failed: ");
-			return(0);
-		}
+			throw "select failed: ";
 		for(int i = 0;i<= max_fd_so_far; i++)
 		{
 			if(FD_ISSET(i, &ready_sockets))
@@ -95,33 +107,30 @@ int main()
 				if(i == server_socket)
 				{
 					if((new_socket = mysocket.accept_socket()) < 0)
-					{
-						perror("failed to accept: ");
-						return(0);
-					}
+						throw "failed to accept: ";
 					FD_SET(new_socket,&current_sockets);
 					if(new_socket > max_fd_so_far)
 						max_fd_so_far = new_socket;
 				}
 				else
 				{
-					valread = read(i, buffer, 1024);
-					Request req(buffer);
-					/* ****** Request Printer ******** */
-					request_printer(req);
-					server_printer(parse_server[0]);
-					/* ******************************* */
-					req_handler.setRequest(req);
-					resp = req_handler.Bootstrap();
-					const char *hello = resp.get_header().c_str();
-					send(i, hello, strlen(hello), 0);
-					resp.header_cleaner();
-					close(i);
+					test_helper(i,req_handler);
+					// valread = read(i, buffer, 1024);
+					// Request req(buffer);
+					// req_handler.setRequest(req);
+					// resp = req_handler.Bootstrap();
+					// const char *hello = resp.get_header().c_str();
+					// send(i, hello, strlen(hello), 0);
+					// resp.header_cleaner();
+					// close(i);
 					FD_CLR(i,&current_sockets);
 				}
 			}
 		}
-		
 	}
 	return 0;
+	} catch (const std::exception& e) {
+		perror(e.what());
+	}
+	
 }
