@@ -66,8 +66,16 @@ public:
 					return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html");
 			}
 		}
-		
-		return Response(404, Servs[Servs.size() - 1].get_root());
+		std::cout << Servs[Servs.size() - 1].get_error_page()[0] << Servs[Servs.size() - 1].get_error_page()[1] << std::endl;
+		std::vector<std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
+		size_t i;
+		for (i = 0; i < errorPages.size(); i++)
+		{
+			std::cout << errorPages[i] << std::endl;
+			if (errorPages[i] == "502")
+				break;
+		}
+		return Response(502, Servs[Servs.size() - 1].get_root() + errorPages[i + 1]);
 	}
 
 	Response Bootstrap() {	
