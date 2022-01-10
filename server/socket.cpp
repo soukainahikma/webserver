@@ -18,28 +18,17 @@ int server_socket::accept_socket()
 int server_socket::set_server()
 {
 	if((server_fd = socket(AF_INET,SOCK_STREAM,0)) == 0)
-	{
-		perror("socket failed"); 
-		return(0);
-	}
+		throw std::runtime_error("socket failed");
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR , &option, sizeof(option)))
-	{
-		perror("setsockopt failed");
-		return(0);
-	}
+		throw std::runtime_error("setsockopt failed");
 	set_add_struct();
 	if(bind(server_fd,(struct sockaddr*)&address,sizeof(address)) < 0)
-	{
-		perror("binding failed");
-		return(0);
-	}
+		throw std::runtime_error("binding failed");
 	//listen backlog to review
 	// how many connections can be waiting for this socket all at one time
 	if(listen(server_fd,5) < 0)
-	{
-		perror("listening failed: ");
-		return(0);
-	}
+		throw std::runtime_error("listening failed: ");
+
 	return(1);
 }
 int server_socket::get_socket_fd() const
