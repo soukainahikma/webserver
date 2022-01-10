@@ -37,10 +37,7 @@ public:
 			for (size_t j = 0; j < servs[i].locations.size(); j++)
 			{
 				if (req_map["URL"] == servs[i].locations[j].path)
-				{
-					std::cout << "<<<<< ENTERED HERE >>>>> => " << servs[i]._root + "/index.html" << std::endl;
 					return Response(servs[i]._root + servs[i].locations[j].path +"/index.html");
-				}
 			}
 		}
 		

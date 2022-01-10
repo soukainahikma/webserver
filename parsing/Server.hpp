@@ -38,4 +38,7 @@ class Server
 		bool						get_location_open();
 
 };
+
+std::vector<Server> parsing(std::string file);
+
 #endif

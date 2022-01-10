@@ -2,9 +2,23 @@
 #include "request_response/response.hpp"
 #include "request_response/request.hpp"
 #include "request_response/request_handler.hpp"
+#include "parsing/Server.hpp"
 #include <sys/select.h>
 #include <exception>
-
+void test_helper(int i,RequestHandler &req_handler)
+{
+	Response resp;
+	char buffer[1024] = {0};
+	read(i, buffer, 1024);
+	Request req(buffer);
+	std::cout<< buffer <<std::endl;
+	req_handler.setRequest(req);
+	resp = req_handler.Bootstrap();
+	const char *hello = resp.get_header().c_str();
+	send(i, hello, strlen(hello), 0);
+	resp.header_cleaner();
+	close(i);
+}
 void request_printer(Request req)
 {
 	std::cout << " ****** Request Printer ******** " << std::endl;
@@ -60,28 +74,33 @@ std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std
 }
 int main()
 {
-	try
-		{
-		/* here is the parsing */
-		std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"./pages");
-		/* here is the parsing */
-		RequestHandler req_handler (parse_server);
-		server_socket mysocket(parse_server[0]);
-		fd_set current_sockets;
-		fd_set ready_sockets;
-		Response resp;
-		int max_fd_so_far = 0;
-		int valread;
-		char buffer[1024] = {0};
+	try {
 
-		int new_socket = 0;
-		FD_ZERO(&current_sockets);
-		
-		mysocket.set_server();
-		int server_socket = mysocket.get_socket_fd();
-		FD_SET(server_socket,&current_sockets);
-		max_fd_so_far = server_socket;
-		while(1)
+	/* here is the parsing */
+	std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"./pages");
+	/* here is the parsing */
+	RequestHandler req_handler (parse_server);
+	server_socket mysocket(parse_server[0]);
+	fd_set current_sockets;
+	fd_set ready_sockets;
+	Response resp;
+	int max_fd_so_far = 0;
+	int valread;
+	char buffer[1024] = {0};
+
+	int new_socket = 0;
+	FD_ZERO(&current_sockets);
+	
+	mysocket.set_server();
+	int server_socket = mysocket.get_socket_fd();
+	FD_SET(server_socket,&current_sockets);
+	max_fd_so_far = server_socket;
+	while(1)
+	{
+		ready_sockets = current_sockets;
+		if(select(max_fd_so_far +1 ,&ready_sockets,NULL,NULL,NULL) < 0)
+			throw "select failed: ";
+		for(int i = 0;i<= max_fd_so_far; i++)
 		{
 			ready_sockets = current_sockets;
 			if(select(max_fd_so_far +1 ,&ready_sockets,NULL,NULL,NULL) < 0)
@@ -93,42 +112,32 @@ int main()
 			{
 				if(FD_ISSET(i, &ready_sockets))
 				{
-					if(i == server_socket)
-					{
-						if((new_socket = mysocket.accept_socket()) < 0)
-						{
-							perror("failed to accept: ");
-							return(0);
-						}
-						FD_SET(new_socket,&current_sockets);
-						if(new_socket > max_fd_so_far)
-							max_fd_so_far = new_socket;
-					}
-					else
-					{
-						valread = read(i, buffer, 1024);
-						Request req(buffer);
-						std::cout << buffer << std::endl;
-						/* ****** Request Printer ******** */
-						// request_printer(req);
-						// server_printer(parse_server[0]);
-						/* ******************************* */
-						req_handler.setRequest(req);
-						resp = req_handler.Bootstrap();
-						const char *hello = resp.get_header().c_str();
-						send(i, hello, strlen(hello), 0);
-						resp.header_cleaner();
-						close(i);
-						FD_CLR(i,&current_sockets);
-					}
+					if((new_socket = mysocket.accept_socket()) < 0)
+						throw "failed to accept: ";
+					FD_SET(new_socket,&current_sockets);
+					if(new_socket > max_fd_so_far)
+						max_fd_so_far = new_socket;
+				}
+				else
+				{
+					test_helper(i,req_handler);
+					// valread = read(i, buffer, 1024);
+					// Request req(buffer);
+					// req_handler.setRequest(req);
+					// resp = req_handler.Bootstrap();
+					// const char *hello = resp.get_header().c_str();
+					// send(i, hello, strlen(hello), 0);
+					// resp.header_cleaner();
+					// close(i);
+					FD_CLR(i,&current_sockets);
 				}
 			}
 			
 		}
-		return 0;
 	}
-	catch(const std::exception& e)
-	{
+	return 0;
+	} catch (const std::exception& e) {
 		perror(e.what());
 	}
+	
 }
