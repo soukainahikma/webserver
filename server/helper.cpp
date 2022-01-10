@@ -29,20 +29,17 @@ void server_printer(t_server serv) {
 	std::cout << " ******************************* " << std::endl;
 }
 
-void connection_handler(int fd,std::vector<t_server> parse_server,RequestHandler req_handler)
+void connection_handler(int i,RequestHandler &req_handler)
 {
 	Response resp;
 	char buffer[1024] = {0};
-	read(fd, buffer, 1024);
-	// Request req(buffer);
-	/* ****** Request Printer ******** */
-	// request_printer(req);
-	// server_printer(parse_server[0]);
-	/* ******************************* */
-	// req_handler.setRequest(req);
-	// resp = req_handler.Bootstrap();
-	const char *hello = strdup("hello");//resp.get_header().c_str();
-	send(fd, hello, strlen(hello), 0);
+	read(i, buffer, 1024);
+	Request req(buffer);
+	req_handler.setRequest(req);
+	resp = req_handler.Bootstrap();
+	const char *hello = resp.get_header().c_str();
+	send(i, hello, strlen(hello), 0);
 	resp.header_cleaner();
-	close(fd);
+	close(i);
+
 }

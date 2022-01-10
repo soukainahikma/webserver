@@ -2,7 +2,7 @@
 
 void server_socket::set_add_struct()
 {
-	int port  = s._listen;
+	int port  = std::stoi(s.get_listen());
 	memset((char *)&address, 0, sizeof(address)); 
 	address.sin_family = AF_INET; 
 	address.sin_addr.s_addr = htonl(INADDR_ANY); 
@@ -24,7 +24,7 @@ void server_socket::set_server()
 	set_add_struct();
 	if(bind(server_fd,(struct sockaddr*)&address,sizeof(address)) < 0)
 		throw std::runtime_error("binding failed");
-	if(listen(server_fd,5) < 0)
+	if(listen(server_fd,0) < 0)
 		throw std::runtime_error("listening failed: ");
 }
 

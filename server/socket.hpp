@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <vector>
+#include "../parsing/Server.hpp"
 
 typedef struct	s_location
 {
@@ -37,10 +38,10 @@ class server_socket
 		struct sockaddr_in address;
 		int option ;
 		int addrlen;
-		t_server s;
+		Server s;
 
 	public:
-		server_socket(t_server s)
+		server_socket(Server s)
 		{
 			option = 1;
 			addrlen = sizeof(address);
