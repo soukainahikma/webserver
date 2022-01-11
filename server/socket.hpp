@@ -9,48 +9,26 @@
 #include <vector>
 #include "../parsing/Server.hpp"
 
-typedef struct	s_location
-{
-	std::string					path;
-	bool						autoindex;
-	std::vector<std::string>	indexs;
-	std::vector<std::string>	allow_methods;
-}				t_location;
-
-
-typedef struct	s_server
-{
-	int							_listen;
-	std::string					_host;
-	std::vector<std::string>	_server_names;
-	std::string					client_max_body;
-	std::vector<std::string>	_err_pages;
-	std::string					_root;
-	std::vector<t_location>		locations;
-}				t_server;
-
 class server_socket
 {
 	private:
+		Server s;
+		int option;
+		int addrlen;
+		struct sockaddr_in address;
 		int server_fd;
 		int client_fd;
-		int valread_checker;
-		struct sockaddr_in address;
-		int option ;
-		int addrlen;
-		Server s;
+		int max_fd_so_far;
+		fd_set set_socket;
 
 	public:
-		server_socket(Server s)
-		{
-			option = 1;
-			addrlen = sizeof(address);
-			this->s = s;
-		}
-		void set_add_struct();
-		void set_server();
-		int accept_socket();
-		int get_socket_fd() const;
-
+		server_socket();
+		sockaddr_in set_add_struct(Server server);
+		server_socket prepare_socket(Server server);
+		std::vector<server_socket> fill_list_socket(std::vector<Server> servers);
+		int accept_socket(int fd);
+		int get_max_fd_so_far() const;
+		int get_server_fd() const;
+		fd_set &get_set_socket();
 };
 #endif

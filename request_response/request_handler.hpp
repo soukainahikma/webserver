@@ -10,19 +10,10 @@ class RequestHandler
 {
 private:
 	Request req;
-	std::vector<t_server> servs;
 	std::vector<Server> Servs;
 	
 public:
-	RequestHandler(std::vector<t_server> &servs) { this->servs = servs;};
-
 	RequestHandler(std::vector<Server> &Servs) { this->Servs = Servs;};
-
-	RequestHandler(Request &req, std::vector<t_server> &serv) {
-		this->req = req;
-		this->servs = serv;
-	};
-
 	RequestHandler(Request &req, std::vector<Server> &Serv) {
 		this->req = req;
 		this->Servs = Serv;

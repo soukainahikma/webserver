@@ -7,22 +7,19 @@
 #include <exception>
 
 void connection_handler(int i,RequestHandler &req_handler);
-
 int main()
 {
 	try {
 		std::vector<Server> parse = parsing("./webserv.conf"); 
+		server_socket info;
 		RequestHandler req_handler (parse);
-		server_socket mysocket(parse[0]);
+		std::vector<server_socket> socket_list = info.fill_list_socket(parse);
+		int max_fd_so_far = info.get_max_fd_so_far(); // getter of the max;
 		fd_set current_sockets;
+		FD_ZERO(&current_sockets);
+		current_sockets = info.get_set_socket();
 		fd_set ready_sockets;
-		int max_fd_so_far = 0;
 		int new_socket;
-		mysocket.set_server();
-		int server_socket = mysocket.get_socket_fd();
-		FD_ZERO(&current_sockets);	
-		FD_SET(server_socket,&current_sockets);
-		max_fd_so_far = server_socket;
 		while(1)
 		{
 			ready_sockets = current_sockets;
@@ -32,15 +29,21 @@ int main()
 			{
 				if(FD_ISSET(i, &ready_sockets))
 				{
-					if(i == server_socket)
+					bool check = false;
+					for (size_t j = 0; j < socket_list.size(); j++)
 					{
-						if((new_socket = mysocket.accept_socket()) < 0)
-							throw "failed to accept: ";
-						FD_SET(new_socket,&current_sockets);
-						if(new_socket > max_fd_so_far)
-							max_fd_so_far = new_socket;
+						if(i == socket_list[j].get_server_fd())
+						{
+							new_socket = socket_list[j].accept_socket(i);
+							FD_SET(new_socket,&current_sockets);
+							if(new_socket > max_fd_so_far)
+								max_fd_so_far = new_socket;
+							check = true;
+						}
 					}
-					else
+					
+					
+					if(check == false)
 					{
 						connection_handler(i,req_handler);
 						FD_CLR(i,&current_sockets);
