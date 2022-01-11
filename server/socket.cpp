@@ -24,6 +24,7 @@ void server_socket::set_server()
 	set_add_struct();
 	if(bind(server_fd,(struct sockaddr*)&address,sizeof(address)) < 0)
 		throw std::runtime_error("binding failed");
+	// remember to close the server fd before quiting
 	if(listen(server_fd,0) < 0)
 		throw std::runtime_error("listening failed: ");
 }
