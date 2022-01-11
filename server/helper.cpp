@@ -34,6 +34,7 @@ void connection_handler(int i,RequestHandler &req_handler)
 	Response resp;
 	char buffer[1024] = {0};
 	read(i, buffer, 1024);
+	// std::cout << buffer << std::endl;
 	Request req(buffer);
 	req_handler.setRequest(req);
 	resp = req_handler.Bootstrap();

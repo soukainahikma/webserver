@@ -38,16 +38,26 @@ public:
 
 	Response GETRequesHandler () {
 		Request::map_request req_map = req.getRequest();
+		size_t found;
+		std::string server_name;
+		std::vector<std::string> server_names;
+		size_t index;
+
+		server_name = req_map["Host"];
+		if ((found = server_name.find(":"))!= std::string::npos)
+				server_name = server_name.substr(0,found);	
 		for (size_t i = 0; i < Servs.size(); i++)
 		{
-			std::vector<Location> locations = Servs[i].get_location();
-			for (size_t j = 0; j < locations.size(); j++)
-			{
-				if (req_map["URL"] == locations[j].get_path())
-					return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html");
+			server_names = Servs[i].get_server_name();
+			if (std::find(server_names.begin(), server_names.end(), server_name) != server_names.end()) {
+				std::vector<Location> locations = Servs[i].get_location();
+				for (size_t j = 0; j < locations.size(); j++)
+				{
+					if (req_map["URL"] == locations[j].get_path())
+						return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html");
+				}
 			}
 		}
-		std::cout << Servs[Servs.size() - 1].get_error_page()[0] << Servs[Servs.size() - 1].get_error_page()[1] << std::endl;
 		std::vector<std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
 		size_t i;
 		for (i = 0; i < errorPages.size(); i++)
@@ -65,9 +75,8 @@ public:
 		return GETRequesHandler();
 	}
 
-	~RequestHandler() {
-		
-	};
+	~RequestHandler()
+	{};
 };
 
 #endif

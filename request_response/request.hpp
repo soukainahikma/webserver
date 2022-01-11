@@ -44,7 +44,7 @@ class Request
 			{
 				if((found = vec[i].find(":"))!= std::string::npos)
 				{
-					map_[vec[i].substr(0,found)] = vec[i].substr(found+1);
+					map_[vec[i].substr(0,found)] = vec[i].substr(found+2);
 				}
 			}
 		}
