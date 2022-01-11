@@ -38,7 +38,7 @@ class Response
 			content_type = "Content-Type: text/html\r\n\n\n";
 		}
 
-		Response(int status_code, std::string root)
+		Response(int status_code, std::string file)
 		{
 			buffer = "";
 			version = "HTTP/1.1 ";
@@ -47,7 +47,7 @@ class Response
 			if (status_code >= 400)
 			{
 				status_message = " KO\n";
-				filename = root + std::to_string(status_code) + ".html";
+				filename = file;
 			}
 			content_type = "Content-Type: text/html\r\n\n\n";
 		}
