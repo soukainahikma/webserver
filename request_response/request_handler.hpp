@@ -14,7 +14,6 @@ private:
 	std::vector<Server> Servs;
 	
 public:
-
 	RequestHandler(std::vector<t_server> &servs) {
 		this->servs = servs;
 	};
@@ -40,20 +39,6 @@ public:
 	Response generateResponse () {
 		return Response();
 	}
-	
-	/* Response GETRequesHandler () {
-		Request::map_request req_map = req.getRequest();
-		for (size_t i = 0; i < servs.size(); i++)
-		{
-			for (size_t j = 0; j < servs[i].locations.size(); j++)
-			{
-				if (req_map["URL"] == servs[i].locations[j].path)
-					return Response(servs[i]._root + servs[i].locations[j].path +"/index.html");
-			}
-		}
-		
-		return Response(404, servs[servs.size() - 1]._root);
-	} */
 
 	Response GETRequesHandler () {
 		Request::map_request req_map = req.getRequest();
@@ -66,13 +51,13 @@ public:
 					return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html");
 			}
 		}
-		
 		return Response(404, Servs[Servs.size() - 1].get_root());
 	}
 
 	Response Bootstrap() {	
-		// if (req_map["Method"] == "GET")
+		if (req.getRequest()["Method"] == "GET")
 			return GETRequesHandler();
+		return GETRequesHandler();
 	}
 
 	~RequestHandler() {

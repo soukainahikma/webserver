@@ -8,41 +8,10 @@
 
 void connection_handler(int i,RequestHandler &req_handler);
 
-t_location fill_location(std::string path, bool autoindex,std::vector<std::string> indexs,std::vector<std::string> allow_methods)
-{
-	t_location loc;
-	loc.path = path;
-	loc.autoindex = autoindex;
-	loc.indexs =  indexs;
-	loc.allow_methods =  allow_methods;
-	return(loc);
-}
-std::vector<t_server> fill_servers(int _listen,std::string _host,std::vector<std::string> _server_names,
-									std::string client_max_body,std::vector<std::string> _err_pages,std::string _root)
-{
-	std::vector<t_location> location;
-	location.push_back(fill_location("/" ,false,std::vector<std::string>(1,"index.html"),std::vector<std::string>(1,"GET")));
-	t_server myserver;
-	myserver._listen = _listen;
-	myserver._host = _host;
-	myserver._server_names = _server_names;
-	myserver.client_max_body = client_max_body;
-	myserver._err_pages = _err_pages;
-	myserver._root = _root;
-	myserver.locations = location;
-	std::vector<t_server> vec_of_servers;
-	
-	vec_of_servers.push_back(myserver);
-	return(vec_of_servers);
-}
 int main()
 {
 	try {
-		/* here is the parsing */
 		std::vector<Server> parse = parsing("./webserv.conf"); 
-
-		// std::vector<t_server> parse_server = fill_servers(8080, "127.0.0.1",std::vector<std::string>(1,"localhost"),"1m",std::vector<std::string>(1,"404.html"),"./pages");
-		/* here is the parsing */
 		RequestHandler req_handler (parse);
 		server_socket mysocket(parse[0]);
 		fd_set current_sockets;
