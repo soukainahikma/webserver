@@ -18,9 +18,9 @@ int main()
 		fd_set ready_sockets;
 		int max_fd_so_far = 0;
 		int new_socket;
-		FD_ZERO(&current_sockets);	
 		mysocket.set_server();
 		int server_socket = mysocket.get_socket_fd();
+		FD_ZERO(&current_sockets);	
 		FD_SET(server_socket,&current_sockets);
 		max_fd_so_far = server_socket;
 		while(1)

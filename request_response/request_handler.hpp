@@ -14,13 +14,9 @@ private:
 	std::vector<Server> Servs;
 	
 public:
-	RequestHandler(std::vector<t_server> &servs) {
-		this->servs = servs;
-	};
+	RequestHandler(std::vector<t_server> &servs) { this->servs = servs;};
 
-	RequestHandler(std::vector<Server> &Servs) {
-		this->Servs = Servs;
-	};
+	RequestHandler(std::vector<Server> &Servs) { this->Servs = Servs;};
 
 	RequestHandler(Request &req, std::vector<t_server> &serv) {
 		this->req = req;
