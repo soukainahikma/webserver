@@ -16,6 +16,8 @@ class Location
 	std::string					_upload_enable;
 	std::string					_upload_store;
 	public:
+		Location();
+		void	Clear();
 		// set
 		void	set_path(std::string);
 		void	set_autoindex(std::string);
