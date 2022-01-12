@@ -48,6 +48,7 @@ server_socket server_socket::prepare_socket(Server server)
 		close(mysocket.server_fd);
 		throw std::runtime_error("listening failed: ");
 	}
+	mysocket.port_sock = std::stoi(server.get_listen());;
 	return(mysocket);
 }
 

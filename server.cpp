@@ -9,7 +9,8 @@
 void connection_handler(int i,RequestHandler &req_handler);
 int main()
 {
-	try {
+	try
+	{
 		std::vector<Server> parse = parsing("./webserv.conf"); 
 		server_socket info;
 		RequestHandler req_handler (parse);
@@ -29,21 +30,14 @@ int main()
 			{
 				if(FD_ISSET(i, &ready_sockets))
 				{
-					bool check = false;
-					for (size_t j = 0; j < socket_list.size(); j++)
+					if(i == socket_list[0].get_server_fd())
 					{
-						if(i == socket_list[j].get_server_fd())
-						{
-							new_socket = socket_list[j].accept_socket(i);
-							FD_SET(new_socket,&current_sockets);
-							if(new_socket > max_fd_so_far)
-								max_fd_so_far = new_socket;
-							check = true;
-						}
+						new_socket = socket_list[0].accept_socket(i);
+						FD_SET(new_socket,&current_sockets);
+						if(new_socket > max_fd_so_far)
+							max_fd_so_far = new_socket;
 					}
-					
-					
-					if(check == false)
+					else
 					{
 						connection_handler(i,req_handler);
 						FD_CLR(i,&current_sockets);
@@ -52,7 +46,9 @@ int main()
 			}
 		}
 		return 0;
-	} catch (const std::exception& e) {
+	}
+	catch (const std::exception& e)
+	{
 		perror(e.what());
 		return (1);
 	}

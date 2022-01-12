@@ -12,7 +12,6 @@
 class server_socket
 {
 	private:
-		Server s;
 		int option;
 		int addrlen;
 		struct sockaddr_in address;
@@ -20,6 +19,7 @@ class server_socket
 		int client_fd;
 		int max_fd_so_far;
 		fd_set set_socket;
+		int port_sock;
 
 	public:
 		server_socket();
