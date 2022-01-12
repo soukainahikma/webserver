@@ -44,9 +44,11 @@ std::string get_key(std::string &line, int &idx)
 		return ("");
 	while (line[idx] == ' ' || line[idx] == '\t')
 		idx++;
-	while (line[end + idx] && line[end + idx] != ' ' && line[end + idx] != '\t' && line[end + idx] != '\n' && line[end + idx] != '{' && line[end + idx] != '}')
+	while (line[end + idx] && line[end + idx] != ' '
+		&& line[end + idx] != '\t' &&
+			line[end + idx] != '\n' && line[end + idx] != '{' &&
+				line[end + idx] != '}')
 		end++;
-
 	str = line.substr(idx, end);
 	idx += end;
 	return (str);
@@ -61,7 +63,8 @@ std::string get_value(std::string &line, int &idx)
 		return ("");
 	while (line[idx] == ' ' || line[idx] == '\t')
 		idx++;
-	while (line[end + idx] && line[end + idx] != ';' && line[end + idx] != '{')
+	while (line[end + idx] && line[end + idx] != ';' &&
+		line[end + idx] != '{' && line[end + idx] != '}')
 		end++;
 	str = line.substr(idx, end);
 	return (str);
@@ -130,6 +133,8 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 			serv.set_location_open(1);
 			line.clear();
 		}
+		else if (!key.compare("server") || !key.compare("location"))
+			print_error(3, key);
 	}
 }
 
@@ -146,12 +151,12 @@ void fill_location(std::string key, std::string value, Server &serv, Location &l
 	}
 	else if (!key.compare("request_method"))
 	{
-		std::vector<std::string> splt;
-		value.erase(value.find('['), 1);
-		value.erase(value.find(']'), 1);
-		splt = split(value, ',');
+		// std::vector<std::string> splt;
+		// value.erase(value.find('['), 1);
+		// value.erase(value.find(']'), 1);
+		// splt = split(value, ',');
 		// std::cout << value << "|" << splt[0] << "\n";
-		locat.set_request_method(splt);
+		locat.set_request_method(value);
 	}
 	else if (!key.compare("fastcgi_pass"))
 		locat.set_fastcgi_pass(value);
@@ -160,7 +165,12 @@ void fill_location(std::string key, std::string value, Server &serv, Location &l
 	else if (!key.compare("upload_store"))
 		locat.set_upload_store(value);
 	else if (!key.compare("return"))
-		locat.set_return(value);
+	{
+		std::vector<std::string> s = split(value, ' ');
+			if (s.size() > 2)
+				print_error(1, value);
+		locat.set_return(s);
+	}
 	else
 		print_error(3, key);
 }
@@ -184,6 +194,8 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		else if (!key.compare("error_page"))
 		{
 			std::vector<std::string> s = split(value, ' ');
+			if (s.size() > 2)
+				print_error(1, value);
 			serv.set_error_page(s[0], s[1]);
 		}
 		else if (!key.compare("root"))
@@ -225,6 +237,7 @@ std::vector<Server> parsing(std::string file)
 	std::string value;
 
 	int idx;
+	int pos;
 	int i = 0;
 	int nbline = 0;
 
@@ -232,6 +245,8 @@ std::vector<Server> parsing(std::string file)
 	{
 		while (getline(myfile, line))
 		{
+			if ((pos = line.find("#")) != std::string::npos)
+				line.erase(pos, line.length());
 			check_brace(line, serv, locat);
 			splt = split(line, ';');
 			i = 0;
@@ -243,6 +258,8 @@ std::vector<Server> parsing(std::string file)
 				value = get_value(splt[i], idx);
 				if ((!key.empty() && !value.empty()) || line.find("}") != std::string::npos)
 					fill_server(key, value, serv, locat, vec_serv, line);
+				else if (!key.empty() && value.empty())
+					print_error(0, key);
 				// std::cout << key << "|" << value << "\n";
 				i++;
 			}
@@ -261,6 +278,7 @@ void	print_all(std::vector<Server> &vec_serv)
 {
 	int idx = 0;
 	int i = 0;
+	int r = 0;
 	// std::cout << vec_serv.size() << "\n";
 	while (i < vec_serv.size())
 	{
@@ -285,7 +303,9 @@ void	print_all(std::vector<Server> &vec_serv)
 		{
 			std::cout << "\n\n------------ location  "<< d + 1 << "---------------\n\n";
 			std::cout << "location  " << vec_serv[i].get_location()[d].get_path() << "{\n";
-			std::cout << "return  " << vec_serv[i].get_location()[d].get_return() << "\n";
+			r = 0;
+			while (r < vec_serv[i].get_location()[d].get_return().size())
+				std::cout << "return  " << vec_serv[i].get_location()[d].get_return()[r++] << "\n";
 			std::cout << "fastcgi_pass  " << vec_serv[i].get_location()[d].get_fastcgi_pass() << "\n";
 			std::cout << "upload_enable  " << vec_serv[i].get_location()[d].get_upload_enable() << "\n";
 			std::cout << "upload_store  " << vec_serv[i].get_location()[d].get_upload_store() << "\n";
@@ -305,15 +325,15 @@ void	print_all(std::vector<Server> &vec_serv)
 	
 }
 
-int main()
-{
-	try
-	{
-		std::vector<Server> vec_serv = parsing("webserv.conf");
-		print_all(vec_serv);
-	}
-	catch(std::string e)
-	{
-		std::cerr << e << '\n';
-	}
-}
+// int main()
+// {
+// 	try
+// 	{
+// 		std::vector<Server> vec_serv = parsing("webserv.conf");
+// 		print_all(vec_serv);
+// 	}
+// 	catch(std::string e)
+// 	{
+// 		std::cerr << e << '\n';
+// 	}
+// }

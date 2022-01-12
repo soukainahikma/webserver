@@ -5,19 +5,20 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <algorithm>
 #include "Location.hpp"
 
 class Server
 {
-	std::string					_listen;
-	std::string					_host;
-	std::string					_client_max_body_size;
-	std::string					_root;
-	std::vector<std::string>	_server_name;
+	int									_listen;
+	std::string							_host;
+	std::string							_client_max_body_size;
+	std::string							_root;
+	std::vector<std::string>			_server_name;
 	std::map<std::string, std::string>	_error_page;
-	std::vector<Location>		_location;
-	int						_location_open;
-	int						_server_open;
+	std::vector<Location>				_location;
+	int									_location_open;
+	int									_server_open;
 	public:
 		Server();
 		void	Clear();
@@ -32,15 +33,17 @@ class Server
 		void	set_location_open(int);
 		void	set_server_open(int);
 		//	get
-		std::string					get_listen();
-		std::string					get_host();
-		std::string					get_root();
-		std::string					get_client_max_body_size();
+		int									get_listen();
+		std::string							get_host();
+		std::string							get_root();
+		std::string							get_client_max_body_size();
 		std::map<std::string, std::string>	get_error_page();
-		std::vector<std::string>	get_server_name();
-		std::vector<Location>		get_location();
-		int						get_location_open();
-		int						get_server_open();
+		std::vector<std::string>			get_server_name();
+		std::vector<Location>				get_location();
+		int									get_location_open();
+		int									get_server_open();
 
 };
+void						print_error(int i, std::string v);
+std::vector<std::string>	split(std::string str, char c);
 #endif

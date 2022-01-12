@@ -5,7 +5,7 @@ Location::Location()
 	this->Clear();
 }
 
-void						Location::Clear()
+void	Location::Clear()
 {
 	_path.clear();
 	_autoindex.clear();
@@ -17,11 +17,81 @@ void						Location::Clear()
 	_request_method.clear();
 }
 
-void						Location::set_path(std::string path) {  _path = path; }
-void						Location::set_autoindex(std::string autoindex) { _autoindex = autoindex; }
-void						Location::set_index(std::vector<std::string> index) { _index = index; }
-void						Location::set_return(std::string retur) { _return = retur; }
-void						Location::set_request_method(std::vector<std::string> request_method) { _request_method	= request_method; }
+void	Location::set_path(std::string path)
+{
+	path = trim(path);
+	if (path.find(" ") != std::string::npos)
+		print_error(0, path);
+	_path = path;
+}
+void	Location::set_autoindex(std::string autoindex)
+{
+	autoindex = trim(autoindex);
+	if (autoindex.compare("on") && autoindex.compare("off"))
+		print_error(0, autoindex);
+	_autoindex = autoindex;
+}
+void	Location::set_index(std::vector<std::string> index)
+{
+	_index = index;
+}
+
+void	Location::set_return(std::vector<std::string> retur)
+{
+	int i = 0;
+	if (retur.size() != 2)
+		print_error(0, "return");
+	while (retur[0][i])
+	{
+		if (!std::isdigit(retur[0][i]))
+			print_error(3, retur[0]);
+		i++;
+	}
+	_return = retur;
+}
+
+int check_merhods(std::string request_method)
+{
+	int idx = 1;
+	request_method = trim(request_method);
+	if (request_method[0] != '[')
+		return (1);
+	while (request_method[idx] && request_method[idx] != ']' && request_method[idx] != '[')
+		idx++;
+	if (request_method[idx + 1] || (request_method[idx] != ']' && request_method[idx] != '['))
+		return (1);
+	
+	return (0);
+}
+
+void	Location::set_request_method(std::string request_method)
+{
+	int g, p, d;
+	if (check_merhods(request_method))
+		print_error(0, request_method);
+	request_method.erase(request_method.find('['), 1);
+	request_method.erase(request_method.find(']'), 1);
+	std::vector<std::string> splt = split(request_method, ',');
+	int idx = 0;
+	while (idx < splt.size())
+	{
+		splt[idx] = trim(splt[idx]);
+		if (!splt[idx].compare("GET"))
+			g++;
+		else if (!splt[idx].compare("POST"))
+			p++;
+		else if (!splt[idx].compare("DELETE"))
+			d++;
+		else
+			print_error(1, request_method);
+		if (idx > 3 || g > 1 || p > 1 || d > 1)
+			print_error(0, request_method);
+		if (splt[idx].find(' ') != std::string::npos)
+			print_error(0, request_method);
+		idx++;
+	}
+	_request_method	= splt;
+}
 void						Location::set_fastcgi_pass(std::string fastcgi_pass) { _fastcgi_pass = fastcgi_pass; }
 void						Location::set_upload_enable(std::string upload_enable) { _upload_enable = upload_enable; }
 void						Location::set_upload_store(std::string upload_store) { _upload_store = upload_store; }
@@ -29,7 +99,7 @@ void						Location::set_upload_store(std::string upload_store) { _upload_store =
 std::string					Location::get_path() { return _path; }
 std::string					Location::get_autoindex() { return _autoindex; }
 std::vector<std::string>	Location::get_index() { return _index; }
-std::string					Location::get_return() { return _return; }
+std::vector<std::string>	Location::get_return() { return _return; }
 std::vector<std::string>	Location::get_request_method() { return _request_method; }
 std::string					Location::get_fastcgi_pass() { return _fastcgi_pass; }
 std::string					Location::get_upload_enable() { return _upload_enable; }
