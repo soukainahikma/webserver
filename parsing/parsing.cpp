@@ -177,7 +177,7 @@ void fill_location(std::string key, std::string value, Server &serv, Location &l
 
 void fill_server(std::string key, std::string value, Server &serv, Location &locat, std::vector<Server> &vec_serv, std::string &line)
 {
-	if (serv.get_server_open())
+	if (serv.get_server_open() == 2)
 	{
 		// std::cout << line << "--------------" << key << "\n";
 		if (!key.compare("listen"))
