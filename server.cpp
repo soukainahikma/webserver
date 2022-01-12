@@ -21,29 +21,45 @@ int main()
 		current_sockets = info.get_set_socket();
 		fd_set ready_sockets;
 		int new_socket;
+		int port = -1;
 		while(1)
 		{
 			ready_sockets = current_sockets;
+			// std::cout<< "here before select"<<std::endl;
 			if(select(max_fd_so_far +1 ,&ready_sockets,NULL,NULL,NULL) < 0)
 				throw "select failed: ";
 			for(int i = 0;i<= max_fd_so_far; i++)
 			{
 				if(FD_ISSET(i, &ready_sockets))
 				{
-					if(i == socket_list[0].get_server_fd())
+				// std::cout<< "index : " << i << std::endl;
+					bool check = false;
+					//check to accept
+					for (size_t j = 0; j < socket_list.size(); j++)
 					{
-						new_socket = socket_list[0].accept_socket(i);
-						FD_SET(new_socket,&current_sockets);
-						if(new_socket > max_fd_so_far)
-							max_fd_so_far = new_socket;
+						if(i == socket_list[j].get_server_fd())
+						{
+							new_socket = socket_list[j].accept_socket(i);
+							port = socket_list[j].get_port();
+							FD_SET(new_socket,&current_sockets);
+							if(new_socket > max_fd_so_far)
+								max_fd_so_far = new_socket;
+							check = true;
+							// std::cout << "<----- got request " << new_socket << " ------->" << std::endl;
+							break;
+						}
 					}
-					else
+					//check to accept
+					if(check == false)
 					{
+
 						connection_handler(i,req_handler);
+						// std::cout << "<----- request: {" << new_socket << " <==>  " << i  <<  "} handled ------->" << std::endl;
 						FD_CLR(i,&current_sockets);
 					}
 				}
 			}
+			// std::cout << "<----- request show time ------->" << std::endl;
 		}
 		return 0;
 	}

@@ -29,6 +29,7 @@ class server_socket
 		int accept_socket(int fd);
 		int get_max_fd_so_far() const;
 		int get_server_fd() const;
+		int get_port() const;
 		fd_set &get_set_socket();
 };
 #endif

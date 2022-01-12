@@ -80,3 +80,7 @@ fd_set & server_socket::get_set_socket()
 {
 	return(set_socket);
 }
+
+int server_socket::get_port() const {
+	return (port_sock);
+}
