@@ -15,15 +15,29 @@ void	Location::Clear()
 	_upload_store.clear();
 	_index.clear();
 	_request_method.clear();
+	_equal = false;
 }
 
 void	Location::set_path(std::string path)
 {
 	path = trim(path);
+	if (path[0] == '=')
+	{
+		int i = 1;
+		if (path[i] == '=')
+			print_error(0, path);
+		set_equal(true);
+		while (path[i] == ' ' || path[i] == '\t')
+			i++;
+		path.erase(0, i);
+	}
 	if (path.find(" ") != std::string::npos)
-		print_error(0, path);
+		print_error(2, path);
 	_path = path;
 }
+
+void Location::set_equal(bool equal) { _equal = equal; }
+
 void	Location::set_autoindex(std::string autoindex)
 {
 	autoindex = trim(autoindex);
@@ -104,6 +118,7 @@ std::vector<std::string>	Location::get_request_method() { return _request_method
 std::string					Location::get_fastcgi_pass() { return _fastcgi_pass; }
 std::string					Location::get_upload_enable() { return _upload_enable; }
 std::string					Location::get_upload_store() { return _upload_store; }
+bool						Location::get_equal() { return _equal; }
 
 /*
 Location::set_path(std::string path) { std::cout << "set path =" << path << "\n"; _path = path; }

@@ -15,11 +15,13 @@ class Location
 	std::string					_fastcgi_pass;
 	std::string					_upload_enable;
 	std::string					_upload_store;
+	bool						_equal;
 	public:
 		Location();
 		void	Clear();
 		// set
 		void	set_path(std::string);
+		void	set_equal(bool);
 		void	set_autoindex(std::string);
 		void	set_index(std::vector<std::string>);
 		void	set_return(std::vector<std::string>);
@@ -36,6 +38,7 @@ class Location
 		std::string					get_fastcgi_pass();
 		std::string					get_upload_enable();
 		std::string					get_upload_store();
+		bool						get_equal();
 };
 void						print_error(int i, std::string v);
 std::vector<std::string>	split(std::string str, char c);

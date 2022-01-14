@@ -45,7 +45,7 @@ std::string get_key(std::string &line, int &idx)
 	while (line[idx] == ' ' || line[idx] == '\t')
 		idx++;
 	while (line[end + idx] && line[end + idx] != ' '
-		&& line[end + idx] != '\t' &&
+		&& line[end + idx] != '\t' && line[end + idx] != '=' &&
 			line[end + idx] != '\n' && line[end + idx] != '{' &&
 				line[end + idx] != '}')
 		end++;
@@ -175,13 +175,37 @@ void fill_location(std::string key, std::string value, Server &serv, Location &l
 		print_error(3, key);
 }
 
-void fill_server(std::string key, std::string value, Server &serv, Location &locat, std::vector<Server> &vec_serv, std::string &line)
+int find_last(std::string s)
+{
+	int idx = s.length() -1;
+	while (s[idx])
+	{
+		if (s[idx] != ' ' && s[idx] != '\t')
+		{
+			if (s[idx] != ';')
+				return (1);
+			else
+				return (0);
+			std::cout << "|" << s[idx] << "|\n";
+		}
+
+		idx--;
+	}
+	return (0);
+}
+
+void fill_server(std::string key, std::string value, Server &serv, Location &locat, std::vector<Server> &vec_serv, std::string &line, std::map<int,int> &m)
 {
 	if (serv.get_server_open() == 2)
 	{
+		if (!key.empty() && find_last(line))
+			print_error(0, line);
 		// std::cout << line << "--------------" << key << "\n";
 		if (!key.compare("listen"))
+		{
 			serv.set_listen(value);
+			m[serv.get_listen()] = serv.get_listen();
+		}
 		else if (!key.compare("server_name"))
 		{
 			std::vector<std::string> s = split(value, ' ');
@@ -210,22 +234,24 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		else if (serv.get_server_open() == 2 && line.find("}") != std::string::npos)
 		{
 			serv.set_server_open(0);
+			if (serv.get_listen() == 80)
+				m[80] = 80;
 			vec_serv.push_back(serv);
 			serv.Clear();
 		}
-		else if (serv.get_location_open())
+		else if (serv.get_location_open() == 2)
 			fill_location(key, value, serv, locat);
-		else 
+		else
 		{
 			// std::cout << key << "|" << value << "hna\n";
-			print_error(0, key);
+			print_error(3, key);
 		}
 	}
 	else
 		print_error(2, key);
 }
 
-std::vector<Server> parsing(std::string file)
+std::vector<Server> parsing(std::string file, std::map<int,int> &m)
 {
 	std::string line;
 	std::ifstream myfile(file);
@@ -240,7 +266,7 @@ std::vector<Server> parsing(std::string file)
 	int pos;
 	int i = 0;
 	int nbline = 0;
-
+	int size;
 	if (myfile.is_open())
 	{
 		while (getline(myfile, line))
@@ -250,20 +276,25 @@ std::vector<Server> parsing(std::string file)
 			check_brace(line, serv, locat);
 			splt = split(line, ';');
 			i = 0;
-			while (i < splt.size())
+			// std::cout << splt.size() << "\n";
+			// exit(0);
+			size = splt.size();
+			while (i < size)
 			{
 				idx = 0;
 				// std::cout << splt[i] << "\n";
 				key = get_key(splt[i], idx);
 				value = get_value(splt[i], idx);
 				if ((!key.empty() && !value.empty()) || line.find("}") != std::string::npos)
-					fill_server(key, value, serv, locat, vec_serv, line);
+					fill_server(key, value, serv, locat, vec_serv, line, m);
 				else if (!key.empty() && value.empty())
 					print_error(0, key);
 				// std::cout << key << "|" << value << "\n";
 				i++;
 			}
 		}
+		if (serv.get_server_open())
+			print_error(1, "opned");
 		myfile.close();
 	}
 	else
@@ -274,7 +305,7 @@ std::vector<Server> parsing(std::string file)
 	return (vec_serv);
 }
 
-void	print_all(std::vector<Server> &vec_serv)
+void	print_all(std::vector<Server> &vec_serv, std::map<int,int> m)
 {
 	int idx = 0;
 	int i = 0;
@@ -289,8 +320,14 @@ void	print_all(std::vector<Server> &vec_serv)
 		std::cout << "listen  " << vec_serv[i].get_listen() << "\n";
 		std::cout << "host  " << vec_serv[i].get_host() << "\n";
 		int p = 0;
-			while (p < vec_serv[i].get_server_name().size())
-				std::cout << "server_name  " << vec_serv[i].get_server_name()[p++] << "\n";
+				std::cout << "server_size  " << vec_serv[i].get_server_name().size() << "\n";
+			for (std::map<std::string, int>::iterator it = vec_serv[i].get_server_name().begin(); it != vec_serv[i].get_server_name().end(); it++)
+			{
+				std::cout << "server_name  " << it->first << "\n";
+			}
+
+
+			
 		std::cout << "client_max_body_size  " << vec_serv[i].get_client_max_body_size() << "\n";
 		std::cout << "error_page  403 " << vec_serv[i].get_error_page()["403"] << "\n";
 		std::cout << "error_page  404 " << vec_serv[i].get_error_page()["404"] << "\n";
@@ -302,7 +339,10 @@ void	print_all(std::vector<Server> &vec_serv)
 		while (d < vec_serv[i].get_location().size())
 		{
 			std::cout << "\n\n------------ location  "<< d + 1 << "---------------\n\n";
-			std::cout << "location  " << vec_serv[i].get_location()[d].get_path() << "{\n";
+			std::cout << "location  ";
+			if (vec_serv[i].get_location()[d].get_equal())
+				std::cout << "= ";
+			std::cout << vec_serv[i].get_location()[d].get_path() << "{\n";
 			r = 0;
 			while (r < vec_serv[i].get_location()[d].get_return().size())
 				std::cout << "return  " << vec_serv[i].get_location()[d].get_return()[r++] << "\n";
@@ -322,18 +362,25 @@ void	print_all(std::vector<Server> &vec_serv)
 		std::cout << "}\n";
 		i++;
 	}
+	int map = 0;
+	std::cout << "\n\n------------ports :\n";
+	for (std::map<int, int>::iterator i = m.begin(); i != m.end(); i++)
+	{
+		std::cout << i->first << "|\n";
+	}
 	
 }
 
-// int main()
-// {
-// 	try
-// 	{
-// 		std::vector<Server> vec_serv = parsing("webserv.conf");
-// 		print_all(vec_serv);
-// 	}
-// 	catch(std::string e)
-// 	{
-// 		std::cerr << e << '\n';
-// 	}
-// }
+int main()
+{
+	try
+	{
+		std::map<int,int> m;
+		std::vector<Server> vec_serv = parsing("webserv.conf", m);
+		print_all(vec_serv, m);
+	}
+	catch(std::string e)
+	{
+		std::cerr << e << '\n';
+	}
+}
