@@ -23,9 +23,11 @@ class server_socket
 
 	public:
 		server_socket();
-		sockaddr_in set_add_struct(Server server);
-		server_socket prepare_socket(Server server);
-		std::vector<server_socket> fill_list_socket(std::vector<Server> servers);
+		// sockaddr_in set_add_struct(Server server);
+		sockaddr_in set_add_struct(int port);
+		// server_socket prepare_socket(Server server);
+		server_socket prepare_socket(int port);
+		std::vector<server_socket> fill_list_socket(std::vector<Server> servers, std::map<int,int> &ports);
 		int accept_socket(int fd);
 		int get_max_fd_so_far() const;
 		int get_server_fd() const;

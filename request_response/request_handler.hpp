@@ -5,6 +5,7 @@
 #include "../server/socket.hpp"
 #include "../parsing/Server.hpp"
 #include <vector>
+#include <map>
 
 class RequestHandler
 {
@@ -31,7 +32,7 @@ public:
 		Request::map_request req_map = req.getRequest();
 		size_t found;
 		std::string server_name;
-		std::vector<std::string> server_names;
+		std::map<std::string, int> server_names;
 		size_t index;
 
 		server_name = req_map["Host"];
@@ -40,7 +41,7 @@ public:
 		for (size_t i = 0; i < Servs.size(); i++)
 		{
 			server_names = Servs[i].get_server_name();
-			if (std::find(server_names.begin(), server_names.end(), server_name) != server_names.end()) {
+			if (server_names[server_name]) {
 				std::vector<Location> locations = Servs[i].get_location();
 				for (size_t j = 0; j < locations.size(); j++)
 				{
@@ -49,15 +50,8 @@ public:
 				}
 			}
 		}
-		std::vector<std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
-		size_t i;
-		for (i = 0; i < errorPages.size(); i++)
-		{
-			std::cout << errorPages[i] << std::endl;
-			if (errorPages[i] == "502")
-				break;
-		}
-		return Response(502, Servs[Servs.size() - 1].get_root() + errorPages[i + 1]);
+		std::map<std::string, std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
+		return Response(502, Servs[Servs.size() - 1].get_root() + errorPages["502"]);
 	}
 
 	Response Bootstrap() {	

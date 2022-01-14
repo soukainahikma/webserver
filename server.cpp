@@ -7,14 +7,17 @@
 #include <exception>
 
 void connection_handler(int i,RequestHandler &req_handler);
+std::vector<Server> parsing(std::string file, std::map<int,int> &m);
+
 int main()
 {
 	try
 	{
-		std::vector<Server> parse = parsing("./webserv.conf"); 
+		std::map<int,int> ports;
+		std::vector<Server> parse = parsing("./webserv.conf", ports); 
 		server_socket info;
 		RequestHandler req_handler (parse);
-		std::vector<server_socket> socket_list = info.fill_list_socket(parse);
+		std::vector<server_socket> socket_list = info.fill_list_socket(parse, ports);
 		int max_fd_so_far = info.get_max_fd_so_far(); // getter of the max;
 		fd_set current_sockets;
 		FD_ZERO(&current_sockets);

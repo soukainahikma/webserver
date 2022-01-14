@@ -6,9 +6,19 @@ server_socket::server_socket()
 	addrlen = sizeof(address);
 }
 
-sockaddr_in server_socket::set_add_struct(Server s)
+// sockaddr_in server_socket::set_add_struct(Server s)
+// {
+// 	int port  = s.get_listen();
+// 	memset((char *)&address, 0, sizeof(address)); 
+// 	address.sin_family = AF_INET; 
+// 	address.sin_addr.s_addr = htonl(INADDR_ANY); 
+// 	address.sin_port = htons(port);
+// 	return(address);
+
+// }
+
+sockaddr_in server_socket::set_add_struct(int port)
 {
-	int port  = std::stoi(s.get_listen());
 	memset((char *)&address, 0, sizeof(address)); 
 	address.sin_family = AF_INET; 
 	address.sin_addr.s_addr = htonl(INADDR_ANY); 
@@ -27,7 +37,32 @@ int server_socket::accept_socket(int fd)
 	return(client_fd);
 }
 
-server_socket server_socket::prepare_socket(Server server)
+// server_socket server_socket::prepare_socket(Server server)
+// {
+// 	server_socket mysocket;
+// 	if((mysocket.server_fd = socket(AF_INET,SOCK_STREAM,0)) == 0)
+// 		throw std::runtime_error("socket failed");
+// 	if (setsockopt(mysocket.server_fd, SOL_SOCKET, SO_REUSEADDR , &option, sizeof(option)))
+// 	{
+// 		close(mysocket.server_fd);
+// 		throw std::runtime_error("setsockopt failed");
+// 	}
+// 	mysocket.address = set_add_struct(server);
+// 	if(bind(mysocket.server_fd,(struct sockaddr*)&address,sizeof(address)) < 0)
+// 	{
+// 		close(mysocket.server_fd);
+// 		throw std::runtime_error("binding failed");
+// 	}
+// 	if(listen(mysocket.server_fd,0) < 0)
+// 	{
+// 		close(mysocket.server_fd);
+// 		throw std::runtime_error("listening failed: ");
+// 	}
+// 	mysocket.port_sock = server.get_listen();
+// 	return(mysocket);
+// }
+
+server_socket server_socket::prepare_socket(int port)
 {
 	server_socket mysocket;
 	if((mysocket.server_fd = socket(AF_INET,SOCK_STREAM,0)) == 0)
@@ -37,7 +72,7 @@ server_socket server_socket::prepare_socket(Server server)
 		close(mysocket.server_fd);
 		throw std::runtime_error("setsockopt failed");
 	}
-	mysocket.address = set_add_struct(server);
+	mysocket.address = set_add_struct(port);
 	if(bind(mysocket.server_fd,(struct sockaddr*)&address,sizeof(address)) < 0)
 	{
 		close(mysocket.server_fd);
@@ -48,19 +83,21 @@ server_socket server_socket::prepare_socket(Server server)
 		close(mysocket.server_fd);
 		throw std::runtime_error("listening failed: ");
 	}
-	mysocket.port_sock = std::stoi(server.get_listen());;
+	mysocket.port_sock = port;
 	return(mysocket);
 }
 
-std::vector<server_socket> server_socket::fill_list_socket(std::vector<Server> servers)
+std::vector<server_socket> server_socket::fill_list_socket(std::vector<Server> servers, std::map<int,int> &ports)
 {
 	server_socket sock;
 	FD_ZERO(&set_socket);
 	max_fd_so_far = 0;
 	std::vector<server_socket> sockets;
-	for (size_t i = 0; i < servers.size(); i++)
+	for (std::map<int, int>::iterator i = ports.begin(); i != ports.end(); i++)
+	// for (size_t i = 0; i < ports.size(); i++)
 	{
-		sock = prepare_socket(servers[i]);
+		// sock = prepare_socket(servers[0]);
+		sock = prepare_socket(i->first);
 		sockets.push_back(sock);
 		FD_SET(sock.server_fd,&set_socket);
 		if(sock.server_fd > max_fd_so_far)
