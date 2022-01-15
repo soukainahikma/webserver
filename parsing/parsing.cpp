@@ -241,8 +241,8 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		{
 			// std::cout << "sgsg\n";0
 			serv.set_location_open(0);
-			if (!serv.get_location_map(locat.get_path()).get_path().empty())
-				print_error(15, serv.get_location_map(locat.get_path()).get_path());
+			// if (!serv.get_location_map(locat.get_path()).get_path().empty())
+			// 	print_error(15, serv.get_location_map(locat.get_path()).get_path());
 			// std::cout << serv.get_location_map(locat.get_path()).get_path() << "\n";
 			serv.set_location_map(locat);
 			serv.set_location(locat);

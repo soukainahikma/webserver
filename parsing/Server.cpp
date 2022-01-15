@@ -162,4 +162,4 @@ std::map<std::string, int> &Server::get_server_name() { return _server_name; }
 std::vector<Location> Server::get_location() { return _location; }
 int Server::get_location_open() { return _location_open; }
 int Server::get_server_open() { return _server_open; }
-Location	Server::get_location_map(std::string path) { return (_map_location[path]); }
+std::map<std::string, Location>	Server::get_location_map() { return (_map_location); }

@@ -36,13 +36,13 @@ class Server
 		void	set_server_open(int);
 		//	get
 		int									get_listen();
-		Location							get_location_map(std::string);
 		std::string							get_host();
 		std::string							get_root();
 		size_t								get_client_max_body_size();
 		std::map<std::string, std::string>	get_error_page();
 		std::map<std::string, int>			&get_server_name();
 		std::vector<Location>				get_location();
+		std::map<std::string, Location>		get_location_map();
 		int									get_location_open();
 		int									get_server_open();
 
