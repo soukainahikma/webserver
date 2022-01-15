@@ -390,18 +390,18 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> m)
 	
 }
 
-int main()
-{
-	try
-	{
-		std::map<int,int> m;
-		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-		// print_all(vec_serv, m);
-		// std::cout << vec_serv[0].get_client_max_body_size() << "\n";
+// int main()
+// {
+// 	try
+// 	{
+// 		std::map<int,int> m;
+// 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
+// 		// print_all(vec_serv, m);
+// 		// std::cout << vec_serv[0].get_client_max_body_size() << "\n";
 
-	}
-	catch(std::string e)
-	{
-		std::cerr << e << '\n';
-	}
-}
+// 	}
+// 	catch(std::string e)
+// 	{
+// 		std::cerr << e << '\n';
+// 	}
+// }
