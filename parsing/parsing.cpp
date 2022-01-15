@@ -8,7 +8,7 @@ void print_error(int i, std::string v)
 		"error2",
 		"error3"
 	};
-	std::cout << v << "----";
+	std::cout << v << "----]]]]]]";
 	throw err[i];
 }
 
