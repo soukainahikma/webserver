@@ -47,17 +47,15 @@ void	Location::set_autoindex(std::string autoindex)
 		print_error(12, autoindex);
 	_autoindex = autoindex;
 }
-void	Location::set_index(std::vector<std::string> index)
+void	Location::set_index(std::vector<std::string> &index)
 {
 	if (get_index().size())
 		print_error(8, "index");
 	_index = index;
 }
 
-void	Location::set_return(std::vector<std::string> retur)
+void	Location::set_return(std::vector<std::string> &retur)
 {
-	if (get_return().size())
-		print_error(8, "return");
 	int i = 0;
 	if (retur.size() != 2)
 		print_error(1, "return");
@@ -117,18 +115,35 @@ void	Location::set_request_method(std::string request_method)
 	}
 	_request_method	= splt;
 }
+
+void	Location::set_return_map(std::vector<std::string> &ret)
+{
+	int i = 0;
+	if (ret.size() != 2)
+		print_error(1, "return " + ret[0] + " " + ret[1]);
+	while (ret[0][i])
+	{
+		if (!std::isdigit(ret[0][i]))
+			print_error(1, "return " + ret[0] + " " + ret[1]);
+		i++;
+	}
+	if (_return_map[std::stoi(ret[0])].empty())
+		_return_map[std::stoi(ret[0])] = ret[1];
+}
+
 void						Location::set_fastcgi_pass(std::string fastcgi_pass) { _fastcgi_pass = fastcgi_pass; }
 void						Location::set_upload_enable(std::string upload_enable) { _upload_enable = upload_enable; }
 void						Location::set_upload_store(std::string upload_store) { _upload_store = upload_store; }
 //		get
-std::string					Location::get_path() { return _path; }
-std::string					Location::get_autoindex() { return _autoindex; }
-std::vector<std::string>	Location::get_index() { return _index; }
-std::vector<std::string>	Location::get_return() { return _return; }
-std::vector<std::string>	Location::get_request_method() { return _request_method; }
-std::string					Location::get_fastcgi_pass() { return _fastcgi_pass; }
-std::string					Location::get_upload_enable() { return _upload_enable; }
-std::string					Location::get_upload_store() { return _upload_store; }
+std::string					&Location::get_path() { return _path; }
+std::string					&Location::get_autoindex() { return _autoindex; }
+std::vector<std::string>	&Location::get_index() { return _index; }
+std::vector<std::string>	&Location::get_return() { return _return; }
+std::vector<std::string>	&Location::get_request_method() { return _request_method; }
+std::string					&Location::get_fastcgi_pass() { return _fastcgi_pass; }
+std::string					&Location::get_upload_enable() { return _upload_enable; }
+std::string					&Location::get_upload_store() { return _upload_store; }
+std::map<int, std::string>	&Location::get_return_map() { return _return_map; }
 bool						Location::get_equal() { return _equal; }
 
 /*
