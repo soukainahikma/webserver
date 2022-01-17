@@ -1,5 +1,88 @@
 #include "Server.hpp"
 
+void print_error(int i, std::string v)
+{
+	static std::string err[] = {
+		"syntax Error: Missing close brace {",
+		"syntax Error: unexpected token {",
+		"syntax Error: Missing open brace {",
+		"syntax Error: Missing ';' {",
+		"syntax Error: too many arguments {",
+		"syntax Error: no server to fill with {",
+		"syntax Error: Missing arguments to {",
+		"syntax Error: permission denied {",
+		"syntax Error: duplicated key {",
+		"syntax Error: unexpected form (example : NN/NNNM) {",
+		"syntax Error: am i a joke to you {",
+		"syntax Error: Only accept MB {",
+		"syntax Error: unexpected token (on/off) -_- {",
+		"syntax Error: unexpected form {",
+		"syntax Error: somthing missing in {",
+		"syntax Error: duplicated location {"
+	};
+	std::cout << err[i];
+	v.append("}");
+	throw v;
+}
+
+std::vector<std::string> split(std::string str, char c)
+{
+	size_t pos = 0;
+	std::string token;
+	std::vector<std::string> spl;
+	while ((pos = str.find(c)) != std::string::npos)
+	{
+		token = str.substr(0, pos);
+		spl.push_back(token);
+		str.erase(0, pos + 1);
+		if (str[0] && str.find(c) == std::string::npos)
+		{
+			token = str.substr(0, str.length());
+			spl.push_back(token);
+		}
+	}
+	if (spl.size() == 0)
+		spl.push_back(str);
+	return (spl);
+}
+
+
+std::string get_key(std::string &line, int &idx)
+{
+	int end = 0;
+	std::string str;
+
+	// std::cout << line << "|" << idx << "|hna\n";
+	if (!line[idx])
+		return ("");
+	while (line[idx] == ' ' || line[idx] == '\t')
+		idx++;
+	while (line[end + idx] && line[end + idx] != ' '
+		&& line[end + idx] != '\t' && line[end + idx] != '=' &&
+			line[end + idx] != '\n' && line[end + idx] != '{' &&
+				line[end + idx] != '}')
+		end++;
+	str = line.substr(idx, end);
+	idx += end;
+	return (str);
+}
+
+std::string get_value(std::string &line, int &idx)
+{
+	int end = 0;
+	std::string str;
+
+	if (!line[idx])
+		return ("");
+	while (line[idx] == ' ' || line[idx] == '\t')
+		idx++;
+	while (line[end + idx] && line[end + idx] != ';' &&
+		line[end + idx] != '{' && line[end + idx] != '}')
+		end++;
+	str = line.substr(idx, end);
+	return (str);
+}
+
 void check_brace(std::string &line, Server &serv, Location &locat)
 {
 	int idx = 0;
