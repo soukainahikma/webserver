@@ -64,11 +64,6 @@ void Server::set_host(std::string &host)
 	host = trim(host);
 	if (host.find(" ") != std::string::npos)
 		print_error(1, host);
-	if (!host.compare("localhost"))
-	{
-		_host = host;
-		return ;
-	}
 	std::vector<std::string> splt = split(host, '.');
 	int idx = 0;
 	int j = 0;
