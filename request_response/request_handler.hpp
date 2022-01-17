@@ -36,18 +36,18 @@ public:
 		size_t index;
 
 		server_name = req_map["Host"];
-		
+		if ((found = server_name.find("\r"))!= std::string::npos)
+				server_name = server_name.substr(0,found);	
 		if ((found = server_name.find(":"))!= std::string::npos)
 				server_name = server_name.substr(0,found);	
+		std::cout << "|" <<  server_name << "|";
 		for (size_t i = 0; i < Servs.size(); i++)
 		{
 			server_names = Servs[i].get_server_name();
-			std::cout << server_names.find(server_name)->first << std::endl;
 			if (server_names.find(server_name) != server_names.end()) {
 				std::map<std::string, Location> locs = Servs[i].get_location_map();
 				if (locs.find(req_map["URL"]) != locs.end()) {
 					std::vector<std::string> allowed_methods = locs[req_map["URL"]].get_request_method();
-					std::cout << allowed_methods.size() << std::endl;
 					if ((allowed_methods.size() == 0 || std::find(allowed_methods.begin(), allowed_methods.end(), req_map["Method"]) != allowed_methods.end()))
 					{
 						return Response(Servs[i].get_root() + locs[req_map["URL"]].get_path() +"/index.html"); // indexes Autoindexn
