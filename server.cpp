@@ -6,7 +6,7 @@
 #include <sys/select.h>
 #include <exception>
 
-void connection_handler(int i,RequestHandler &req_handler);
+void connection_handler(int i,RequestHandler &req_handler, int port);
 std::vector<Server> parsing(std::string file, std::map<int,int> &m);
 
 int main()
@@ -55,8 +55,7 @@ int main()
 					//check to accept
 					if(check == false)
 					{
-
-						connection_handler(i,req_handler);
+						connection_handler(i,req_handler, port);
 						// std::cout << "<----- request: {" << new_socket << " <==>  " << i  <<  "} handled ------->" << std::endl;
 						FD_CLR(i,&current_sockets);
 					}

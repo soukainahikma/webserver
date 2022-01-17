@@ -3,7 +3,7 @@
 #include "../request_response/request.hpp"
 #include "../request_response/request_handler.hpp"
 
-void connection_handler(int i,RequestHandler &req_handler)
+void connection_handler(int i,RequestHandler &req_handler, int port)
 {
 	Response resp;
 	char buffer[1024] = {0};
