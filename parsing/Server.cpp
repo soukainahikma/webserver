@@ -146,6 +146,8 @@ void Server::set_error_page(std::string &str_num, std::string &str_path)
 
 void	Server::set_location_map(Location &location)
 {
+	if (_map_location.find(location.get_path()) != _map_location.end())
+		print_error(15, location.get_path());
 	_map_location[location.get_path()] = location;
 }
 

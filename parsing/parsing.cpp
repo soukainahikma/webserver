@@ -214,17 +214,17 @@ std::vector<Server> parsing(std::string file, std::map<int,int> &m)
 	return (vec_serv);
 }
 
-// int main()
-// {
-// 	try
-// 	{
-// 		std::map<int,int> m;
-// 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-// 		print_all(vec_serv, m);
+int main()
+{
+	try
+	{
+		std::map<int,int> m;
+		std::vector<Server> vec_serv = parsing("webserv.conf", m);
+		print_all(vec_serv, m);
 
-// 	}
-// 	catch(std::string e)
-// 	{
-// 		std::cerr << e << '\n';
-// 	}
-// }
+	}
+	catch(std::string e)
+	{
+		std::cerr << e << '\n';
+	}
+}
