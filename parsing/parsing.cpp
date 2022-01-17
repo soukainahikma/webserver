@@ -3,13 +3,26 @@
 void print_error(int i, std::string v)
 {
 	static std::string err[] = {
-		"error0",
-		"error1",
-		"error2",
-		"error3"
+		"syntax Error: Missing close brace {",
+		"syntax Error: unexpected token {",
+		"syntax Error: Missing open brace {",
+		"syntax Error: Missing ';' {",
+		"syntax Error: too many arguments {",
+		"syntax Error: no server to fill with {",
+		"syntax Error: Missing arguments to {",
+		"syntax Error: permission denied {",
+		"syntax Error: duplicated key {",
+		"syntax Error: unexpected form (example : NN/NNNM) {",
+		"syntax Error: am i a joke to you {",
+		"syntax Error: Only accept MB {",
+		"syntax Error: unexpected token (on/off) -_- {",
+		"syntax Error: unexpected form {",
+		"syntax Error: somthing missing in {",
+		"syntax Error: duplicated location {"
 	};
-	std::cout << v << "----]]]]]]";
-	throw err[i];
+	std::cout << err[i];
+	v.append("}");
+	throw v;
 }
 
 std::vector<std::string> split(std::string str, char c)
@@ -94,7 +107,7 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 		else if (!key.compare("server"))
 		{
 			if (!value.empty() || serv.get_server_open())
-				print_error(0, key);
+				print_error(1, key);
 			serv.set_server_open(2);
 		}
 		else if (!key.compare("location"))
@@ -103,7 +116,7 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 			if (value.empty() || serv.get_location_open())
 			{
 				// std::cout << "sdfsdf\n";
-				print_error(1, key);
+				print_error(1, line);
 			}
 			serv.set_location_open(2);
 			locat.set_path(value);
@@ -118,7 +131,7 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 		{
 			if (serv.get_server_open()){
 				// std::cout << "sdfsdf\n";
-				print_error(3, key);
+				print_error(0, key);
 			}
 			serv.set_server_open(1);
 			line.clear();
@@ -127,14 +140,14 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 		{
 			if (serv.get_location_open()){
 				// std::cout << "sdfsdf\n";
-				print_error(3, key);
+				print_error(0, key);
 			}
 			locat.set_path(value);
 			serv.set_location_open(1);
 			line.clear();
 		}
 		else if (!key.compare("server") || !key.compare("location"))
-			print_error(3, key);
+			print_error(2, key);
 	}
 }
 
@@ -168,11 +181,11 @@ void fill_location(std::string key, std::string value, Server &serv, Location &l
 	{
 		std::vector<std::string> s = split(value, ' ');
 			if (s.size() > 2)
-				print_error(1, value);
+				print_error(4, value);
 		locat.set_return(s);
 	}
 	else
-		print_error(3, key);
+		print_error(1, key);
 }
 
 int find_last(std::string s)
@@ -199,7 +212,7 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 	if (serv.get_server_open() == 2)
 	{
 		if (!key.empty() && find_last(line))
-			print_error(0, line);
+			print_error(3, line);
 		// std::cout << line << "--------------" << key << "\n";
 		if (!key.compare("listen"))
 		{
@@ -219,23 +232,29 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		{
 			std::vector<std::string> s = split(value, ' ');
 			if (s.size() > 2)
-				print_error(1, value);
+				print_error(4, value);
 			serv.set_error_page(s[0], s[1]);
 		}
 		else if (!key.compare("root"))
 			serv.set_root(value);
 		else if (serv.get_location_open() == 2 && line.find("}") != std::string::npos)
 		{
-			// std::cout << "sgsg\n";
+			// std::cout << "sgsg\n";0
+			serv.set_location_open(0);
+			// if (!serv.get_location_map(locat.get_path()).get_path().empty())
+			// 	print_error(15, serv.get_location_map(locat.get_path()).get_path());
+			// std::cout << serv.get_location_map(locat.get_path()).get_path() << "\n";
+			serv.set_location_map(locat);
 			serv.set_location(locat);
 			locat.Clear();
-			serv.set_location_open(0);
 		}
 		else if (serv.get_server_open() == 2 && line.find("}") != std::string::npos)
 		{
 			serv.set_server_open(0);
-			if (serv.get_listen() == 80)
-				m[80] = 80;
+			if (serv.get_client_max_body_size() == -1 || serv.get_root().empty() ||
+				!serv.get_listen() || serv.get_root().empty() || serv.get_host().empty() ||
+					!serv.get_location().size() || !serv.get_server_name().size())
+				print_error(14, serv.get_host());
 			vec_serv.push_back(serv);
 			serv.Clear();
 		}
@@ -244,11 +263,11 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		else
 		{
 			// std::cout << key << "|" << value << "hna\n";
-			print_error(3, key);
+			print_error(1, key);
 		}
 	}
 	else
-		print_error(2, key);
+		print_error(5, key);
 }
 
 std::vector<Server> parsing(std::string file, std::map<int,int> &m)
@@ -288,13 +307,13 @@ std::vector<Server> parsing(std::string file, std::map<int,int> &m)
 				if ((!key.empty() && !value.empty()) || line.find("}") != std::string::npos)
 					fill_server(key, value, serv, locat, vec_serv, line, m);
 				else if (!key.empty() && value.empty())
-					print_error(0, key);
+					print_error(6, key);
 				// std::cout << key << "|" << value << "\n";
 				i++;
 			}
 		}
 		if (serv.get_server_open())
-			print_error(1, "opned");
+			print_error(7, file);
 		myfile.close();
 	}
 	else
@@ -377,7 +396,9 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> m)
 // 	{
 // 		std::map<int,int> m;
 // 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-// 		print_all(vec_serv, m);
+// 		// print_all(vec_serv, m);
+// 		// std::cout << vec_serv[0].get_client_max_body_size() << "\n";
+
 // 	}
 // 	catch(std::string e)
 // 	{

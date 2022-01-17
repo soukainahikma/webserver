@@ -25,14 +25,14 @@ void	Location::set_path(std::string path)
 	{
 		int i = 1;
 		if (path[i] == '=')
-			print_error(0, path);
+			print_error(1, path);
 		set_equal(true);
 		while (path[i] == ' ' || path[i] == '\t')
 			i++;
 		path.erase(0, i);
 	}
 	if (path.find(" ") != std::string::npos)
-		print_error(2, path);
+		print_error(1, path);
 	_path = path;
 }
 
@@ -40,25 +40,31 @@ void Location::set_equal(bool equal) { _equal = equal; }
 
 void	Location::set_autoindex(std::string autoindex)
 {
+	if (!get_autoindex().empty())
+		print_error(8, "autoindex");
 	autoindex = trim(autoindex);
 	if (autoindex.compare("on") && autoindex.compare("off"))
-		print_error(0, autoindex);
+		print_error(12, autoindex);
 	_autoindex = autoindex;
 }
 void	Location::set_index(std::vector<std::string> index)
 {
+	if (get_index().size())
+		print_error(8, "index");
 	_index = index;
 }
 
 void	Location::set_return(std::vector<std::string> retur)
 {
+	if (get_return().size())
+		print_error(8, "return");
 	int i = 0;
 	if (retur.size() != 2)
-		print_error(0, "return");
+		print_error(1, "return");
 	while (retur[0][i])
 	{
 		if (!std::isdigit(retur[0][i]))
-			print_error(3, retur[0]);
+			print_error(1, retur[0]);
 		i++;
 	}
 	_return = retur;
@@ -80,13 +86,18 @@ int check_merhods(std::string request_method)
 
 void	Location::set_request_method(std::string request_method)
 {
+	if (get_request_method().size())
+		print_error(8, request_method);
 	int g, p, d;
 	if (check_merhods(request_method))
-		print_error(0, request_method);
+		print_error(13, request_method);
 	request_method.erase(request_method.find('['), 1);
 	request_method.erase(request_method.find(']'), 1);
 	std::vector<std::string> splt = split(request_method, ',');
 	int idx = 0;
+	g = 0;
+	p = g;
+	d = g;
 	while (idx < splt.size())
 	{
 		splt[idx] = trim(splt[idx]);
@@ -101,9 +112,9 @@ void	Location::set_request_method(std::string request_method)
 			print_error(1, request_method);
 		}
 		if (idx > 3 || g > 1 || p > 1 || d > 1)
-			print_error(0, request_method);
+			print_error(8, request_method);
 		if (splt[idx].find(' ') != std::string::npos)
-			print_error(0, request_method);
+			print_error(1, request_method);
 		idx++;
 	}
 	_request_method	= splt;

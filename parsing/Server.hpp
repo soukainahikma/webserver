@@ -12,11 +12,12 @@ class Server
 {
 	int									_listen;
 	std::string							_host;
-	std::string							_client_max_body_size;
+	size_t								_client_max_body_size;
 	std::string							_root;
 	std::map<std::string, int>			_server_name;
 	std::map<std::string, std::string>	_error_page;
 	std::vector<Location>				_location;
+	std::map<std::string, Location>		_map_location;
 	int									_location_open;
 	int									_server_open;
 	public:
@@ -30,16 +31,18 @@ class Server
 		void	set_server_name(std::vector<std::string>);
 		void	set_error_page(std::string, std::string);
 		void	set_location(Location);
+		void	set_location_map(Location);
 		void	set_location_open(int);
 		void	set_server_open(int);
 		//	get
 		int									get_listen();
 		std::string							get_host();
 		std::string							get_root();
-		std::string							get_client_max_body_size();
+		size_t								get_client_max_body_size();
 		std::map<std::string, std::string>	get_error_page();
 		std::map<std::string, int>			&get_server_name();
 		std::vector<Location>				get_location();
+		std::map<std::string, Location>		get_location_map();
 		int									get_location_open();
 		int									get_server_open();
 
