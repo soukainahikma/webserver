@@ -36,8 +36,11 @@ public:
 		size_t index;
 
 		server_name = req_map["Host"];
-		if ((found = server_name.find(":"))!= std::string::npos)
+		if ((found = server_name.find("\r"))!= std::string::npos)
 				server_name = server_name.substr(0,found);	
+		if ((found = server_name.find(":"))!= std::string::npos)
+				server_name = server_name.substr(0,found);
+		std::map<std::string, std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
 		for (size_t i = 0; i < Servs.size(); i++)
 		{
 			server_names = Servs[i].get_server_name();
@@ -46,11 +49,11 @@ public:
 				for (size_t j = 0; j < locations.size(); j++)
 				{
 					if (req_map["URL"] == locations[j].get_path())
-						return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html");
+						return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html"); // autoindexing
+					return Response(404, Servs[Servs.size() - 1].get_root() + errorPages["404"]);
 				}
 			}
 		}
-		std::map<std::string, std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
 		return Response(502, Servs[Servs.size() - 1].get_root() + errorPages["502"]);
 	}
 
