@@ -20,9 +20,8 @@ void print_error(int i, std::string v)
 		"syntax Error: somthing missing in {",
 		"syntax Error: duplicated location {"
 	};
-	std::cout << err[i];
-	v.append("}");
-	throw v;
+	std::cout << v << "----]]]]]]";
+	throw err[i];
 }
 
 std::vector<std::string> split(std::string str, char c)
