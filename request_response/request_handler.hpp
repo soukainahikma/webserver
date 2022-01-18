@@ -36,6 +36,7 @@ public:
 		size_t index;
 
 		server_name = req_map["Host"];
+		std::cout << "Request's URL" <<  req_map["URL"] << std::endl;
 		if ((found = server_name.find("\r"))!= std::string::npos)
 				server_name = server_name.substr(0,found);	
 		if ((found = server_name.find(":"))!= std::string::npos)
