@@ -14,7 +14,9 @@ int main()
 	try
 	{
 		std::map<int,int> ports;
+		std::cout << "Before" << std::endl;
 		std::vector<Server> parse = parsing("./webserv.conf", ports); 
+		std::cout << "After" << std::endl;
 		server_socket info;
 		RequestHandler req_handler (parse);
 		std::vector<server_socket> socket_list = info.fill_list_socket(parse, ports);
