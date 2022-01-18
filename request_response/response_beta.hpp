@@ -3,6 +3,8 @@
 #define RESPONSE_HPP
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <map>
 
 class Response
 {
@@ -18,6 +20,7 @@ class Response
 				(OPTIONAL) content_type: "Content-Type: application/json\r\n\n\n"
 			}
 		 */
+        std::ifstream file;
 		std::string buffer;
 		std::string version;
 		std::string status;
@@ -26,31 +29,26 @@ class Response
 		std::string content_length;
 		std::string response_page;
 		std::string filename;
-
+        std::vector<std::string> indexes;
+        std::map<std::string, std::string> errorPages;
+    
 	public:
-		Response()
+		Response(int status, std::string filename)
 		{
 			buffer = "";
 			version = "HTTP/1.1 ";
-			status = "200 ";
-			status_message = " OK\n";
+            file.open(filename);
+			// status = "200 ";
+			// status_message = " OK\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
+			this->filename = filename;
 		}
 
-		Response(int status_code, std::string file)
+        Response(std::string filename, std::map<std::string, std::string> errs)
 		{
 			buffer = "";
 			version = "HTTP/1.1 ";
-			status = std::to_string(status_code) + " ";
-			status_message = status_code >= 400 ? " KO\n" : " OK\n";
-			filename = file;
-			content_type = "Content-Type: text/html\r\n\n\n";
-		}
-
-		Response(std::string filename)
-		{
-			buffer = "";
-			version = "HTTP/1.1 ";
+            file.open(filename);
 			// status = "200 ";
 			// status_message = " OK\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
@@ -59,7 +57,7 @@ class Response
 
 		std::string get_file()
 		{
-			std::ifstream file;
+			// std::ifstream file;
 			std::string line;
 			file.open(filename);
 			// do not forget to check the open permission

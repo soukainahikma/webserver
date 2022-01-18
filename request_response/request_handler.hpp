@@ -7,6 +7,22 @@
 #include <vector>
 #include <map>
 
+/* ************ Successful responses ******** */
+
+#define OK 200
+#define CREATED 201
+
+/* *********** Redirection messages ********* */
+
+#define MOVED_PERMANENTLY 301
+
+/* ********** Client error responses ******** */
+
+#define BAD_REQUEST 400
+#define UNAUTHORIZED 401
+#define FORBIDDEN 403
+#define NOT_FOUND 404
+
 class RequestHandler
 {
 private:
@@ -22,6 +38,7 @@ public:
 
 	void setRequest(Request &req) {
 		this->req = req;
+		std::cout << this->req.get_port() << std::endl;
 	}
 
 	Response generateResponse () {
@@ -36,26 +53,27 @@ public:
 		size_t index;
 
 		server_name = req_map["Host"];
-		std::cout << "Request's URL" <<  req_map["URL"] << std::endl;
+		std::cout << "Request's URL => " <<  req_map["URL"] << std::endl;
 		if ((found = server_name.find("\r"))!= std::string::npos)
 				server_name = server_name.substr(0,found);	
 		if ((found = server_name.find(":"))!= std::string::npos)
 				server_name = server_name.substr(0,found);
-		std::map<std::string, std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
+		std::map<std::string, std::string> defaultErrorPages = Servs[0].get_error_page();
 		for (size_t i = 0; i < Servs.size(); i++)
 		{
-			server_names = Servs[i].get_server_name();
-			if (server_names[server_name]) {
+			std::cout << req.get_port() << std::endl;
+			std::cout << Servs[i].get_listen() << std::endl;
+			if (req.get_port() == Servs[i].get_listen() && Servs[i].get_server_name()[server_name]) {
 				std::vector<Location> locations = Servs[i].get_location();
 				for (size_t j = 0; j < locations.size(); j++)
 				{
 					if (req_map["URL"] == locations[j].get_path())
-						return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html"); // autoindexing
-					return Response(404, Servs[Servs.size() - 1].get_root() + errorPages["404"]);
+						return Response(200, Servs[i].get_root() + locations[j].get_path()); // autoindexing
 				}
+				return Response(404, Servs[i].get_root() + Servs[i].get_error_page()["404"]);
 			}
 		}
-		return Response(502, Servs[Servs.size() - 1].get_root() + errorPages["502"]);
+		return Response(502, Servs[0].get_root() + defaultErrorPages["502"]);
 	}
 
 	Response Bootstrap() {	

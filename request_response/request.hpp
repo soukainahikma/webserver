@@ -12,12 +12,14 @@ class Request
 		typedef std::map<string,string> map_request;
 		typedef std::vector<string> vector_request;
 		Request(){};
-		Request(char *buffer){
+		Request(char *buffer, int port){
+			this->port = port;
 			fill_map(buffer);
 		};
 		Request &operator= (Request &r) {
 			if (this != &r) {
 				map_ = r.map_;
+				port = r.port;
 			}
 			return (*this);
 		}
@@ -49,11 +51,12 @@ class Request
 			}
 		}
 
-		map_request	getRequest() {
-			return (map_);
-		}
+		map_request	getRequest() { return (map_); }
+
+		int get_port() { return (port); }
 
 	private:
 		map_request map_;
+		int port;
 };
 #endif
