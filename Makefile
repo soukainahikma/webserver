@@ -9,7 +9,7 @@ SRC =	./server.cpp\
 
 HEADERS = parsing/Location.hpp\
 		request_response/request.hpp\
-		request_response/response.hpp\
+		request_response/response_beta.hpp\
 		parsing/Server.hpp\
 		request_response/request_handler.hpp\
 		server/socket.hpp

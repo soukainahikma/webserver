@@ -33,6 +33,9 @@ class Response
         std::map<std::string, std::string> errorPages;
     
 	public:
+		Response(){}
+		
+
 		Response(int status, std::string filename)
 		{
 			buffer = "";
@@ -43,7 +46,10 @@ class Response
 			content_type = "Content-Type: text/html\r\n\n\n";
 			this->filename = filename;
 		}
+		// Response(int status, std::string root)
+		// {
 
+		// }
         Response(std::string filename, std::map<std::string, std::string> errs)
 		{
 			buffer = "";
