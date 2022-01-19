@@ -55,6 +55,8 @@ class Response
 			std::cout << "While construction {1} => " << filename << std::endl;
 			file.close();
 		}
+		// Response(int status, std::string root)
+		// {
 
 		Response(std::string root, std::string filename, std::map<std::string, std::string> errorPages)
 		{
