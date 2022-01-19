@@ -1,7 +1,7 @@
 #ifndef REQUEST_HANDLER_HPP
 #define REQUEST_HANDLER_HPP
 #include "request.hpp"
-#include "response_beta.hpp"
+#include "response.hpp"
 #include "../server/socket.hpp"
 #include "../parsing/Server.hpp"
 #include <vector>

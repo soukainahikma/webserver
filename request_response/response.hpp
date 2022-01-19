@@ -76,14 +76,14 @@ class Response
 			return(version + status + status_message + content_type + get_file());
 		}
 
-		/* void header_cleaner()
+		void header_cleaner()
 		{
 			buffer = "";
 			version = "HTTP/1.1 ";
 			status = "200 ";
 			status_message = " OK\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
-		} */
+		}
 
 };
 #endif
