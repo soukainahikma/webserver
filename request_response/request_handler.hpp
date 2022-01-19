@@ -7,22 +7,6 @@
 #include <vector>
 #include <map>
 
-/* ************ Successful responses ******** */
-
-#define OK 200
-#define CREATED 201
-
-/* *********** Redirection messages ********* */
-
-#define MOVED_PERMANENTLY 301
-
-/* ********** Client error responses ******** */
-
-#define BAD_REQUEST 400
-#define UNAUTHORIZED 401
-#define FORBIDDEN 403
-#define NOT_FOUND 404
-
 class RequestHandler
 {
 private:

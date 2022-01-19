@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<unistd.h>
+
+
 void fileCheck(const char *fileName)
 {
 
@@ -44,16 +46,9 @@ void fileCheck(const char *fileName)
 }
 int main()
 {
-<<<<<<< HEAD
-    std::ifstream file/* ("test.cpp") */;
-    file.open("test");
-    std::cout << file.fail() << std::endl;
-    return 0;
-=======
 	std::ifstream file /* ("test.cpp") */;
 	file.open("file");
 	fileCheck("file");
 	// std::cout << file.good() << std::endl;
 	return 0;
->>>>>>> 14e982a62501559fecfa92bb3e80ea0f43ba1978
 }

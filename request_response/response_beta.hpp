@@ -5,6 +5,57 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <stdlib.h>
+#include <unistd.h>
+
+/* ************ Successful responses ******** */
+
+#define OK 200
+#define CREATED 201
+
+/* *********** Redirection messages ********* */
+
+#define MOVED_PERMANENTLY 301
+
+/* ********** Client error responses ******** */
+
+#define BAD_REQUEST 400
+#define UNAUTHORIZED 401
+#define FORBIDDEN 403
+#define NOT_FOUND 404
+
+int fileCheck(const char *fileName)
+{
+	if (!access(fileName, F_OK))
+	{
+		if (!access(fileName, R_OK))
+			return OK;
+		return FORBIDDEN;
+	}
+	return NOT_FOUND;
+	// else
+	// {
+	// 	printf("The File %s\t cannot be read\n", fileName);
+	// }
+
+	// if (!access(fileName, W_OK))
+	// {
+	// 	printf("The File %s\t it can be Edited\n", fileName);
+	// }
+	// else
+	// {
+	// 	printf("The File %s\t it cannot be Edited\n", fileName);
+	// }
+
+	// if (!access(fileName, X_OK))
+	// {
+	// 	printf("The File %s\t is an Executable\n", fileName);
+	// }
+	// else
+	// {
+	// 	printf("The File %s\t is not an Executable\n", fileName);
+	// }
+}
 
 class Response
 {
@@ -36,24 +87,23 @@ class Response
 		
 		Response(std::string root, std::string path, std::vector<std::string> &indexes, std::map<std::string, std::string> errorPages)
 		{
-			std::ifstream file;
 			size_t i;
+			int stats;
 
 			this->root = root;
 			this->path = path;
 			for (i = 0; i < indexes.size(); i++)
 			{
-				file.open(root + path + "/" + indexes[i]);
-				if (!file.fail())
+				stats = fileCheck(root + path + "/" + indexes[i]);
+				if (stats == OK)
 					break;
 			}
 			version = "HTTP/1.1 ";
-			status = !file.fail() ? "200 " : "404 ";
-			status_message = !file.fail() ? " OK\n" : "KO\n";
+			status = stats == OK ? "200 " : "404 ";
+			status_message = stats == OK ? " OK\n" : "KO\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
-			filename = !file.fail() ? root + path + "/" + indexes[i] : errorPages["404"];
+			filename = stats == OK ? root + path + "/" + indexes[i] : errorPages["404"];
 			std::cout << "While construction {1} => " << filename << std::endl;
-			file.close();
 		}
 		// Response(int status, std::string root)
 		// {
@@ -61,14 +111,15 @@ class Response
 		Response(std::string root, std::string filename, std::map<std::string, std::string> errorPages)
 		{
 			std::ifstream file;
+			int stats;
 	
 			this->root = "";
 			this->path = "";
 			version = "HTTP/1.1 ";
-            file.open(filename);
-			status = !file.fail() ? "200 " : "404 ";
-			status_message = !file.fail() ? " OK\n" : "KO\n";
-			this->filename = !file.fail() ? filename : root + errorPages["404"];
+			stats = fileCheck(filename);
+			status = stats == OK ? "200 " : "404 ";
+			status_message =stats == OK ? " OK\n" : "KO\n";
+			this->filename =stats == OK ? filename : root + errorPages["404"];
 			std::cout << "While construction {2} => " << this->filename << std::endl;
 			content_type = "Content-Type: text/html\r\n\n\n";
 			file.close();

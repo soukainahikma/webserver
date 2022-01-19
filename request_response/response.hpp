@@ -3,6 +3,58 @@
 #define RESPONSE_HPP
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include<unistd.h>
+
+/* ************ Successful responses ******** */
+
+#define OK 200
+#define CREATED 201
+
+/* *********** Redirection messages ********* */
+
+#define MOVED_PERMANENTLY 301
+
+/* ********** Client error responses ******** */
+
+#define BAD_REQUEST 400
+#define UNAUTHORIZED 401
+#define FORBIDDEN 403
+#define NOT_FOUND 404
+
+int fileCheck(const char *fileName)
+{
+
+	if (!access(fileName, F_OK))
+	{
+		if (!access(fileName, R_OK))
+			return OK;
+		return FORBIDDEN;
+	}
+	return NOT_FOUND;
+	// else
+	// {
+	// 	printf("The File %s\t cannot be read\n", fileName);
+	// }
+
+	// if (!access(fileName, W_OK))
+	// {
+	// 	printf("The File %s\t it can be Edited\n", fileName);
+	// }
+	// else
+	// {
+	// 	printf("The File %s\t it cannot be Edited\n", fileName);
+	// }
+
+	// if (!access(fileName, X_OK))
+	// {
+	// 	printf("The File %s\t is an Executable\n", fileName);
+	// }
+	// else
+	// {
+	// 	printf("The File %s\t is not an Executable\n", fileName);
+	// }
+}
 
 class Response
 {
