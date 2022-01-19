@@ -1,7 +1,7 @@
 #ifndef REQUEST_HANDLER_HPP
 #define REQUEST_HANDLER_HPP
 #include "request.hpp"
-#include "response.hpp"
+#include "response_beta.hpp"
 #include "../server/socket.hpp"
 #include "../parsing/Server.hpp"
 #include <vector>
@@ -38,11 +38,6 @@ public:
 
 	void setRequest(Request &req) {
 		this->req = req;
-		std::cout << this->req.get_port() << std::endl;
-	}
-
-	Response generateResponse () {
-		return Response();
 	}
 
 	Response GETRequesHandler () {
@@ -53,7 +48,6 @@ public:
 		size_t index;
 
 		server_name = req_map["Host"];
-		std::cout << "Request's URL => " <<  req_map["URL"] << std::endl;
 		if ((found = server_name.find("\r"))!= std::string::npos)
 				server_name = server_name.substr(0,found);	
 		if ((found = server_name.find(":"))!= std::string::npos)
@@ -61,19 +55,21 @@ public:
 		std::map<std::string, std::string> defaultErrorPages = Servs[0].get_error_page();
 		for (size_t i = 0; i < Servs.size(); i++)
 		{
-			std::cout << req.get_port() << std::endl;
-			std::cout << Servs[i].get_listen() << std::endl;
-			if (req.get_port() == Servs[i].get_listen() && Servs[i].get_server_name()[server_name]) {
+			if (req.get_port() == Servs[i].get_listen() && Servs[i].get_server_name()[server_name])
+			{
 				std::vector<Location> locations = Servs[i].get_location();
 				for (size_t j = 0; j < locations.size(); j++)
 				{
 					if (req_map["URL"] == locations[j].get_path())
-						return Response(200, Servs[i].get_root() + locations[j].get_path()); // autoindexing
+					{
+						return Response(Servs[i].get_root(), locations[j].get_path(), locations[j].get_index(), Servs[i].get_error_page());
+					}
 				}
-				return Response(404, Servs[i].get_root() + Servs[i].get_error_page()["404"]);
+				std::cout << "Request => " << Servs[i].get_root() + req_map["URL"] << std::endl;
+				return Response(Servs[i].get_root(), Servs[i].get_root() + req_map["URL"], Servs[i].get_error_page());
 			}
 		}
-		return Response(502, Servs[0].get_root() + defaultErrorPages["502"]);
+		return Response(Servs[0].get_root(), Servs[0].get_root() + defaultErrorPages["502"], Servs[0].get_error_page());
 	}
 
 	Response Bootstrap() {	

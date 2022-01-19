@@ -20,47 +20,66 @@ class Response
 				(OPTIONAL) content_type: "Content-Type: application/json\r\n\n\n"
 			}
 		 */
-        std::ifstream file;
-		std::string buffer;
 		std::string version;
 		std::string status;
 		std::string status_message;
 		std::string content_type;
 		std::string content_length;
 		std::string response_page;
+		std::string root;
+		std::string path;
 		std::string filename;
         std::vector<std::string> indexes;
         std::map<std::string, std::string> errorPages;
     
 	public:
-		Response(int status, std::string filename)
+		
+		Response(std::string root, std::string path, std::vector<std::string> &indexes, std::map<std::string, std::string> errorPages)
 		{
-			buffer = "";
+			std::ifstream file;
+			size_t i;
+
+			this->root = root;
+			this->path = path;
+			for (i = 0; i < indexes.size(); i++)
+			{
+				file.open(root + path + "/" + indexes[i]);
+				if (!file.fail())
+					break;
+			}
 			version = "HTTP/1.1 ";
-            file.open(filename);
-			// status = "200 ";
-			// status_message = " OK\n";
+			status = !file.fail() ? "200 " : "404 ";
+			status_message = !file.fail() ? " OK\n" : "KO\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
-			this->filename = filename;
+			filename = !file.fail() ? root + path + "/" + indexes[i] : errorPages["404"];
+			std::cout << "While construction {1} => " << filename << std::endl;
+			file.close();
 		}
 
-        Response(std::string filename, std::map<std::string, std::string> errs)
+		Response(std::string root, std::string filename, std::map<std::string, std::string> errorPages)
 		{
-			buffer = "";
+			std::ifstream file;
+	
+			this->root = "";
+			this->path = "";
 			version = "HTTP/1.1 ";
             file.open(filename);
-			// status = "200 ";
-			// status_message = " OK\n";
+			status = !file.fail() ? "200 " : "404 ";
+			status_message = !file.fail() ? " OK\n" : "KO\n";
+			this->filename = !file.fail() ? filename : root + errorPages["404"];
+			std::cout << "While construction {2} => " << this->filename << std::endl;
 			content_type = "Content-Type: text/html\r\n\n\n";
-			this->filename = filename;
+			file.close();
 		}
 
 		std::string get_file()
 		{
-			// std::ifstream file;
+			std::ifstream file;
 			std::string line;
+			std::string buffer;
+
 			file.open(filename);
-			// do not forget to check the open permission
+			std::cout << "In get_file => "<< filename << std::endl;
 			while (getline(file, line))
 			{
 				buffer = buffer + line;

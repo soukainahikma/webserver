@@ -4,7 +4,7 @@
 int main()
 {
     std::ifstream file/* ("test.cpp") */;
-    file.open("test.cpp");
-    std::cout << file.good() << std::endl;
+    file.open("test");
+    std::cout << file.fail() << std::endl;
     return 0;
 }
