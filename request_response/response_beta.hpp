@@ -24,39 +24,7 @@
 #define FORBIDDEN 403
 #define NOT_FOUND 404
 
-int fileCheck(const char *fileName)
-{
-	if (!access(fileName, F_OK))
-	{
-		if (!access(fileName, R_OK))
-			return OK;
-		return FORBIDDEN;
-	}
-	return NOT_FOUND;
-	// else
-	// {
-	// 	printf("The File %s\t cannot be read\n", fileName);
-	// }
-
-	// if (!access(fileName, W_OK))
-	// {
-	// 	printf("The File %s\t it can be Edited\n", fileName);
-	// }
-	// else
-	// {
-	// 	printf("The File %s\t it cannot be Edited\n", fileName);
-	// }
-
-	// if (!access(fileName, X_OK))
-	// {
-	// 	printf("The File %s\t is an Executable\n", fileName);
-	// }
-	// else
-	// {
-	// 	printf("The File %s\t is not an Executable\n", fileName);
-	// }
-}
-
+int fileCheck(std::string fileName);
 class Response
 {
 	private:
@@ -102,7 +70,7 @@ class Response
 			status = stats == OK ? "200 " : "404 ";
 			status_message = stats == OK ? " OK\n" : "KO\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
-			filename = stats == OK ? root + path + "/" + indexes[i] : errorPages["404"];
+			filename = stats == OK ? root + path + "/" + indexes[i] : root + errorPages[std::to_string(stats)];
 			std::cout << "While construction {1} => " << filename << std::endl;
 		}
 		// Response(int status, std::string root)
@@ -119,7 +87,7 @@ class Response
 			stats = fileCheck(filename);
 			status = stats == OK ? "200 " : "404 ";
 			status_message =stats == OK ? " OK\n" : "KO\n";
-			this->filename =stats == OK ? filename : root + errorPages["404"];
+			this->filename =stats == OK ? filename : root + errorPages[std::to_string(stats)];
 			std::cout << "While construction {2} => " << this->filename << std::endl;
 			content_type = "Content-Type: text/html\r\n\n\n";
 			file.close();

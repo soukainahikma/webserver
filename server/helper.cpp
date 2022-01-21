@@ -3,6 +3,18 @@
 #include "../request_response/request.hpp"
 #include "../request_response/request_handler.hpp"
 
+int fileCheck(std::string fileName)
+{
+	if (!access(fileName.c_str(), F_OK))
+	{
+		if (!access(fileName.c_str(), R_OK))
+			return OK;
+		return FORBIDDEN;
+	}
+	return NOT_FOUND;
+}
+
+
 void connection_handler(int i,RequestHandler &req_handler, int port)
 {
 	char buffer[1024] = {0};
