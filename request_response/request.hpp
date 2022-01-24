@@ -20,6 +20,8 @@ struct body_struct
 {
 	std::string filename;
 	std::string content_type;
+	std::string Content_Disposition;
+	std::string name;
 	std::string body;
 };
 
@@ -50,12 +52,17 @@ public:
 		std::istringstream iss(myText);
 		std::string line;
 		while (std::getline(iss, line, c))
-			vec.push_back(line);
+		{
+			if(*line.begin() == '\n')
+				line = line.substr(1);
+			if(line!="")
+				vec.push_back(line);
+		}
 		return (vec);
 	}
 	void fill_header(std::string buffer)
 	{
-		vector_request vec = split_buffer(buffer, 13);
+		vector_request vec = split_buffer(buffer, '\r');
 		vector_request head = split_buffer(vec[0].c_str(), ' ');
 		map_head["Method"] = head[0];
 		map_head["URL"] = head[1];
@@ -64,17 +71,46 @@ public:
 		for (size_t i = 1; i < vec.size(); i++)
 		{
 			if ((found = vec[i].find(":")) != std::string::npos)
-				map_head[vec[i].substr(1, found-1)] = vec[i].substr(found + 2);
+				map_head[vec[i].substr(0, found)] = vec[i].substr(found + 2);
 			else
 				break;
 		}
+	}
+	void body_info(body_struct &info,std::string str)// see if i have to pass it by reference
+	{
+		std::vector <std::string> tmp = split_buffer(str,';');
+		std::vector<std::string> str_help;
+		for (size_t i = 0; i < tmp.size(); i++)
+		{
+			if(i == 0)
+				str_help = split_buffer(tmp[i],':');
+			else
+				str_help = split_buffer(tmp[i],'=');
+			if(str_help[0] =="Content-Disposition")
+				info.Content_Disposition = str_help[1].substr(1);
+			if(str_help[0]==" name")
+				info.name = str_help[1].substr(1,str_help[1].length() - 2);
+			if(str_help[0]==" filename")
+				info.filename = str_help[1].substr(1,str_help[1].length() - 2);
+		}
+		
+		//Content-Disposition: form-data; name="test"; filename="index.html"
+	}
+	body_struct initializer()
+	{
+		body_struct info;
+		info.body ="";
+		info.content_type = "";
+		info.name = "";
+		info.Content_Disposition = "";
+		info.filename = "";
+		return(info);
 	}
 	void fill_body(std::string body)
 	{
 		body_struct info;
 
 		size_t found = 0;
-		std::cout<<BLUE<< "|"<<body<< "|" << RESET << std::endl;
 		std::map<std::string,std::string>::iterator it= map_head.find("Content-Type");
 		if(it !=map_head.end())
 		{
@@ -82,14 +118,29 @@ public:
 			{
 				boundary = "--" + it->second.substr(found+11);
 				it->second = it->second.substr(0,found);
+				std::vector<std::string> tmp = split_buffer(body,13);
+				size_t i = 0;
+				while(i < tmp.size())
+				{
+					info = initializer();
+					if(tmp[i] == boundary)
+					{
+						i++;
+						body_info(info,tmp[i]);
+						if(tmp[i+1].find("Content-Type")!= std::string::npos)
+						{
+							info.content_type = tmp[++i].substr(12);
+						}
+						while(tmp[i+1] != boundary && tmp[i+1] != boundary+"--" && i+1<tmp.size())
+						{
+							info.body += tmp[i+1] +"\n";
+							i++;
+						}
+						myfiles.push_back(info);
+					}
+					i++;
+				}
 			}
-		}
-		int len =boundary.size()+6;
-		while((found = body.find(boundary,len))!=std::string::npos)
-		{
-			info.body = body.substr(len,found - len-2);
-			len = len + found-4 ;
-			std::cout << "|"<<info.body <<"|" <<std::endl;
 		}
 	}
 	void fill_map(char *buffer)
@@ -103,16 +154,13 @@ public:
 			header = s.substr(0, found);
 			body = s.substr(found);
 			fill_header(header);
+			std::cout<< MAGENTA << body << RESET << std::endl;
 			fill_body(body);
-
-			// std::cout << BLUE << s<< RESET <<std::endl;
-			// std::cout<< YELLOW << header <<RESET << std::endl;
-			// std::cout<< MAGENTA << body << RESET << std::endl;
-			// map_printer();
 		}
 		else
 			fill_header(s);
-		// map_printer();
+		vec_printer();
+		map_printer();
 	}
 
 	map_request getRequest() { return (map_head); }
@@ -120,8 +168,6 @@ public:
 	int get_port() { return (port); }
 	void map_printer()
 	{
-		// std::map<std::string,std::string>::iterator it= map_head.find("Method");
-		// 	std::cout<< it->first << it->second<<std::endl;
 		for (std::map<std::string, std::string>::iterator it = map_head.begin(); it != map_head.end(); ++it)
 			std::cout<< BLUE <<"|" << it->first<< "|" <<RESET <<" => " << RED <<it->second << RESET<< '\n';
 	}
@@ -132,7 +178,9 @@ public:
 			std::cout << MAGENTA<< "this is file number " << WHITE <<i << std::endl;
 			std::cout << YELLOW << "File name "<< RESET<< myfiles[i].filename<<std::endl;
 			std::cout << YELLOW << "content type "<< RESET<< myfiles[i].content_type<<std::endl;
-			std::cout << YELLOW << "body "<< RESET<< myfiles[i].body<<std::endl;
+			std::cout << YELLOW << "body "<< RESET<< myfiles[i].body<<std::endl; 
+			std::cout << YELLOW << "name "<< RESET<< myfiles[i].name<<std::endl; 
+			std::cout << YELLOW << "Content_Disposition "<< RESET<< myfiles[i].Content_Disposition<<std::endl; 
 		}
 		
 	}
