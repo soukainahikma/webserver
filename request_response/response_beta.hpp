@@ -71,7 +71,7 @@ class Response
 			status_message = stats == OK ? " OK\n" : "KO\n";
 			content_type = "Content-Type: text/html\r\n\n\n";
 			filename = stats == OK ? root + path + "/" + indexes[i] : root + errorPages[std::to_string(stats)];
-			std::cout << "While construction {1} => " << filename << std::endl;
+			// std::cout << "While construction {1} => " << filename << std::endl;
 		}
 		// Response(int status, std::string root)
 		// {
@@ -88,7 +88,7 @@ class Response
 			status = stats == OK ? "200 " : "404 ";
 			status_message =stats == OK ? " OK\n" : "KO\n";
 			this->filename =stats == OK ? filename : root + errorPages[std::to_string(stats)];
-			std::cout << "While construction {2} => " << this->filename << std::endl;
+			// std::cout << "While construction {2} => " << this->filename << std::endl;
 			content_type = "Content-Type: text/html\r\n\n\n";
 			file.close();
 		}

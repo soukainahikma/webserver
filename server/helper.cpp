@@ -7,7 +7,7 @@ int fileCheck(std::string fileName)
 {
 	if (!access(fileName.c_str(), F_OK))
 	{
-		if (!access(fileName.c_str(), R_OK))
+		if (!access(fileName.c_str(), R_OK	))
 			return OK;
 		return FORBIDDEN;
 	}

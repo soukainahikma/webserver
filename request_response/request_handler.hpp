@@ -56,9 +56,28 @@ public:
 		return Response(Servs[0].get_root(), Servs[0].get_root() + defaultErrorPages["502"], Servs[0].get_error_page());
 	}
 
+	Response POSTRequesHandler () {
+		std::cout << "CONTENT TYPE => " << req.getRequest()["Content-Type"] << std::endl;
+		// |Content-Type| => multipart/form-data
+		if (req.getRequest()["Content-Type"] == "multipart/form-data")
+		{
+			std::vector<body_struct> body = req.getBodyStructs();
+			for (size_t i = 0; i < body.size(); i++)
+			{
+				if (body[i].filename != "")
+				{
+					
+				}
+			}
+			// std::cout << "SIZE => "<< req.getBodyStructs().size() << std::endl;
+		}
+		return GETRequesHandler();
+	}
 	Response Bootstrap() {	
 		if (req.getRequest()["Method"] == "GET")
 			return GETRequesHandler();
+		if (req.getRequest()["Method"] == "POST")
+			return POSTRequesHandler();
 		return GETRequesHandler();
 	}
 
