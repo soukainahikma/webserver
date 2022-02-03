@@ -17,10 +17,13 @@ int fileCheck(std::string fileName)
 
 void connection_handler(int i,RequestHandler &req_handler, int port)
 {
-	char buffer[1024] = {0};
-	int read_val = read(i, buffer, 1024);
+	char buffer[3000] = {0};
+	int read_val = read(i, buffer, 3000);
+	// std::cout << "we are in the connection handler " << read_val  <<std::endl;
 	if (buffer[0] != 0)
 	{
+		// std::cout << buffer << std::endl;
+
 		Request req(buffer, port);
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
