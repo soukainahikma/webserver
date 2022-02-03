@@ -1,5 +1,5 @@
 #include "server/socket.hpp"
-#include "request_response/response_beta.hpp"
+#include "request_response/response.hpp"
 #include "request_response/request.hpp"
 #include "request_response/request_handler.hpp"
 #include "parsing/Server.hpp"
