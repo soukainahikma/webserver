@@ -2,6 +2,7 @@
 #include "../request_response/response.hpp"
 #include "../request_response/request.hpp"
 #include "../request_response/request_handler.hpp"
+#include <sys/ioctl.h>
 
 int fileCheck(std::string fileName, std::string req_type)
 {
@@ -17,16 +18,21 @@ int fileCheck(std::string fileName, std::string req_type)
 
 void connection_handler(int i,RequestHandler &req_handler, int port)
 {
-	char buffer[1024] = {0};
-	int read_val = read(i, buffer, 1024);
+	int size;
+
+	if (ioctl(i, FIONREAD, &size) == -1)
+		throw std::runtime_error("INTERNAL SERVER ERROR");
+	char *buffer = (char *)malloc(size * sizeof(char));
+	int read_val = read(i, buffer, size);
 	if (buffer[0] != 0)
 	{
 		Request req(buffer, port);
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
 		const char *hello = resp.get_header().c_str();
-		std::cout << hello << std::endl;
+		// std::cout << hello << std::endl;
 		send(i, hello, strlen(hello), 0);
 		close(i);
 	}
+	free(buffer);
 }

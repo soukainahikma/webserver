@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<unistd.h>
-
+#include <sys/stat.h>
+#include <fcntl.h>
 
 void fileCheck(const char *fileName)
 {
@@ -44,11 +45,15 @@ void fileCheck(const char *fileName)
 		printf("The File %s\t is not an Executable\n", fileName);
 	}
 }
-int main()
-{
-	std::ifstream file /* ("test.cpp") */;
-	file.open("file");
-	fileCheck("file");
-	// std::cout << file.good() << std::endl;
-	return 0;
+
+int main(int ac, char **argv){
+    struct stat fileStat;
+	if(stat(argv[1], &fileStat) < 0)    
+        return 1;
+	if (fileStat.st_mode & S_IRUSR)
+        std::cout << "read " << std::endl;
+    if (fileStat.st_mode & S_IWUSR)
+        std::cout << "write" << std::endl;
+    if (fileStat.st_mode & S_IXUSR)
+        std::cout << "execute " << std::endl;
 }

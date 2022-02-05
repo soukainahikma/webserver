@@ -173,6 +173,10 @@ public:
 		return (myfiles);
 	}
 
+	std::string & getBodyString() {
+		return (body);
+	}
+
 	void map_printer()
 	{
 		for (std::map<std::string, std::string>::iterator it = map_head.begin(); it != map_head.end(); ++it)

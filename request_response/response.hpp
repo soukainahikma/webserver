@@ -25,6 +25,7 @@
 #define BAD_REQUEST 400
 #define UNAUTHORIZED 401
 #define FORBIDDEN 403
+#define PAYLOAD_TOO_LARGE 413
 #define NOT_FOUND 404
 #define NOT AUTHORIZED 405
 
@@ -95,7 +96,7 @@ class Response
 			file.close();
 		}	
 
-		std::string get_extension(std::string myText)
+		static std::string get_extension(std::string myText)
 		{
 			std::vector<std::string> vec;
 			std::istringstream iss(myText);
@@ -115,7 +116,7 @@ class Response
 			std::string buffer;
 
 			file.open(filename);
-			std::cout << "In get_file => "<< filename << std::endl;
+			// std::cout << "In get_file => "<< filename << std::endl;
 			while (getline(file, line))
 			{
 				buffer = buffer + line;
