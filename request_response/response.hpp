@@ -73,7 +73,7 @@ class Response
 					break;
 			}
 			version = "HTTP/1.1 ";
-			status = (stats == OK || stats == CREATED) ? "201 " : "404 ";
+			status = (stats == OK || stats == CREATED) ? "201 " :( (stats == FORBIDDEN) ? "403 " : "404 ");
 			status_message = (stats == OK || stats == CREATED) ? " OK\n" : "KO\n";
 			filename = (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + errorPages[std::to_string(stats)];
 			content_type = "Content-Type: text/" + get_extension(this->filename) + "\r\n\n\n";
@@ -89,8 +89,8 @@ class Response
 			this->path = "";
 			version = "HTTP/1.1 ";
 			stats = fileCheck(filename, req_type);
-			this->status = (stats == OK || stats == CREATED) ? status + " " : "404 ";
-			status_message = this->status == "404 " ? "KO\n" : "OK\n";
+			this->status = (stats == OK || stats == CREATED) ? "201 " :( (stats == FORBIDDEN) ? "403 " : "404 ");
+			status_message = !(stats == OK || stats == CREATED) ? "KO\n" : "OK\n";
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
 			content_type = "Content-Type: text/" + get_extension(this->filename) + "\r\n\n\n";
 			file.close();
@@ -116,7 +116,6 @@ class Response
 			std::string buffer;
 
 			file.open(filename);
-			// std::cout << "In get_file => "<< filename << std::endl;
 			while (getline(file, line))
 			{
 				buffer = buffer + line;
@@ -129,15 +128,6 @@ class Response
 		{
 			return(version + status + status_message + content_type + get_file());
 		}
-
-		/* void header_cleaner()
-		{
-			buffer = "";
-			version = "HTTP/1.1 ";
-			status = "200 ";
-			status_message = " OK\n";
-			content_type = "Content-Type: text/html\r\n\n\n";
-		} */
 
 };
 #endif
