@@ -27,7 +27,7 @@
 #define FORBIDDEN 403
 #define PAYLOAD_TOO_LARGE 413
 #define NOT_FOUND 404
-#define NOT AUTHORIZED 405
+#define NOT_AUTHORIZED 405
 
 int fileCheck(std::string fileName, std::string req_type);
 class Response
