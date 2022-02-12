@@ -97,15 +97,14 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> &m)
 		std::cout << "	listen  " << vec_serv[i].get_listen() << "\n";
 		std::cout << "	host  " << vec_serv[i].get_host() << "\n";
 		int p = 0;
-				std::cout << "	server_size  " << vec_serv[i].get_server_name().size() << "\n";
-			for (std::map<std::string, int>::iterator it = vec_serv[i].get_server_name().begin(); it != vec_serv[i].get_server_name().end(); it++)
-			{
-				std::cout << "	server_name  " << it->first << "\n";
-			}
-
-
-			
+		std::cout << "	server_size  " << vec_serv[i].get_server_name().size() << "\n";
+		for (std::map<std::string, int>::iterator it = vec_serv[i].get_server_name().begin(); it != vec_serv[i].get_server_name().end(); it++)
+		{
+			std::cout << "	server_name  " << it->first << "\n";
+		}
 		std::cout << "	client_max_body_size  " << vec_serv[i].get_client_max_body_size() << "\n";
+		std::cout << "	enable_delete  " << vec_serv[i].get_enable_delete() << "\n";
+		std::cout << "	enable_upload  " << vec_serv[i].get_enable_upload() << "\n";
 		std::cout << "	error_page  403 " << vec_serv[i].get_error_page()["403"] << "\n";
 		std::cout << "	error_page  404 " << vec_serv[i].get_error_page()["404"] << "\n";
 		std::cout << "	error_page  500 " << vec_serv[i].get_error_page()["500"] << "\n";

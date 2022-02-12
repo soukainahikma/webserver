@@ -37,6 +37,8 @@ void Server::Clear()
 	_location_open = 0;
 	_server_open = 0;
 	_map_location.clear();
+	_enable_upload.clear();
+	_enable_delete.clear();
 }
 
 void Server::set_listen(std::string &listen)
@@ -171,6 +173,8 @@ void Server::set_server_open(int server) { _server_open = server; }
 
 int &Server::get_listen() { return _listen; }
 std::string &Server::get_host() { return _host; }
+std::string &Server::get_enable_delete() { return _enable_delete; }
+std::string &Server::get_enable_upload() { return _enable_upload; }
 std::string &Server::get_root() { return _root; }
 size_t &Server::get_client_max_body_size() { return _client_max_body_size; }
 std::map<std::string, std::string> &Server::get_error_page() { return _error_page; }
