@@ -63,6 +63,7 @@ class AbstractRequest
                     return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, "200");
                 }
             }
+            k = k == -1 ? 0 : k;
             return Response(servs[k], servs[k].get_root() + defaultErrorPages["404"], this->method, "404");
         }
 
