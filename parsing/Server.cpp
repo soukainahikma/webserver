@@ -86,6 +86,20 @@ void Server::set_host(std::string &host)
 	_host = host;
 }
 
+void Server::set_enable_delete(std::string &value)
+{
+	if (value.compare("on") && value.compare("off"))
+		print_error(12, value);
+	_enable_delete = value;
+}
+
+void Server::set_enable_upload(std::string &value)
+{
+	if (value.compare("on") && value.compare("off"))
+		print_error(12, value);
+	_enable_upload = value;
+}
+
 void Server::set_root(std::string &root)
 {
 	if (!get_root().empty())

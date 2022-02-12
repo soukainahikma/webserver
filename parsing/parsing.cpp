@@ -157,6 +157,10 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		}
 		else if (!key.compare("root"))
 			serv.set_root(value);
+		else if (!key.compare("enable_delete"))
+			serv.set_enable_delete(value);
+		else if (!key.compare("enable_upload"))
+			serv.set_enable_upload(value);
 		else
 			print_error(1, key);
 	}
@@ -209,22 +213,22 @@ std::vector<Server> parsing(std::string file, std::map<int,int> &m)
 	else
 	{
 		std::cout << "Error file: ";
-		throw std::out_of_range("test");
+		throw file;
 	}
 	return (vec_serv);
 }
 
-// int main()
-// {
-// 	try
-// 	{
-// 		std::map<int,int> m;
-// 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-// 		print_all(vec_serv, m);
+int main()
+{
+	try
+	{
+		std::map<int,int> m;
+		std::vector<Server> vec_serv = parsing("webserv.conf", m);
+		print_all(vec_serv, m);
 
-// 	}
-// 	catch(std::string e)
-// 	{
-// 		std::cerr << e << '\n';
-// 	}
-// }
+	}
+	catch(std::string e)
+	{
+		std::cerr << e << '\n';
+	}
+}

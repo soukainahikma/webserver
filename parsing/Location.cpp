@@ -105,10 +105,8 @@ void	Location::set_request_method(std::string request_method)
 			p++;
 		else if (!splt[idx].compare("DELETE"))
 			d++;
-		else{
-			std::cout << "|" << g << "|"  << p << "|" <<  d << "|\n";
+		else
 			print_error(1, request_method);
-		}
 		if (idx > 3 || g > 1 || p > 1 || d > 1)
 			print_error(8, request_method);
 		if (splt[idx].find(' ') != std::string::npos)
