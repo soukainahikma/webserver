@@ -32,7 +32,7 @@ public:
 	typedef std::map<string, string> map_request;
 	typedef std::vector<string> vector_request;
 	Request(){};
-	Request(char *buffer, int port)
+	Request(std::string buffer, int port)
 	{
 		this->port = port;
 		fill_map(buffer);
@@ -145,11 +145,10 @@ public:
 			}
 		}
 	}
-	void fill_map(char *buffer)
+	void fill_map(std::string s)
 	{
 		std::string header;
 		// std::string body;
-		std::string s(buffer);
 		size_t found;
 		if ((found = s.find("\r\n\r\n")) != std::string::npos)
 		{
