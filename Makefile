@@ -12,6 +12,10 @@ HEADERS = parsing/Location.hpp\
 		request_response/response.hpp\
 		parsing/Server.hpp\
 		request_response/request_handler.hpp\
+		request_response/AbstractRequest.hpp\
+		request_response/DELETERequest.hpp\
+		request_response/GETRequest.hpp\
+		request_response/POSTRequest.hpp\
 		server/socket.hpp
 
 

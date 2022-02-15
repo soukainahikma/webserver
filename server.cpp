@@ -45,6 +45,7 @@ int main()
 							new_socket = socket_list[j].accept_socket(i);
 							port = socket_list[j].get_port();
 							FD_SET(new_socket,&current_sockets);
+							// FD_SET(new_socket, &write_fds);
 							if(new_socket > max_fd_so_far)
 								max_fd_so_far = new_socket;
 							check = true;

@@ -21,7 +21,7 @@ void connection_handler(int i,RequestHandler &req_handler, int port)
 {
 	int size;
 	std::string files;
-	std::ofstream file("req.txt");
+	// std::ofstream file("req.txt");
 	int		ret;
 
 	// if (ioctl(i, FIONREAD, &size) == -1)
@@ -38,8 +38,7 @@ void connection_handler(int i,RequestHandler &req_handler, int port)
 			break;
 	};
 	std::cout<< "last ret : " << ret << std::endl;
-	file << files << std::endl;
-	file.close();
+	std::cout << files << std::endl;
 	// if (buffer[0] != 0)
 	// {
 	// 	Request req(buffer, port);
