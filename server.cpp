@@ -6,9 +6,9 @@
 #include <sys/select.h>
 #include <exception>
 
-void connection_handler(int i,RequestHandler &req_handler, int port);
+void connection_handler(int i,RequestHandler &req_handler, int port, fd_set write_fds,std::map<int,std::string> map_of_req);
 std::vector<Server> parsing(std::string file, std::map<int,int> &m);
-
+std::map<int,std::string> map_of_req;
 int main()
 {
 	try
@@ -20,24 +20,25 @@ int main()
 		std::vector<server_socket> socket_list = info.fill_list_socket(parse, ports);
 		int max_fd_so_far = info.get_max_fd_so_far(); // getter of the max;
 		fd_set current_sockets;
+		fd_set write_fds;
 		FD_ZERO(&current_sockets);
+		FD_ZERO(&write_fds);
 		current_sockets = info.get_set_socket();
 		fd_set ready_sockets;
 		int new_socket;
 		int port = -1;
+		// create map
 		while(1)
 		{
 			ready_sockets = current_sockets;
 			// std::cout<< "here before select"<<std::endl;
-			if(select(max_fd_so_far +1 ,&ready_sockets,NULL,NULL,NULL) < 0)
+			if(select(max_fd_so_far +1 ,&ready_sockets,&write_fds,NULL,NULL) < 0)
 				throw "select failed: ";
 			for(int i = 0;i<= max_fd_so_far; i++)
 			{
 				if(FD_ISSET(i, &ready_sockets))
 				{
-				// std::cout<< "index : " << i << std::endl;
 					bool check = false;
-					//check to accept
 					for (size_t j = 0; j < socket_list.size(); j++)
 					{
 						if(i == socket_list[j].get_server_fd())
@@ -45,24 +46,21 @@ int main()
 							new_socket = socket_list[j].accept_socket(i);
 							port = socket_list[j].get_port();
 							FD_SET(new_socket,&current_sockets);
-							// FD_SET(new_socket, &write_fds);
+							FD_SET(new_socket, &write_fds);//make sure if i have to pass it in params
 							if(new_socket > max_fd_so_far)
 								max_fd_so_far = new_socket;
 							check = true;
-							// std::cout << "<----- got request " << new_socket << " ------->" << std::endl;
 							break;
 						}
 					}
-					//check to accept
 					if(check == false)
 					{
-						connection_handler(i,req_handler, port);
-						// std::cout << "<----- request: {" << new_socket << " <==>  " << i  <<  "} handled ------->" << std::endl;
+						connection_handler(i,req_handler, port,write_fds, map_of_req);//add write_fds in here and check them in the send + map
 						FD_CLR(i,&current_sockets);
+						FD_CLR(i,&write_fds);
 					}
 				}
 			}
-			// std::cout << "<----- request show time ------->" << std::endl;
 		}
 		return 0;
 	}
@@ -72,4 +70,3 @@ int main()
 		return (1);
 	}
 }
-//[alert] socket: select and discovered it's not ready sock.c:384: Operation timed out

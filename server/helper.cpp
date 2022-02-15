@@ -17,47 +17,40 @@ int fileCheck(std::string fileName, std::string req_type)
 }
 
 
-void connection_handler(int i,RequestHandler &req_handler, int port)
+void connection_handler(int i,RequestHandler &req_handler, int port,fd_set write_fds,std::map<int,std::string> map_of_req)
 {
-	int size;
-	// std::string files;
-	// std::ofstream file("req.txt");
-	// int		ret;
-
-	// if (ioctl(i, FIONREAD, &size) == -1)
-	// 	throw std::runtime_error("INTERNAL SERVER ERROR");
-	// char *buffer = (char *)malloc(size * sizeof(char));
-	// int read_val = read(i, buffer, size);
 	std::string files;
-	int		ret;
-
-	if (ioctl(i, FIONREAD, &size) == -1)
-		throw std::runtime_error("INTERNAL SERVER ERROR");
+	std::map<int ,std::string>::iterator it;
 	char *buffer =(char*) malloc(sizeof(char) * 1025);
 	bzero(buffer,1025);
-	while((ret = recv(i, buffer, 1024, 0))>0)
+	if((recv(i, buffer, 1024, 0))>=0)
 	{
-		// std::cout<< buffer<<std::endl;
-		std::cout << "ret: { " << ret << " } gurrela debugging \n";
-		files += std::string(buffer);
+		if((it = map_of_req.find(i))!=map_of_req.end())
+		{
+			it->second+=std::string(buffer);
+			files = it->second;
+		}
+		else
+		{
+			map_of_req[i] = std::string(buffer);
+			files = std::string(buffer);
+		}
 		bzero(buffer,1025);
-		if(ret< 1024)
-			break;
+
 	};
-
-	std::cout << "out \n";
-
+	std::cout<< files << std::endl;
+	//throw exception for the read == -1
 	if (!files.empty())
-	// if (buffer[0] != 0)
 	{
 		Request req(files, port);
-		// Request req(std::string(buffer), port);
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
 		const char *hello = resp.get_header().c_str();
-		// std::cout << hello << std::endl;
-		send(i, hello, strlen(hello), 0);
-		close(i);
+		if(FD_ISSET(i,&write_fds))
+		{
+			send(i, hello, strlen(hello), 0);
+			close(i);
+		}
 	}
 	free(buffer);
 }
