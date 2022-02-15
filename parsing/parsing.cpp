@@ -34,6 +34,8 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 			serv.set_location_open(2);
 			locat.set_path(value);
 		}
+		else
+			print_error(5, line);
 		line.erase(0, idx + 1);
 	}
 	else if (!line[idx] && (line.find("server") != std::string::npos || line.find("location") != std::string::npos))
@@ -42,7 +44,7 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 		value = get_value(line, i);
 		if (!key.compare("server") && value.empty())
 		{
-			if (serv.get_server_open()){
+			if (serv.get_server_open() || serv.get_location_open()){
 				print_error(0, key);
 			}
 			serv.set_server_open(1);
@@ -50,20 +52,20 @@ void check_brace(std::string &line, Server &serv, Location &locat)
 		}
 		else if (!key.compare("location") && !value.empty())
 		{
-			if (serv.get_location_open()){
+			if (serv.get_location_open() || serv.get_server_open() != 2){
 				print_error(0, key);
 			}
 			locat.set_path(value);
 			serv.set_location_open(1);
 			line.clear();
 		}
-		else if (!key.compare("server") || !key.compare("location"))
+		else if (!key.compare("server"))
 			print_error(2, key);
 	}
 }
 
 
-void fill_location(std::string key, std::string value, Server &serv, Location &locat)
+void fill_location(std::string key, std::string value, Location &locat)
 {
 	if (!key.compare("autoindex"))
 		locat.set_autoindex(value);
@@ -81,6 +83,8 @@ void fill_location(std::string key, std::string value, Server &serv, Location &l
 		locat.set_upload_enable(value);
 	else if (!key.compare("upload_store"))
 		locat.set_upload_store(value);
+	else if (!key.compare("enable_delete"))
+		locat.set_enable_delete(value);
 	else if (!key.compare("return"))
 	{
 		std::vector<std::string> s = split(value, ' ');
@@ -104,7 +108,6 @@ int find_last(std::string s)
 				return (0);
 			std::cout << "|" << s[idx] << "|\n";
 		}
-
 		idx--;
 	}
 	return (0);
@@ -133,7 +136,7 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 			serv.Clear();
 		}
 		else if (serv.get_location_open() == 2)
-			fill_location(key, value, serv, locat);
+			fill_location(key, value, locat);
 		else if (!key.compare("listen"))
 		{
 			serv.set_listen(value);
@@ -157,10 +160,6 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 		}
 		else if (!key.compare("root"))
 			serv.set_root(value);
-		else if (!key.compare("enable_delete"))
-			serv.set_enable_delete(value);
-		else if (!key.compare("enable_upload"))
-			serv.set_enable_upload(value);
 		else
 			print_error(1, key);
 	}
@@ -180,9 +179,8 @@ std::vector<Server> parsing(std::string file, std::map<int,int> &m)
 	std::string value;
 
 	int idx;
-	int pos;
+	size_t pos;
 	int i = 0;
-	int nbline = 0;
 	int size;
 	if (myfile.is_open())
 	{
@@ -224,7 +222,7 @@ int main()
 	{
 		std::map<int,int> m;
 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-		print_all(vec_serv, m);
+		// print_all(vec_serv, m);
 
 	}
 	catch(std::string e)

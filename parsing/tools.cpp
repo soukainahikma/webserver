@@ -4,22 +4,22 @@
 void print_error(int i, std::string v)
 {
 	static std::string err[] = {
-		"syntax Error: Missing close brace {" + v + "}",
-		"syntax Error: unexpected token {" + v + "}",
-		"syntax Error: Missing open brace {" + v + "}",
-		"syntax Error: Missing ';' {" + v + "}",
-		"syntax Error: too many arguments {" + v + "}",
-		"syntax Error: no server to fill with {" + v + "}",
-		"syntax Error: Missing arguments to {" + v + "}",
-		"syntax Error: permission denied {" + v + "}",
-		"syntax Error: duplicated key {" + v + "}",
-		"syntax Error: unexpected form (example : NN/NNNM) {" + v + "}",
-		"syntax Error: am i a joke to you {" + v + "}",
-		"syntax Error: Only accept MB {" + v + "}",
-		"syntax Error: unexpected token (on/off) -_- {" + v + "}",
-		"syntax Error: unexpected form {" + v + "}",
-		"syntax Error: somthing missing in {" + v + "}",
-		"syntax Error: duplicated location {" + v + "}"
+		"syntax Error: Missing close brace '" + v + "'", // 0
+		"syntax Error: unexpected token '" + v + "'", // 1
+		"syntax Error: Missing open brace '" + v + "'", // 2
+		"syntax Error: Missing ';' '" + v + "'", // 3
+		"syntax Error: too many arguments '" + v + "'", // 4
+		"syntax Error: no server to fill with '" + v + "'", // 5
+		"syntax Error: Missing arguments to '" + v + "'", // 6
+		"syntax Error: permission denied '" + v + "'", //7
+		"syntax Error: duplicated key '" + v + "'",// 8
+		"syntax Error: unexpected form (example : NN/NNNM) '" + v + "'",// 9
+		"syntax Error: am i a joke to you '" + v + "'",// 10
+		"syntax Error: Only accept MB '" + v + "'",// 11
+		"syntax Error: unexpected token (on/off) -_- '" + v + "'",// 12
+		"syntax Error: unexpected form '" + v + "'",// 13
+		"syntax Error: somthing missing in '" + v + "'",// 14
+		"syntax Error: duplicated location '" + v + "'"// 15
 	};
 	throw err[i];
 }
@@ -84,9 +84,9 @@ std::string get_value(std::string &line, int &idx)
 
 void	print_all(std::vector<Server> &vec_serv, std::map<int,int> &m)
 {
-	int idx = 0;
-	int i = 0;
-	int r = 0;
+	size_t idx = 0;
+	size_t i = 0;
+	size_t r = 0;
 	// std::cout << vec_serv.size() << "\n";
 	while (i < vec_serv.size())
 	{
@@ -96,22 +96,19 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> &m)
 		std::cout << "server {\n\n";
 		std::cout << "	listen  " << vec_serv[i].get_listen() << "\n";
 		std::cout << "	host  " << vec_serv[i].get_host() << "\n";
-		int p = 0;
 		std::cout << "	server_size  " << vec_serv[i].get_server_name().size() << "\n";
 		for (std::map<std::string, int>::iterator it = vec_serv[i].get_server_name().begin(); it != vec_serv[i].get_server_name().end(); it++)
 		{
 			std::cout << "	server_name  " << it->first << "\n";
 		}
 		std::cout << "	client_max_body_size  " << vec_serv[i].get_client_max_body_size() << "\n";
-		std::cout << "	enable_delete  " << vec_serv[i].get_enable_delete() << "\n";
-		std::cout << "	enable_upload  " << vec_serv[i].get_enable_upload() << "\n";
 		std::cout << "	error_page  403 " << vec_serv[i].get_error_page()["403"] << "\n";
 		std::cout << "	error_page  404 " << vec_serv[i].get_error_page()["404"] << "\n";
 		std::cout << "	error_page  500 " << vec_serv[i].get_error_page()["500"] << "\n";
 		std::cout << "	error_page  502 " << vec_serv[i].get_error_page()["502"] << "\n";
 		std::cout << "	root  " << vec_serv[i].get_root() << "\n";
 
-		int d = 0;
+		size_t d = 0;
 		while (d < vec_serv[i].get_location().size())
 		{
 			std::cout << "\n\n------------ location  "<< d + 1 << "---------------\n\n";
@@ -126,7 +123,7 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> &m)
 			std::cout << "	upload_enable		" << vec_serv[i].get_location()[d].get_upload_enable() << "\n";
 			std::cout << "	upload_store		" << vec_serv[i].get_location()[d].get_upload_store() << "\n";
 			std::cout << "	autoindex		" << vec_serv[i].get_location()[d].get_autoindex() << "\n";
-			int p = 0;
+			size_t p = 0;
 			while (p < vec_serv[i].get_location()[d].get_index().size())
 				std::cout << "	index		" << vec_serv[i].get_location()[d].get_index()[p++] << "\n";
 			p = -1;
@@ -143,7 +140,6 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> &m)
 		std::cout << "}\n";
 		i++;
 	}
-	int map = 0;
 	std::cout << "\n\n------------ports :\n";
 	for (std::map<int, int>::iterator i = m.begin(); i != m.end(); i++)
 	{

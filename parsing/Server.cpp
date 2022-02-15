@@ -37,8 +37,6 @@ void Server::Clear()
 	_location_open = 0;
 	_server_open = 0;
 	_map_location.clear();
-	_enable_upload.clear();
-	_enable_delete.clear();
 }
 
 void Server::set_listen(std::string &listen)
@@ -53,7 +51,7 @@ void Server::set_listen(std::string &listen)
 			print_error(13, "listen " + listen);
 		idx++;
 	}
-	if (idx != 2 && idx != 4)
+	if (idx > 5)
 		print_error(9, "listen " + listen);
 	_listen = atoi(listen.c_str());
 }
@@ -88,20 +86,6 @@ void Server::set_host(std::string &host)
 	_host = host;
 }
 
-void Server::set_enable_delete(std::string &value)
-{
-	if (value.compare("on") && value.compare("off"))
-		print_error(12, value);
-	_enable_delete = value;
-}
-
-void Server::set_enable_upload(std::string &value)
-{
-	if (value.compare("on") && value.compare("off"))
-		print_error(12, value);
-	_enable_upload = value;
-}
-
 void Server::set_root(std::string &root)
 {
 	if (!get_root().empty())
@@ -114,7 +98,7 @@ void Server::set_root(std::string &root)
 
 void Server::set_client_max_body_size(std::string &client_max_body_size)
 {
-	if (get_client_max_body_size() != -1)
+	if (get_client_max_body_size() != (size_t)-1)
 		print_error(8, "client_max_body_size");
 	client_max_body_size = trim(client_max_body_size);
 	int j = 0;
@@ -133,7 +117,7 @@ void Server::set_client_max_body_size(std::string &client_max_body_size)
 
 void Server::set_server_name(std::vector<std::string> &server_name)
 {
-	int idx = 0;
+	size_t idx = 0;
 
 	while (idx < server_name.size())
 	{
@@ -173,8 +157,6 @@ void Server::set_server_open(int server) { _server_open = server; }
 
 int &Server::get_listen() { return _listen; }
 std::string &Server::get_host() { return _host; }
-std::string &Server::get_enable_delete() { return _enable_delete; }
-std::string &Server::get_enable_upload() { return _enable_upload; }
 std::string &Server::get_root() { return _root; }
 size_t &Server::get_client_max_body_size() { return _client_max_body_size; }
 std::map<std::string, std::string> &Server::get_error_page() { return _error_page; }

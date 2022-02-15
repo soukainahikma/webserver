@@ -15,6 +15,7 @@ class Location
 	std::vector<std::string>	_request_method;
 	std::string					_fastcgi_pass;
 	std::string					_upload_enable;
+	std::string					_enable_delete;
 	std::string					_upload_store;
 	std::map<int,std::string>	_return_map;
 	bool						_equal;
@@ -30,6 +31,7 @@ class Location
 		void	set_request_method(std::string);
 		void	set_fastcgi_pass(std::string);
 		void	set_upload_enable(std::string);
+		void	set_enable_delete(std::string);
 		void	set_upload_store(std::string);
 		void	set_return_map(std::vector<std::string>&);
 		//		get
@@ -40,6 +42,7 @@ class Location
 		std::vector<std::string>	&get_request_method();
 		std::string					&get_fastcgi_pass();
 		std::string					&get_upload_enable();
+		std::string					&get_enable_delete();
 		std::string					&get_upload_store();
 		std::map<int,std::string>	&get_return_map();
 		bool						get_equal();
@@ -47,4 +50,5 @@ class Location
 void						print_error(int i, std::string v);
 std::vector<std::string>	split(std::string &str, char c);
 std::string					trim(const std::string &s);
+
 #endif

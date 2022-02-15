@@ -20,15 +20,11 @@ class Server
 	std::map<std::string, Location>		_map_location;
 	int									_location_open;
 	int									_server_open;
-	std::string							_enable_delete;
-	std::string							_enable_upload;
 	public:
 		Server();
 		void	Clear();
 		// set
 		void	set_listen(std::string&);
-		void	set_enable_delete(std::string&);
-		void	set_enable_upload(std::string&);
 		void	set_host(std::string&);
 		void	set_root(std::string&);
 		void	set_client_max_body_size(std::string&);
@@ -41,8 +37,6 @@ class Server
 		//	get
 		int									&get_listen();
 		std::string							&get_host();
-		std::string							&get_enable_delete();
-		std::string							&get_enable_upload();
 		std::string							&get_root();
 		size_t								&get_client_max_body_size();
 		std::map<std::string, std::string>	&get_error_page();
