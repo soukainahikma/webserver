@@ -222,7 +222,7 @@ int main()
 	{
 		std::map<int,int> m;
 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-		// print_all(vec_serv, m);
+		print_all(vec_serv, m);
 
 	}
 	catch(std::string e)

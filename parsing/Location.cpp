@@ -128,8 +128,8 @@ void	Location::set_return_map(std::vector<std::string> &ret)
 			print_error(1, "return " + ret[0] + " " + ret[1]);
 		i++;
 	}
-	if (_return_map[std::stoi(ret[0])].empty())
-		_return_map[std::stoi(ret[0])] = ret[1];
+	if (_return_map[atoi(ret[0].c_str())].empty())
+		_return_map[atoi(ret[0].c_str())] = ret[1];
 }
 
 void	Location::set_fastcgi_pass(std::string fastcgi_pass)

@@ -79,7 +79,7 @@ void Server::set_host(std::string &host)
 				print_error(1, host);
 			j++;
 		}
-		if (std::stoi(splt[idx]) < 0 || std::stoi(splt[idx]) > 255)
+		if (atoi(splt[idx].c_str()) < 0 || atoi(splt[idx].c_str()) > 255)
 			print_error(10, host);
 		idx++;
 	}
