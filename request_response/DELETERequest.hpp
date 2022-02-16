@@ -3,7 +3,7 @@
 
 #include "request.hpp"
 #include "response.hpp"
-#include "AbstractRequest.hpp"
+#include "ARequest.hpp"
 #include "../server/socket.hpp"
 #include "../parsing/Server.hpp"
 #include <vector>
@@ -12,11 +12,11 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-class DELETERequest: public AbstractRequest
+class DELETERequest: public ARequest
 {
 
 public:
-    DELETERequest(Request &req, std::vector<Server> &servs): AbstractRequest(req, servs) {
+    DELETERequest(Request &req, std::vector<Server> &servs): ARequest(req, servs) {
         this->method = "DELETE";
     };
 

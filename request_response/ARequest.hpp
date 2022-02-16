@@ -10,10 +10,10 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-class AbstractRequest
+class ARequest
 {
     public:
-        AbstractRequest(Request &req, std::vector<Server> &servs) {
+        ARequest(Request &req, std::vector<Server> &servs) {
             this->req = req;
             this->servs = servs;
         };
@@ -57,7 +57,7 @@ class AbstractRequest
                         {
                             if (checkAllowedMethods(locations[j].get_request_method(), this->method))
                                 return logic_function(servs[i], locations[j]);
-                            return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["403"], this->method, "403");
+                            return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405");
                         }
                     }
                     return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, "200");
@@ -67,7 +67,7 @@ class AbstractRequest
             return Response(servs[k], servs[k].get_root() + defaultErrorPages["404"], this->method, "404");
         }
 
-        ~AbstractRequest() {
+        ~ARequest() {
 
         };
     protected:

@@ -4,7 +4,7 @@
 #include "response.hpp"
 #include "../server/socket.hpp"
 #include "../parsing/Server.hpp"
-#include "AbstractRequest.hpp"
+#include "ARequest.hpp"
 #include "request.hpp"
 #include <vector>
 #include <map>
@@ -12,10 +12,10 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-class GETRequest: public AbstractRequest
+class GETRequest: public ARequest
 {
 public:
-    GETRequest(Request &req, std::vector<Server> &servs): AbstractRequest(req, servs) {
+    GETRequest(Request &req, std::vector<Server> &servs): ARequest(req, servs) {
         this->method = "GET";
     };
 
