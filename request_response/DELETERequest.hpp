@@ -39,7 +39,7 @@ public:
             }
         }
 			std::cout << "+++++++++++++++" << std::endl;
-		return Response(server, location, "POST");
+		return Response(server, location, "POST", req);
 	}
 
     ~DELETERequest() {};

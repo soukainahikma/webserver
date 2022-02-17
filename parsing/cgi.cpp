@@ -4,7 +4,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <fstream>
-#include "Server.hpp"
+#include "../parsing/Server.hpp"
+#include "../request_response/request.hpp"
 
 char	**init_env(std::string serv_name, std::string query, std::string status, std::string path, std::string page, std::string method)
 {
@@ -39,7 +40,7 @@ char	**init_env(std::string serv_name, std::string query, std::string status, st
 	return (env);
 }
 
-std::string runCgi(std::string path, std::string method, std::string page, std::string status)
+std::string runCgi(std::string path, std::string method, std::string page, std::string status, Request req_map)
 {
 	int pipefd[2];
 	char **args;
@@ -91,8 +92,9 @@ std::string runCgi(std::string path, std::string method, std::string page, std::
 
 int main ()
 {
+	Request req;
 	std::cout << "------ index.py ------" << std::endl;
-	std::string s = runCgi("/Users/aboulbaz/Desktop/webserver", "POST", "index.py", "200");
+	std::string s = runCgi("/Users/aboulbaz/Desktop/webserver/pages/python_cgi/", "GET", "index.py", "200", req);
 	std::cout << s << std::endl;
 	// std::cout << "------ index.php ------" << std::endl;
 	// std::string s1 = runCgi("/Users/aboulbaz/Desktop/webserver", "POST", "index.php", "200");

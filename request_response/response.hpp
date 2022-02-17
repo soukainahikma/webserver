@@ -10,6 +10,7 @@
 #include "../parsing/Server.hpp"
 #include <cstring>
 #include <sstream>
+#include "request.hpp"
 
 /* ************ Successful responses ******** */
 
@@ -29,7 +30,9 @@
 #define NOT_FOUND 404
 #define NOT_AUTHORIZED 405
 
-int fileCheck(std::string fileName, std::string req_type);
+int			fileCheck(std::string fileName, std::string req_type);
+std::string	runCgi(std::string path, std::string method, std::string page, std::string status, Request request);
+
 class Response
 {
 	private:
@@ -53,11 +56,13 @@ class Response
 		std::string root;
 		std::string path;
 		std::string filename;
+		std::string method;
         std::vector<std::string> indexes;
         std::map<std::string, std::string> errorPages;
+		Request request;
     
 	public:
-		Response(Server server, Location location, std::string req_type)
+		Response(Server server, Location location, std::string req_type, Request req)
 		{
 			size_t i;
 			int stats;
@@ -65,6 +70,7 @@ class Response
 
 			root = server.get_root();
 			path = location.get_path();
+			this->request = req;
 			std::vector<std::string> indexes = location.get_index();
 			for (i = 0; i < indexes.size(); i++)
 			{
@@ -72,27 +78,28 @@ class Response
 				if (stats == OK || stats == CREATED)
 					break;
 			}
+			method = req_type;
 			version = "HTTP/1.1 ";
-			status = (stats == OK || stats == CREATED) ? "201 " :( (stats == FORBIDDEN) ? "403 " : "404 ");
+			status = (stats == OK || stats == CREATED) ? "201" :( (stats == FORBIDDEN) ? "403" : "404");
 			status_message = (stats == OK || stats == CREATED) ? " OK\n" : "KO\n";
 			filename = (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + errorPages[std::to_string(stats)];
-			content_type = "Content-Type: text/" + get_extension(this->filename) + "\r\n\n\n";
 		}
 
-		Response(Server server, std::string filename, std::string req_type, std::string status)
+		Response(Server server, std::string filename, std::string req_type, std::string status, Request req)
 		{
 			std::ifstream file;
 			int stats;
 			std::string extension;
-	
+
+			this->request = req;
 			this->root = "";
 			this->path = "";
+			method = req_type;
 			version = "HTTP/1.1 ";
 			stats = fileCheck(filename, req_type);
-			this->status = (stats == OK || stats == CREATED) ? "201 " :( (stats == FORBIDDEN) ? "403 " : "404 ");
+			this->status = (stats == OK || stats == CREATED) ? "201" :( (stats == FORBIDDEN) ? "403" : "404");
 			status_message = !(stats == OK || stats == CREATED) ? "KO\n" : "OK\n";
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
-			content_type = "Content-Type: text/" + get_extension(this->filename) + "\r\n\n\n";
 			file.close();
 		}	
 
@@ -126,7 +133,18 @@ class Response
 
 		std::string get_header()
 		{
-			return(version + status + status_message + content_type + get_file());
+			std::string		extension = get_extension(this->filename);
+			std::string		file_to_send = "";
+		
+			std::cout << this->root + this->path << std::endl;
+			if (extension == "py" || extension == "php")
+				file_to_send = runCgi(this->path, this->method, this->filename, status, request);
+			else
+				file_to_send = get_file();
+			extension = (extension == "py" || extension == "php") ? "html" : extension;
+			std::cout << extension << std::endl;
+			content_type = "Content-Type: text/" + extension + "\r\n\n\n";	
+			return(version + status + status_message + content_type + file_to_send);
 		}
 
 };

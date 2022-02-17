@@ -20,7 +20,7 @@ public:
     };
 
     Response logic_function(Server server, Location location) {
-        return Response(server, location, this->method);
+        return Response(server, location, this->method, req);
     }
     ~GETRequest() {
     };

@@ -4,6 +4,7 @@ SRC =	./server.cpp\
 		./parsing/Server.cpp\
 		./parsing/parsing.cpp\
 		./parsing/tools.cpp\
+		./request_response/cgi.cpp\
 		./server/socket.cpp\
 		./server/helper.cpp\
 

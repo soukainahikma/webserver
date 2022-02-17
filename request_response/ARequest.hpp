@@ -57,14 +57,14 @@ class ARequest
                         {
                             if (checkAllowedMethods(locations[j].get_request_method(), this->method))
                                 return logic_function(servs[i], locations[j]);
-                            return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405");
+                            return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
                         }
                     }
-                    return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, "200");
+                    return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, "200", req);
                 }
             }
             k = k == -1 ? 0 : k;
-            return Response(servs[k], servs[k].get_root() + defaultErrorPages["404"], this->method, "404");
+            return Response(servs[k], servs[k].get_root() + defaultErrorPages["404"], this->method, "404", req);
         }
 
         ~ARequest() {
