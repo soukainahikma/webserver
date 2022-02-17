@@ -119,7 +119,7 @@ public:
 			if((found = it->second.find("; boundary="))!= std::string::npos)
 			{
 				boundary = "--" + it->second.substr(found+11);
-				it->second = it->second.substr(0,found);
+				it->second = it->second.substr(0,found);//this should be removed
 				std::vector<std::string> tmp = split_buffer(body,13);
 				size_t i = 0;
 				while(i < tmp.size())

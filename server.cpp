@@ -6,17 +6,17 @@
 #include <sys/select.h>
 #include <exception>
 
-void connection_handler(int i,RequestHandler &req_handler, int port, fd_set write_fds,std::map<int,std::string> map_of_req);
-std::vector<Server> parsing(std::string file, std::map<int,int> &m);
-std::map<int,std::string> map_of_req;
+void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds, fd_set &curent_socket, std::map<int, map_info*> &map_of_req);
+std::vector<Server> parsing(std::string file, std::map<int, int> &m);
+std::map<int, map_info*> map_of_req;
 int main()
 {
 	try
 	{
-		std::map<int,int> ports;
-		std::vector<Server> parse = parsing("./webserv.conf", ports); 
+		std::map<int, int> ports;
+		std::vector<Server> parse = parsing("./webserv.conf", ports);
 		server_socket info;
-		RequestHandler req_handler (parse);
+		RequestHandler req_handler(parse);
 		std::vector<server_socket> socket_list = info.fill_list_socket(parse, ports);
 		int max_fd_so_far = info.get_max_fd_so_far(); // getter of the max;
 		fd_set current_sockets;
@@ -27,44 +27,43 @@ int main()
 		fd_set ready_sockets;
 		int new_socket;
 		int port = -1;
-		// create map
-		while(1)
+		while (1)
 		{
 			ready_sockets = current_sockets;
-			// std::cout<< "here before select"<<std::endl;
-			if(select(max_fd_so_far +1 ,&ready_sockets,&write_fds,NULL,NULL) < 0)
-				throw "select failed: ";
-			for(int i = 0;i<= max_fd_so_far; i++)
+			// std::cout<< "this is before sellect" << std::endl;
+			int select_ret = select(max_fd_so_far + 1, &ready_sockets, &write_fds, NULL, NULL);
+			if (select_ret > 0)
 			{
-				if(FD_ISSET(i, &ready_sockets))
+				for (int i = 0; i <= max_fd_so_far; i++)
 				{
-					bool check = false;
-					for (size_t j = 0; j < socket_list.size(); j++)
+					if (FD_ISSET(i, &ready_sockets))
 					{
-						if(i == socket_list[j].get_server_fd())
+						bool check = false;
+						for (size_t j = 0; j < socket_list.size(); j++)
 						{
-							new_socket = socket_list[j].accept_socket(i);
-							port = socket_list[j].get_port();
-							FD_SET(new_socket,&current_sockets);
-							FD_SET(new_socket, &write_fds);//make sure if i have to pass it in params
-							if(new_socket > max_fd_so_far)
-								max_fd_so_far = new_socket;
-							check = true;
-							break;
+							if (i == socket_list[j].get_server_fd())
+							{
+								new_socket = socket_list[j].accept_socket(i);
+								port = socket_list[j].get_port();
+								FD_SET(new_socket, &current_sockets);
+								FD_SET(new_socket, &write_fds); //make sure if i have to pass it in params
+								if (new_socket > max_fd_so_far)
+									max_fd_so_far = new_socket;
+								check = true;
+								break;
+							}
 						}
-					}
-					if(check == false)
-					{
-						connection_handler(i,req_handler, port,write_fds, map_of_req);//add write_fds in here and check them in the send + map
-						FD_CLR(i,&current_sockets);
-						FD_CLR(i,&write_fds);
+						if (check == false)
+						{
+							connection_handler(i, req_handler, port, write_fds, current_sockets, map_of_req); //add write_fds in here and check them in the send + map
+						}
 					}
 				}
 			}
 		}
 		return 0;
 	}
-	catch (const std::exception& e)
+	catch (const std::exception &e)
 	{
 		perror(e.what());
 		return (1);
