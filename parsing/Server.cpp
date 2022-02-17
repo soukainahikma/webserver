@@ -51,7 +51,7 @@ void Server::set_listen(std::string &listen)
 			print_error(13, "listen " + listen);
 		idx++;
 	}
-	if (idx != 2 && idx != 4)
+	if (idx > 5)
 		print_error(9, "listen " + listen);
 	_listen = atoi(listen.c_str());
 }
@@ -79,7 +79,7 @@ void Server::set_host(std::string &host)
 				print_error(1, host);
 			j++;
 		}
-		if (std::stoi(splt[idx]) < 0 || std::stoi(splt[idx]) > 255)
+		if (atoi(splt[idx].c_str()) < 0 || atoi(splt[idx].c_str()) > 255)
 			print_error(10, host);
 		idx++;
 	}
@@ -98,7 +98,7 @@ void Server::set_root(std::string &root)
 
 void Server::set_client_max_body_size(std::string &client_max_body_size)
 {
-	if (get_client_max_body_size() != -1)
+	if (get_client_max_body_size() != (size_t)-1)
 		print_error(8, "client_max_body_size");
 	client_max_body_size = trim(client_max_body_size);
 	int j = 0;
@@ -117,7 +117,7 @@ void Server::set_client_max_body_size(std::string &client_max_body_size)
 
 void Server::set_server_name(std::vector<std::string> &server_name)
 {
-	int idx = 0;
+	size_t idx = 0;
 
 	while (idx < server_name.size())
 	{
