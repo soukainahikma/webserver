@@ -31,14 +31,18 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 				{
 					std::string str = files.substr(found + 16, end - found - 16);
 					it->second->content_length = atoi(str.c_str());
-					return(0);
+
+					return (0);
 				}
 				return (1);
 			}
 			else
 			{
-				if (files.size() - start-4 == it->second->content_length)
+				if (files.size() - start - 4 == it->second->content_length)
+				{
+					std::cout<< files.size() - start - 4 <<std::endl;
 					return (1);
+				}
 				else
 					return (0);
 			}
@@ -62,17 +66,15 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		if ((it = map_of_req.find(i)) != map_of_req.end())
 		{
 			buffer[rd] = '\0';
-			// std::cout << buffer << std::endl;
 			it->second->body += std::string(buffer);
 			files = it->second->body;
 			if (check_body(files, it) == 0)
 				return;
-			std::cout<< it->second->content_length << std::endl;
 			FD_CLR(i, &current_socket);
 		}
 		else
 		{
-			std::cout << RED << "here" << RESET << std::endl;
+			// std::cout << RED << "here" << RESET << std::endl;
 			info->body = std::string(buffer);
 			info->content_length = -1;
 			it = map_of_req.insert(std::pair<int, map_info *>(i, info)).first;
@@ -81,13 +83,13 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 				return;
 		}
 	}
-	// else if (rd == 0)
-	// {
-	// 	FD_CLR(i,&current_socket);
-	// }
+	else if (rd == 0)
+	{
+		FD_CLR(i,&current_socket);
+	}
 	else
 		return;
-	std::cout<< files << std::endl;
+	std::cout << files << std::endl;
 	if (!files.empty())
 	{
 		Request req(files, port);
