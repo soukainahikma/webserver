@@ -7,8 +7,23 @@
 #include "../parsing/Server.hpp"
 #include "../request_response/request.hpp"
 
-char	**init_env(std::string serv_name, std::string query, std::string status, std::string path, std::string page, Request &req)
+char	**init_env(std::string status, std::string path, std::string page, Request &req)
 {
+
+	setenv("REDIRECT_STATUS", status.c_str(), 1);
+	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
+	setenv("SCRIPT_NAME", page.c_str(), 1);
+	setenv("SCRIPT_FILENAME", page.c_str(), 1);
+	setenv("REQUEST_METHOD", req.getRequest()["Method"].c_str(), 1);
+	setenv("CONTENT_TYPE", "text/html", 1);
+	setenv("PATH_INFO", path.c_str(), 1);
+	setenv("PATH_TRANSLATED", path.c_str(), 1);
+	// setenv("QUERY_STRING", query.c_str(), 1);
+	// (void)query;
+	setenv("SERVER_NAME", split(req.getRequest()["Host"], ':')[0].c_str(), 1);
+	setenv("SERVER_PORT", std::to_string(req.get_port()).c_str(), 1);
+	setenv("SERVER_PROTOCOL", "\"HTTP/1.1\"", 1);
+	/*
 	char **env = new char*[19];
 	std::string tmp = "";
 	std::map<std::string,std::string> env_m;
@@ -37,7 +52,9 @@ char	**init_env(std::string serv_name, std::string query, std::string status, st
 		j++;
 	}
 	env[j] = NULL;
-	return (env);
+	*/
+	extern char **environ;
+	return (environ);
 }
 
 std::string runCgi(std::string root, std::string path, std::string page, std::string &status, Request &req)
@@ -45,8 +62,11 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 	int pipefd[2];
 	char **args;
 	std::string body = "";
-	int size_read = 24;
+	int size_read = 1024;
 	char buffer[size_read];
+	if (size_read < 6)
+		return NULL;
+	char **env = init_env(status, path, page, req);
 	if (page.find(".py") != std::string::npos)
 	{
 		args = new char*[3];
@@ -61,7 +81,6 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 		args[1] = NULL;
 	}
 	pipe(pipefd);
-	char **env = init_env("tst.com", "fname=test&name=chb", status, path, page, req);
 	int pid = fork();
 	if (!pid)
 	{
@@ -74,7 +93,7 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 	else
 	{
 		wait(&pid);
-		size_t r;
+		int r;
 		bzero(buffer, size_read);
 		while ((r = read(pipefd[0], buffer, size_read - 1)))
 		{
