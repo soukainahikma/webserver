@@ -6,9 +6,11 @@
 #include <sys/select.h>
 #include <exception>
 
-void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds, fd_set &curent_socket, std::map<int, map_info*> &map_of_req);
+void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds,
+					fd_set &curent_socket, std::map<int, map_info *> &map_of_req);
+
 std::vector<Server> parsing(std::string file, std::map<int, int> &m);
-std::map<int, map_info*> map_of_req;
+std::map<int, map_info *> map_of_req;
 int main()
 {
 	try
@@ -30,7 +32,6 @@ int main()
 		while (1)
 		{
 			ready_sockets = current_sockets;
-			// std::cout<< "this is before sellect" << std::endl;
 			int select_ret = select(max_fd_so_far + 1, &ready_sockets, &write_fds, NULL, NULL);
 			if (select_ret > 0)
 			{
@@ -46,7 +47,7 @@ int main()
 								new_socket = socket_list[j].accept_socket(i);
 								port = socket_list[j].get_port();
 								FD_SET(new_socket, &current_sockets);
-								FD_SET(new_socket, &write_fds); //make sure if i have to pass it in params
+								FD_SET(new_socket, &write_fds);
 								if (new_socket > max_fd_so_far)
 									max_fd_so_far = new_socket;
 								check = true;
@@ -54,9 +55,7 @@ int main()
 							}
 						}
 						if (check == false)
-						{
-							connection_handler(i, req_handler, port, write_fds, current_sockets, map_of_req); //add write_fds in here and check them in the send + map
-						}
+							connection_handler(i, req_handler, port, write_fds, current_sockets, map_of_req);
 					}
 				}
 			}

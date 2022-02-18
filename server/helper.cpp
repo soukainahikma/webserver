@@ -4,7 +4,6 @@
 #include "../request_response/request_handler.hpp"
 #include <sys/ioctl.h>
 
-#define SIZE 65507
 int fileCheck(std::string fileName, std::string req_type)
 {
 	if (!access(fileName.c_str(), F_OK))
@@ -23,7 +22,7 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 	int content_length = it->second->content_length;
 	if ((start = files.find("\r\n\r\n")) != std::string::npos)
 	{
-		if ((found = files.find("Content-Length: ")) != std::string::npos) //check if the content type is == -1
+		if ((found = files.find("Content-Length: ")) != std::string::npos)
 		{
 			if (content_length == -1)
 			{
@@ -38,11 +37,8 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 			}
 			else
 			{
-				if (files.size() - start - 4 == it->second->content_length)
-				{
-					std::cout<< files.size() - start - 4 <<std::endl;
+				if (files.length() - start - 4 == it->second->content_length)
 					return (1);
-				}
 				else
 					return (0);
 			}
@@ -65,8 +61,9 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	{
 		if ((it = map_of_req.find(i)) != map_of_req.end())
 		{
-			buffer[rd] = '\0';
-			it->second->body += std::string(buffer);
+			// buffer[rd] = '\0';
+			it->second->body.append(buffer, rd);
+			// it->second->body += std::string(buffer);
 			files = it->second->body;
 			if (check_body(files, it) == 0)
 				return;
@@ -74,8 +71,10 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		}
 		else
 		{
-			// std::cout << RED << "here" << RESET << std::endl;
-			info->body = std::string(buffer);
+			std::cout << "here1" << std::endl;
+			info->body.append(buffer, rd);
+			std::cout << "here" << std::endl;
+			// info->body = std::string(buffer);
 			info->content_length = -1;
 			it = map_of_req.insert(std::pair<int, map_info *>(i, info)).first;
 			files = info->body;
@@ -85,7 +84,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	}
 	else if (rd == 0)
 	{
-		FD_CLR(i,&current_socket);
+		FD_CLR(i, &current_socket);
 	}
 	else
 		return;

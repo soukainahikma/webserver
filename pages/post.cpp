@@ -10,5 +10,3 @@ int main()
 	// std::cout<< str << " " << str[9] << std::endl;
 }
 
-
-
