@@ -71,9 +71,9 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		}
 		else
 		{
-			std::cout << "here1" << std::endl;
+			// std::cout << "here1" << std::endl;
 			info->body.append(buffer, rd);
-			std::cout << "here" << std::endl;
+			// std::cout << "here" << std::endl;
 			// info->body = std::string(buffer);
 			info->content_length = -1;
 			it = map_of_req.insert(std::pair<int, map_info *>(i, info)).first;
@@ -88,7 +88,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	}
 	else
 		return;
-	std::cout << files << std::endl;
+	// std::cout << files << std::endl;
 	if (!files.empty())
 	{
 		Request req(files, port);

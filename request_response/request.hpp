@@ -116,32 +116,42 @@ public:
 		std::map<std::string,std::string>::iterator it= map_head.find("Content-Type");
 		if(it !=map_head.end())
 		{
+			// std::cout<< body << std::endl;
 			if((found = it->second.find("; boundary="))!= std::string::npos)
 			{
 				boundary = "--" + it->second.substr(found+11);
-				it->second = it->second.substr(0,found);//this should be removed
-				std::vector<std::string> tmp = split_buffer(body,13);
-				size_t i = 0;
-				while(i < tmp.size())
+				it->second = it->second.substr(0,found);
+				std::string tmp;
+				size_t start;
+				size_t end;
+				size_t found;
+				size_t cont_ty;
+				start = body.find(boundary);
+				while (start != std::string::npos)
 				{
-					info = initializer();
-					if(tmp[i] == boundary)
+					if ((end = body.find(boundary, start + 1)) != std::string::npos)
 					{
-						i++;
-						body_info(info,tmp[i]);
-						if(tmp[i+1].find("Content-Type")!= std::string::npos)
+						tmp = body.substr(start + boundary.length(), end - start - boundary.length());
+						if ((found = tmp.find("\r\n", 2)) != std::string::npos)
 						{
-							info.content_type = tmp[++i].substr(12);
+							body_info(info, tmp.substr(1, found - 1));
+							if ((cont_ty = tmp.find("Content-Type")) != std::string::npos)
+							{
+								end = tmp.find("\r\n", cont_ty);
+								info.content_type = tmp.substr(cont_ty+14, end - cont_ty-14);
+								found = end;
+							}
+							info.body = tmp.substr(found+4,tmp.length()-4);
 						}
-						while(tmp[i+1] != boundary && tmp[i+1] != boundary+"--" && i+1<tmp.size())
-						{
-							info.body += tmp[i+1] +"\n";
-							i++;
-						}
-						myfiles.push_back(info);
 					}
-					i++;
+					start = body.find(boundary, start + 1);
+					myfiles.push_back(info);
 				}
+				std::cout<< "body : |" << myfiles[0].body<<"|" <<std::endl;
+				std::cout<< "Content_Disposition : |" << myfiles[0].Content_Disposition<<"|" <<std::endl;
+				std::cout<< "content_type : |" << myfiles[0].content_type<<"|" <<std::endl;
+				std::cout<< "filename : |" << myfiles[0].filename<<"|" <<std::endl;
+				std::cout<< "name : |" << myfiles[0].name<<"|" <<std::endl;
 			}
 		}
 	}
