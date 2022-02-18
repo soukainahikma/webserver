@@ -31,7 +31,7 @@
 #define NOT_AUTHORIZED 405
 
 int			fileCheck(std::string fileName, std::string req_type);
-std::string	runCgi(std::string path, std::string method, std::string page, std::string status, Request request);
+std::string runCgi(std::string root, std::string path, std::string page, std::string &status, Request &req);
 
 class Response
 {
@@ -136,15 +136,24 @@ class Response
 			std::string		extension = get_extension(this->filename);
 			std::string		file_to_send = "";
 		
-			std::cout << this->root + this->path << std::endl;
+			std::cout << " ROOT => { " << this->root << " } " << std::endl;
+			std::cout << " PATH => { " << this->path << " } " << std::endl;
+			std::cout << " METHOD => { " << this->method << " } " << std::endl;
+			std::cout << " FILENAME => { " << this->filename << " } " << std::endl;
+			std::cout << " STATUS => { " << status << " } " << std::endl;
+			std::cout << " Content-Type => { " << request.getRequest()["Content-Type"] << " } " << std::endl;
+
 			if (extension == "py" || extension == "php")
-				file_to_send = runCgi(this->path, this->method, this->filename, status, request);
+				file_to_send = runCgi(this->root, this->path, this->filename, status, request);
 			else
 				file_to_send = get_file();
+			std::cout << MAGENTA << " +++++ FILE TO SEND +++++ " << RESET << std::endl;
+			std::cout << file_to_send << std::endl;
+			std::cout << MAGENTA << " +++++ FILE TO SEND +++++ " << RESET << std::endl;
 			extension = (extension == "py" || extension == "php") ? "html" : extension;
 			std::cout << extension << std::endl;
 			content_type = "Content-Type: text/" + extension + "\r\n\n\n";	
-			return(version + status + status_message + content_type + file_to_send);
+			return(version + status + " " + status_message + content_type + file_to_send);
 		}
 
 };

@@ -7,26 +7,26 @@
 #include "../parsing/Server.hpp"
 #include "../request_response/request.hpp"
 
-char	**init_env(std::string serv_name, std::string query, std::string status, std::string path, std::string page, std::string method)
+char	**init_env(std::string serv_name, std::string query, std::string status, std::string path, std::string page, Request &req)
 {
 	char **env = new char*[19];
 	std::string tmp = "";
 	std::map<std::string,std::string> env_m;
-
+	
 	env_m["REDIRECT_STATUS="] = status;
 	env_m["GATEWAY_INTERFACE="] = "CGI/1.1";
 	// env_m["SCRIPT_NAME="] = "/Users/cabouelw/Desktop/WebServ/index.php";
-	env_m["SCRIPT_FILENAME="] = path + "/" + page;
+	env_m["SCRIPT_FILENAME="] = page;
 	// std::cerr << env_m["SCRIPT_FILENAME="] << "\n";
-	env_m["REQUEST_METHOD="] = method;
+	env_m["REQUEST_METHOD="] = req.getRequest()["Method"];
 	// env_m["CONTENT_LENGTH="] = "16"; // size of request
 	env_m["CONTENT_TYPE="] = "text/html";
 	env_m["PATH_INFO="] = path;
 	env_m["PATH_TRANSLATED="] = path;
-	env_m["QUERY_STRING="] = query;
+	env_m["QUERY_STRING="] = req.get_query();
 	// env_m["REMOTE_USER="] = ;
-	env_m["SERVER_NAME="] = serv_name;
-	env_m["SERVER_PORT="] = "8080"; // port
+	env_m["SERVER_NAME="] = serv_name ; // req.getRequest()["Host"].split(":")[0];
+	env_m["SERVER_PORT="] = std::to_string(req.get_port()); // port
 	env_m["SERVER_PROTOCOL="] = "\"HTTP/1.1\"";
 	// env_m["SERVER_SOFTWARE="] = ;
 	int j = 0;
@@ -40,7 +40,7 @@ char	**init_env(std::string serv_name, std::string query, std::string status, st
 	return (env);
 }
 
-std::string runCgi(std::string path, std::string method, std::string page, std::string status, Request req_map)
+std::string runCgi(std::string root, std::string path, std::string page, std::string &status, Request &req)
 {
 	int pipefd[2];
 	char **args;
@@ -51,7 +51,7 @@ std::string runCgi(std::string path, std::string method, std::string page, std::
 	{
 		args = new char*[3];
 		args[0] = (char*)"/usr/bin/python";
-		args[1] = (char*)("../" + page).c_str();
+		args[1] = (char*)(page).c_str();
 		args[2] = NULL;
 	}
 	else
@@ -61,7 +61,7 @@ std::string runCgi(std::string path, std::string method, std::string page, std::
 		args[1] = NULL;
 	}
 	pipe(pipefd);
-	char **env = init_env("tst.com", "fname=test&name=chb", status, path, page, method);
+	char **env = init_env("tst.com", "fname=test&name=chb", status, path, page, req);
 	int pid = fork();
 	if (!pid)
 	{
@@ -69,6 +69,7 @@ std::string runCgi(std::string path, std::string method, std::string page, std::
 		close(pipefd[0]);
 		close(pipefd[1]);
 		execve(args[0], args, (char **)env);
+		status = "403";
 	}
 	else
 	{
@@ -90,13 +91,13 @@ std::string runCgi(std::string path, std::string method, std::string page, std::
 	return (body);
 }
 
-int main ()
-{
-	Request req;
-	std::cout << "------ index.py ------" << std::endl;
-	std::string s = runCgi("/Users/aboulbaz/Desktop/webserver/pages/python_cgi/", "GET", "index.py", "200", req);
-	std::cout << s << std::endl;
-	// std::cout << "------ index.php ------" << std::endl;
-	// std::string s1 = runCgi("/Users/aboulbaz/Desktop/webserver", "POST", "index.php", "200");
-	// std::cout << s1 << std::endl;
-}
+// int main ()
+// {
+// 	Request req;
+// 	std::cout << "------ index.py ------" << std::endl;
+// 	std::string s = runCgi("/Users/aboulbaz/Desktop/webserver/pages/python_cgi/", "GET", "index.py", "200", req);
+// 	std::cout << s << std::endl;
+// 	// std::cout << "------ index.php ------" << std::endl;
+// 	// std::string s1 = runCgi("/Users/aboulbaz/Desktop/webserver", "POST", "index.php", "200");
+// 	// std::cout << s1 << std::endl;
+// }

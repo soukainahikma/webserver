@@ -198,12 +198,16 @@ public:
 		std::cout << RED << " ************* { HERE IS BODY PRINTER ENDS } *************** " << RESET << std::endl;
 	}
 
+	std::string &get_query() {
+		return (query); 
+	}
 
 private:
 	map_request map_head;
 	std::string body;
 	int port;
 	std::string boundary;
+	std::string query;
 	std::vector<body_struct> myfiles; // if (|Content-Type| => multipart/form-data) myfiles| myfiles.size() != 0 
 };
 #endif
