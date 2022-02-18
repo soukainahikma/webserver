@@ -83,6 +83,7 @@ class Response
 			status = (stats == OK || stats == CREATED) ? "201" :( (stats == FORBIDDEN) ? "403" : "404");
 			status_message = (stats == OK || stats == CREATED) ? " OK\n" : "KO\n";
 			filename = (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + errorPages[std::to_string(stats)];
+			std::cout << "GET THE FILENAME IN CONSTRUCTION [ " << filename << " ]\n";
 		}
 
 		Response(Server server, std::string filename, std::string req_type, std::string status, Request req)
@@ -100,6 +101,7 @@ class Response
 			this->status = (stats == OK || stats == CREATED) ? "201" :( (stats == FORBIDDEN) ? "403" : "404");
 			status_message = !(stats == OK || stats == CREATED) ? "KO\n" : "OK\n";
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
+			std::cout << "GET THE FILENAME IN CONSTRUCTION 2 [ " << filename << " ]\n";
 			file.close();
 		}	
 

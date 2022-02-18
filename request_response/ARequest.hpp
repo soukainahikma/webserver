@@ -43,10 +43,10 @@ class ARequest
             if ((found = server_name.find(":"))!= std::string::npos)
                     server_name = server_name.substr(0,found);
             std::map<std::string, std::string> defaultErrorPages = servs[0].get_error_page();
-
+            
             for (size_t i = 0; i < servs.size(); i++)
             {
-                if (req.get_port() == servs[i].get_listen() && servs[i].get_server_name()[server_name])
+                if (req.get_port() == servs[i].get_listen())
                 {
                     if (k == -1)
                         k = i;
@@ -55,6 +55,7 @@ class ARequest
                     {
                         if (req_map["URL"] == locations[j].get_path())
                         {
+                            
                             if (checkAllowedMethods(locations[j].get_request_method(), this->method))
                                 return logic_function(servs[i], locations[j]);
                             return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
