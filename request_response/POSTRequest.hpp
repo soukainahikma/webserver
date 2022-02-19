@@ -22,6 +22,8 @@ public:
 		struct stat fileStat;
 		std::string upload_path = location.get_upload_store() != "" ? location.get_upload_store() : location.get_path();
 	
+		if (req.getBodyString().length() > 10 && false) // server.get_client_max_body_size()
+				return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
 		if (req.getRequest()["Content-Type"] == "multipart/form-data")
 		{
 			std::vector<body_struct> body = req.getBodyStructs();
@@ -30,10 +32,8 @@ public:
 				if (body[i].filename != "" && location.get_upload_enable() == "on")
 				{
 					std::cout << RED << " +++ { IT IS A FILE } +++" << RESET << std::endl;
-					if (body[i].body.length() > 10 && false) // server.get_client_max_body_size()
-						return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
 					if(stat((server.get_root() + upload_path).c_str(), &fileStat) < 0)    
-        				return Response(server, server.get_root() + server.get_error_page()["502"], this->method, "500", req);
+        				return Response(server, server.get_root() + server.get_error_page()["500"], this->method, "500", req);
 					if(!(fileStat.st_mode & S_IWUSR))
         				return Response(server, server.get_root() + server.get_error_page()["403"], this->method, "403", req);
 					

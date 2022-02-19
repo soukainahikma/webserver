@@ -9,7 +9,7 @@ int fileCheck(std::string fileName, std::string req_type)
 	if (!access(fileName.c_str(), F_OK))
 	{
 		if (!access(fileName.c_str(), R_OK	))
-			return req_type == "GET" ? OK : CREATED;
+			return req_type == "GET" || req_type == "DELETE" ? OK : CREATED;
 		return FORBIDDEN;
 	}
 	return NOT_FOUND;

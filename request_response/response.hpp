@@ -55,6 +55,7 @@ class Response
 		std::string root;
 		std::string path;
 		std::string filename;
+		std::string location_string;
 		std::string method;
         std::vector<std::string> indexes;
         std::map<std::string, std::string> errorPages;
@@ -67,29 +68,40 @@ class Response
 			size_t i;
 			int stats;
 			std::string extension;
-
+			std::string url;
+			
 			generate_status_map();
 			root = server.get_root();
 			path = location.get_path();
+			url = req.getRequest()["URL"];
+			
 			this->request = req;
 			std::vector<std::string> indexes = location.get_index();
 			for (i = 0; i < indexes.size(); i++)
 			{
-				stats = fileCheck(root + path + "/" + indexes[i], req_type);
+				stats = fileCheck(root + path + "/" + indexes[i], this->request.getRequest()["Method"]);
 				if (stats == OK || stats == CREATED)
 					break;
 			}
-			method = req_type;
+			method = this->request.getRequest()["Method"];
 			version = "HTTP/1.1 ";
-			status = (stats == OK || stats == CREATED) ? (stats == OK ? "200" : "201"):( (stats == FORBIDDEN) ? "403" : "404");
-			filename = (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + errorPages[std::to_string(stats)];
+			location_string = "";
+			if (location.get_return().size() != 0 || !(url.c_str()[url.size() - 1] == '/'))
+			{ 
+				std::cout << "here i am \n";
+				status = location.get_return().size() != 0 ?location.get_return()[0] : "301";
+				location_string = location.get_return().size() != 0 ? location.get_return()[1] : url + "/";
+			}
+			else
+				status = ((stats == OK || stats == CREATED) ? (stats == OK ? "200" : "201"):( (stats == FORBIDDEN) ? "403" : "404"));
+			filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + server.get_error_page()[std::to_string(stats)];
 		}
 
 		Response(Server server, std::string filename, std::string req_type, std::string status, Request &req)
 		{
-			std::ifstream file;
 			int stats;
 			std::string extension;
+			int is_deleted;
 
 			generate_status_map();
 			this->request = req;
@@ -97,11 +109,18 @@ class Response
 			this->path = "";
 			method = req_type;
 			version = "HTTP/1.1 ";
-			stats = fileCheck(filename, req_type);
+			stats = fileCheck(filename, this->request.getRequest()["Method"]);
 			this->status = (stats == OK || stats == CREATED) ? status :( (stats == FORBIDDEN) ? "403" : "404");
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
-			file.close();
-		}	
+			if (true && this->request.getRequest()["Method"] == "DELETE" && (stats == OK))
+			{
+				is_deleted = remove(this->filename.c_str());
+				if (is_deleted != 0) {
+					this->status = "500";
+				}
+				this->filename = "";
+			}
+		}
 
 		void generate_status_map() {
 			status_map["200"] ="OK\n";
@@ -151,24 +170,24 @@ class Response
 
 		std::string get_header()
 		{
-			std::string		extension = get_extension(this->filename);
+			std::string		extension;
 			std::string		file_to_send = "";
-		
-			// std::cout << " ROOT => { " << this->root << " } " << std::endl;
-			// std::cout << " PATH => { " << this->path << " } " << std::endl;
-			// std::cout << " METHOD => { " << this->method << " } " << std::endl;
-			// std::cout << " FILENAME => { " << this->filename << " } " << std::endl;
-			// std::cout << " STATUS => { " << status << " } " << std::endl;
-			// std::cout << " Content-Type => { " << request.getRequest()["Content-Type"] << " } " << std::endl;
-
-			if (extension == "py" || extension == "php")
-				file_to_send = runCgi(this->root, this->path, this->filename, status, request);
-			else
-				file_to_send = get_file();
-			extension = (extension == "py" || extension == "php") ? "html" : extension;
-			content_type = "Content-Type: text/" + extension + "\r\n\n\n";
 			
-			return(version + status + " " + status_map[this->status] + content_type + file_to_send);
+			content_type = "";
+			std::cout << status << std::endl;
+			if (status == "301")
+				location_string = "Location: " + location_string;
+			else if (this->filename != "") {
+				extension = get_extension(this->filename);
+				if (extension == "py" || extension == "php")
+					file_to_send = runCgi(this->root, this->path, this->filename, status, request);
+				else
+					file_to_send = get_file();
+				extension = (extension == "py" || extension == "php") ? "html" : extension;
+				content_type = "Content-Type: text/" + extension + "\r\n\n\n";
+			}
+			std::cout << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
+			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 
 };

@@ -63,14 +63,14 @@ class ARequest
                     std::vector<Location> locations = servs[i].get_location();
                     for (size_t j = 0; j < locations.size(); j++)
                     {
-                        if (req_map["URL"] == locations[j].get_path())
+                        if (req_map["URL"] == locations[j].get_path() || req_map["URL"] == locations[j].get_path() + "/")
                         {
                             if (checkAllowedMethods(locations[j].get_request_method(), this->method))
                                 return logic_function(servs[i], locations[j]);
                             return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
                         }
                     }
-                    return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, "200", req);
+                    return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, this->method == "POST" ? "201" : "200", req);
                 }
             }
             k = k == -1 ? 0 : k;
