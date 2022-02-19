@@ -29,27 +29,37 @@ class ARequest
 
         virtual Response logic_function(Server server, Location location) = 0;
 
-        Response returnedResponse () {
-            Request::map_request req_map = req.getRequest();
+        std::string server_name_extractor() {
             size_t found;
             std::string server_name;
-            std::map<std::string, int> server_names;
-            size_t index;
-            int k = -1;
 
-            server_name = req_map["Host"];
+            server_name = req.getRequest()["Host"];
             if ((found = server_name.find("\r"))!= std::string::npos)
                     server_name = server_name.substr(0,found);	
             if ((found = server_name.find(":"))!= std::string::npos)
                     server_name = server_name.substr(0,found);
-            std::map<std::string, std::string> defaultErrorPages = servs[0].get_error_page();
+            return (server_name);
+        }
+
+        Response returnedResponse () {
+            Request::map_request req_map = req.getRequest();
+            std::string server_name;
+            int k = -1;
+
+            server_name = server_name_extractor();
+            std::map<std::string, std::string> defaultErrorPages;
 
             for (size_t i = 0; i < servs.size(); i++)
             {
                 if (req.get_port() == servs[i].get_listen() && servs[i].get_server_name()[server_name])
                 {
                     if (k == -1)
+                    {
                         k = i;
+                        defaultErrorPages = servs[k].get_error_page();
+                    }
+                    if (req.getRequest()["Method"] != "GET" && this->method == "GET")
+                        return Response(servs[k], servs[k].get_root() + defaultErrorPages["400"], this->method, "400", req);
                     std::vector<Location> locations = servs[i].get_location();
                     for (size_t j = 0; j < locations.size(); j++)
                     {

@@ -33,29 +33,21 @@ public:
 					if (body[i].body.length() > 10 && false) // server.get_client_max_body_size()
 						return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
 					if(stat((server.get_root() + upload_path).c_str(), &fileStat) < 0)    
-        				return Response(server, server.get_root() + server.get_error_page()["502"], this->method, "502", req);
+        				return Response(server, server.get_root() + server.get_error_page()["502"], this->method, "500", req);
 					if(!(fileStat.st_mode & S_IWUSR))
         				return Response(server, server.get_root() + server.get_error_page()["403"], this->method, "403", req);
+					
+					// std::ofstream file(body[i].filename);
+					// file << body[i].body;
+					// file.close();
 					int fd = open((server.get_root() + "/" + upload_path + "/" + body[i].filename).c_str(), O_CREAT | O_RDWR, 0644);
-					std::cout << "Get the file's path => " << (server.get_root() + "/" + body[i].filename) << std::endl;
 					write(fd, body[i].body.c_str(), body[i].body.length());
-					std::cout << RED << " ++++++++++++++++++++" << RESET << std::endl;
+
 				}
 				else if (location.get_upload_enable() != "on")
 					return Response(server, server.get_root() + server.get_error_page()["405"], this->method, "405", req);
-				else
-				{
-					std::cout << "IT IS NOT A FILE" << std::endl;
-					std::cout << body[i].body.c_str()[0] << std::endl;
-					// CGI
-				}
 			}
 		}
-		else {
-			std::cout << "BODY AS STRING => "<< req.getBodyString() << std::endl;
-			// CGI
-		}
-		std::cout << "+++++++++++++++" << std::endl;
 		return Response(server, location, this->method, req);
 	}
 
