@@ -1,3 +1,7 @@
+
+
+CC = clang++
+# CFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = webserv
 SRC =	./server.cpp\
 		./parsing/Location.cpp\
@@ -8,7 +12,7 @@ SRC =	./server.cpp\
 		./server/socket.cpp\
 		./server/helper.cpp\
 
-HEADERS = parsing/Location.hpp\
+INC = parsing/Location.hpp\
 		request_response/request.hpp\
 		request_response/response.hpp\
 		parsing/Server.hpp\
@@ -19,16 +23,20 @@ HEADERS = parsing/Location.hpp\
 		request_response/POSTRequest.hpp\
 		server/socket.hpp
 
+OBJ = $(SRC:.cpp=.o)
 
-all: $(NAME) $(HEADERS)
+all: $(NAME)
 
-$(NAME): $(SRC) $(HEADERS)
-	@clang++  $(SRC) -o $(NAME)
+$(NAME): $(OBJ) 
+	@$(CC) $(OBJ) -o $(NAME)
+
+%.o: %.cpp $(INC)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@rm -f $(NAME)
+	@rm -rf $(OBJ)
 
 fclean: clean
-	@rm -f $(NAME)
+	@rm -rf $(NAME)
 
-re: fclean $(NAME)
+re: fclean all
