@@ -2,65 +2,54 @@
 #include <iostream>
 #include<map>
 #include <cstring>
+#include <unistd.h>
+std::vector<std::string> fill_vec(std::string str)
+{
+	std::vector<std::string> result;
+	std::string body;
+	std::string info;
+	std::string content;
+	std::string tmp;
+	size_t start;
+	size_t end;
+	size_t found;
+	
+	start = str.find("----WebKitFormBoundary7MA4YWxkTrZu0gW");
+	while(start != std::string::npos)
+	{
+		if((end = str.find("----WebKitFormBoundary7MA4YWxkTrZu0gW",start+1))!= std::string::npos)
+		{
+			tmp = str.substr(start+38,end - start -38);
+			if((found = tmp.find("\r\n",2))!= std::string::npos)
+			{
+				info = tmp.substr(1,found-1);
+				if((found = tmp.find("Content-Type"))!= std::string::npos)
+				{
+					end = tmp.find("\r\n",found);
+					content = tmp.substr(found, end -found );
+					std::cout<<"|"<< content<<"|" << std::endl;
+					found = end;
+				}
+				body = tmp.substr(found);
+				std::cout<<"|"<< info<<"|" << std::endl;
+				std::cout<<"|"<< body<<"|" << std::endl;
+			}
+		}
+		start = str.find("----WebKitFormBoundary7MA4YWxkTrZu0gW",start+1);
+	}
+	return(result);
+}
 int main()
 {
-	char *buffer =strdup("POST / HTTP/1.1\nHost: localhost:3000\nContent-Type: multipart/form-data; boundary=--------------------------918282565863101620614950\nCache-Control: no-cache\nPostman-Token: 846339bc-40f4-9dde-1933-b17ecc45951c \n\n----------------------------918282565863101620614950\nContent-Disposition: form-data; name=\"index\"; filename=\"index.html\"\nContent-Type: text/html\n\n<!DOCTYPE html>\n<html>\n<body>\n\n<h1 style=\"text-align:center ;color:green\">Welcome to our WEB SERVER</h1>\n\n</body>\n</html>\n----------------------------918282565863101620614950--");
-	Request req(buffer,8080);
-	// std::cout<< buffer<<std::endl;
-	// std::map<std::string,std::string> mymap = req.getRequest();
-	req.map_printer();
-	// for (std::map<std::string,std::string>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
-    	// std::cout << it->first << " => " << it->second << '\n';
-
-
+	std::string str = "----WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;\r\nContent-Type: text/html\r\n name=\"hello\" =test\r\n----WebKitFormBoundary7MA4YWxkTrZu0gW--";
+	fill_vec(str);
 }
-/*
-POST  HTTP/1.1
-Host: localhost:3000
-Content-Type: multipart/form-data; boundary=--------------------------918282565863101620614950
-Cache-Control: no-cache
-Postman-Token: 846339bc-40f4-9dde-1933-b17ecc45951c 
-
-----------------------------918282565863101620614950
-Content-Disposition: form-data; name="index"; filename="index.html"
-Content-Type: text/html
-
-<!DOCTYPE html>
-<html>
-<body>
-
-<h1 style="text-align:center ;color:green">Welcome to our WEB SERVER</h1>
-
-</body>
-</html>
-----------------------------918282565863101620614950--
-
-HTTP/1.1 200  OK
-Content-Type: text/html
-
-
- */
-
 
 
 
 /* 
-POST / HTTP/1.1
-Host: localhost:3000
-Content-Type: multipart/form-data; boundary=--------------------------918282565863101620614950
-Cache-Control: no-cache
-Postman-Token: 846339bc-40f4-9dde-1933-b17ecc45951c 
-
-----------------------------918282565863101620614950
-Content-Disposition: form-data; name=\"index\"; filename=\"index.html\"
-Content-Type: text/html
-
-<!DOCTYPE html>
-<html>
-<body>
-
-<h1 style=\"text-align:center ;color:green\">Welcome to our WEB SERVER</h1>
-
-</body>
-</html>
-----------------------------918282565863101620614950-- */
+if(tmp[i+1].find("Content-Type")!= std::string::npos)
+{
+	info.content_type = tmp[++i].substr(12);
+}
+				} */

@@ -1,0 +1,38 @@
+
+
+----------------------------725620010948269090255034
+Content-Disposition: form-data; name="test2"; filename="test.html"
+Content-Type: text/html
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+	<h1>TEST</h1>
+	<form action="http://localhost:5000" method="post">
+		<input value="TEST" name="test">
+		<input type="submit" value="test">
+	</form>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+	<script>
+		// fetch('http://localhost:5000', {
+		// 	method: 'POST',
+		// 	headers: {
+		// 		'Content-Type': 'application/json'
+		// 	},
+		// 	data: JSON.stringify({test: "test"})
+		// }).then(data => console.log(data))
+	</script>
+</body>
+</html>
+
+
+----------------------------725620010948269090255034--
+

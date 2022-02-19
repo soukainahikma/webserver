@@ -88,7 +88,6 @@ class Response
 			location_string = "";
 			if (location.get_return().size() != 0 || !(url.c_str()[url.size() - 1] == '/'))
 			{ 
-				std::cout << "here i am \n";
 				status = location.get_return().size() != 0 ?location.get_return()[0] : "301";
 				location_string = location.get_return().size() != 0 ? location.get_return()[1] : url + "/";
 			}
@@ -174,7 +173,6 @@ class Response
 			std::string		file_to_send = "";
 			
 			content_type = "";
-			std::cout << status << std::endl;
 			if (status == "301")
 				location_string = "Location: " + location_string;
 			else if (this->filename != "") {
@@ -186,7 +184,6 @@ class Response
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 				content_type = "Content-Type: text/" + extension + "\r\n\n\n";
 			}
-			std::cout << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
 			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 
