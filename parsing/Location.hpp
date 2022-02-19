@@ -17,7 +17,6 @@ class Location
 	std::string					_upload_enable;
 	std::string					_enable_delete;
 	std::string					_upload_store;
-	std::map<int,std::string>	_return_map;
 	bool						_equal;
 	public:
 		Location();
@@ -33,7 +32,6 @@ class Location
 		void	set_upload_enable(std::string);
 		void	set_enable_delete(std::string);
 		void	set_upload_store(std::string);
-		void	set_return_map(std::vector<std::string>&);
 		//		get
 		std::string					&get_path();
 		std::string					&get_autoindex();
@@ -44,7 +42,6 @@ class Location
 		std::string					&get_upload_enable();
 		std::string					&get_enable_delete();
 		std::string					&get_upload_store();
-		std::map<int,std::string>	&get_return_map();
 		bool						get_equal();
 };
 void						print_error(int i, std::string v);

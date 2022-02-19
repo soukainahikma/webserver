@@ -117,21 +117,6 @@ void	Location::set_request_method(std::string request_method)
 	_request_method	= splt;
 }
 
-void	Location::set_return_map(std::vector<std::string> &ret)
-{
-	int i = 0;
-	if (ret.size() != 2)
-		print_error(1, "return " + ret[0] + " " + ret[1]);
-	while (ret[0][i])
-	{
-		if (!std::isdigit(ret[0][i]))
-			print_error(1, "return " + ret[0] + " " + ret[1]);
-		i++;
-	}
-	if (_return_map[atoi(ret[0].c_str())].empty())
-		_return_map[atoi(ret[0].c_str())] = ret[1];
-}
-
 void	Location::set_fastcgi_pass(std::string fastcgi_pass)
 {
 	if (fastcgi_pass.compare("on") && fastcgi_pass.compare("off"))
@@ -175,5 +160,4 @@ std::string					&Location::get_fastcgi_pass() { return _fastcgi_pass; }
 std::string					&Location::get_upload_enable() { return _upload_enable; }
 std::string					&Location::get_enable_delete() { return _enable_delete; }
 std::string					&Location::get_upload_store() { return _upload_store; }
-std::map<int, std::string>	&Location::get_return_map() { return _return_map; }
 bool						Location::get_equal() { return _equal; }

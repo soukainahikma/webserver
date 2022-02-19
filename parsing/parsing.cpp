@@ -87,9 +87,10 @@ void fill_location(std::string key, std::string value, Location &locat)
 		locat.set_enable_delete(value);
 	else if (!key.compare("return"))
 	{
+		if (locat.get_return().size())
+			print_error(8, key);
 		std::vector<std::string> s = split(value, ' ');
 		locat.set_return(s);
-		locat.set_return_map(s);
 	}
 	else
 		print_error(1, key);
