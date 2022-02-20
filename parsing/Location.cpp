@@ -69,7 +69,7 @@ void	Location::set_return(std::vector<std::string> &retur)
 	_return = retur;
 }
 
-int check_merhods(std::string request_method)
+int check_methods(std::string request_method)
 {
 	int idx = 1;
 	request_method = trim(request_method);
@@ -88,7 +88,7 @@ void	Location::set_request_method(std::string request_method)
 	if (get_request_method().size())
 		print_error(8, request_method);
 	int g, p, d;
-	if (check_merhods(request_method))
+	if (check_methods(request_method))
 		print_error(13, request_method);
 	request_method.erase(request_method.find('['), 1);
 	request_method.erase(request_method.find(']'), 1);
@@ -119,8 +119,6 @@ void	Location::set_request_method(std::string request_method)
 
 void	Location::set_fastcgi_pass(std::string fastcgi_pass)
 {
-	if (fastcgi_pass.compare("on") && fastcgi_pass.compare("off"))
-		print_error(12, "fastcgi_pass	" + fastcgi_pass);
 	if (!_fastcgi_pass.empty())
 		print_error(8, "fastcgi_pass	" + fastcgi_pass);
 	_fastcgi_pass = fastcgi_pass;
