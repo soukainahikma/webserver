@@ -22,24 +22,26 @@ public:
 		struct stat fileStat;
 		std::string upload_path = location.get_upload_store() != "" ? location.get_upload_store() : location.get_path();
 	
-		if (req.getBodyString().length() > 10 && false) // server.get_client_max_body_size()
-				return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
-		if (req.getRequest()["Content-Type"] == "multipart/form-data")
+		
+		if (req.getBodyString().length() > server.get_client_max_body_size())
 		{
+			return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
+		}
+		if (req.getRequest().find("Content-Type")->second == "multipart/form-data")
+		{
+			
 			std::vector<body_struct> body = req.getBodyStructs();
 			for (size_t i = 0; i < body.size(); i++)
 			{
 				if (body[i].filename != "" && location.get_upload_enable() == "on")
 				{
-					std::cout << RED << " +++ { IT IS A FILE } +++" << RESET << std::endl;
+					// std::cout << RED << " +++ { IT IS A FILE } +++" << RESET << std::endl;
+					
 					if(stat((server.get_root() + upload_path).c_str(), &fileStat) < 0)    
         				return Response(server, server.get_root() + server.get_error_page()["500"], this->method, "500", req);
 					if(!(fileStat.st_mode & S_IWUSR))
         				return Response(server, server.get_root() + server.get_error_page()["403"], this->method, "403", req);
-					
-					// std::ofstream file(body[i].filename);
-					// file << body[i].body;
-					// file.close();
+					// std::cout << server.get_root() + upload_path << std::endl;
 					int fd = open((server.get_root() + "/" + upload_path + "/" + body[i].filename).c_str(), O_CREAT | O_RDWR, 0644);
 					write(fd, body[i].body.c_str(), body[i].body.length());
 
@@ -48,6 +50,7 @@ public:
 					return Response(server, server.get_root() + server.get_error_page()["405"], this->method, "405", req);
 			}
 		}
+		std::cout << "Hello from POST Request" << std::endl;
 		return Response(server, location, this->method, req);
 	}
 

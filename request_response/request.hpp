@@ -151,7 +151,8 @@ public:
 								info.content_type = tmp.substr(cont_ty+14, end - cont_ty-14);
 								found = end;
 							}
-							info.body = tmp.substr(found+4,tmp.length()-4);
+							info.body = tmp.substr(found+4,tmp.length()- found -6);
+							// std::cout<< MAGENTA<<"|" <<info.body << "|" << RESET<< std::endl;
 						}
 					}
 					start = body.find(boundary, start + 1);

@@ -69,20 +69,22 @@ class Response
 			int stats;
 			std::string extension;
 			std::string url;
-			
 			generate_status_map();
 			root = server.get_root();
 			path = location.get_path();
 			url = req.getRequest()["URL"];
-			
 			this->request = req;
+	
+			filename = "";
 			std::vector<std::string> indexes = location.get_index();
+			// std::cout<< MAGENTA << "here" << RESET << std::endl;
 			for (i = 0; i < indexes.size(); i++)
 			{
 				stats = fileCheck(root + path + "/" + indexes[i], this->request.getRequest()["Method"]);
 				if (stats == OK || stats == CREATED)
 					break;
 			}
+			// std::cout<< BLUE << "here" << RESET << std::endl;
 			method = this->request.getRequest()["Method"];
 			version = "HTTP/1.1 ";
 			location_string = "";
@@ -93,7 +95,8 @@ class Response
 			}
 			else
 				status = ((stats == OK || stats == CREATED) ? (stats == OK ? "200" : "201"):( (stats == FORBIDDEN) ? "403" : "404"));
-			filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + server.get_error_page()[std::to_string(stats)];
+			if (indexes.size() > 0)
+				filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + server.get_error_page()[std::to_string(stats)];
 		}
 
 		Response(Server server, std::string filename, std::string req_type, std::string status, Request &req)
@@ -111,14 +114,6 @@ class Response
 			stats = fileCheck(filename, this->request.getRequest()["Method"]);
 			this->status = (stats == OK || stats == CREATED) ? status :( (stats == FORBIDDEN) ? "403" : "404");
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
-			if (true && this->request.getRequest()["Method"] == "DELETE" && (stats == OK))
-			{
-				// is_deleted = remove(this->filename.c_str());
-				// if (is_deleted != 0) {
-				// 	this->status = "500";
-				// }
-				// this->filename = "";
-			}
 		}
 
 		void generate_status_map() {
@@ -150,21 +145,33 @@ class Response
 
 		std::string get_file()
 		{
-			std::ifstream file;
-			std::string line;
-			std::string	buffer;
-			file.open(filename);
-			while (getline(file, line))
-			{
-				buffer = buffer + line;
-			}
-			file.close();
-			return(buffer);
+			// std::ifstream file;
+			// std::string line;
+			// std::string	buffer;
+
+			// file.open(filename, std::ios::binary);
+			// while (getline(file, line))
+			// 	buffer = buffer + line;
+			std::cout << filename << std::endl;
+
+			std::ifstream    indexFile(filename, std::ios::binary);
+			std::ostringstream buffer;
+
+			buffer << indexFile.rdbuf();
+			std::ofstream out ("test_art.jpeg");
+			out << buffer.str();
+			return(buffer.str());
 		}
 
 		// std::string extension_extractor(std::string extension) {
 			
 		// }
+
+		std::string get_content_type () {
+			std::string content_type;
+
+			return content_type;
+		}
 
 		std::string get_header()
 		{
@@ -178,6 +185,7 @@ class Response
 			if (status == "301")
 				location_string = "Location: " + location_string;
 			else if (this->filename != "") {
+				get_content_type();
 				extension = get_extension(this->filename);
 				if (extension == "py" || extension == "php")
 				{
@@ -190,13 +198,13 @@ class Response
 				else
 				{
 					file_to_send = get_file();
-					content_type = "Content-Type: text/" + extension + "\r\n\n\n";
+					// content_type = "Content-Type: text/" + extension + "\r\n\n\n";
+					std::cout << file_to_send << std::endl;
+					content_type = "Content-Type: */*\r\n\n\n";
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 			}
-			std::cout << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
-			// std::string cookieResponse = "Set-Cookie: \n";
-			return(version + status + " " + status_map[this->status] + location_string + file_to_send);
+			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 };
 #endif

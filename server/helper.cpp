@@ -85,7 +85,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	}
 	else
 		return;
-		std::cout<< files << std::endl;
+		// std::cout<< files << std::endl;
 	if (!files.empty())
 	{
 		Request req(files, port);
@@ -94,7 +94,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		const char *hello = resp.get_header().c_str();
 		if (FD_ISSET(i, &write_fds))
 		{
-			send(i, hello, strlen(hello), 0);
+			send(i, hello, resp.get_header().length(), 0);
 			map_of_req.erase(i);
 			FD_CLR(i, &write_fds);
 			close(i);
