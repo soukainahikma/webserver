@@ -171,7 +171,7 @@ public:
 		else
 			fill_header(s);
 		// vec_printer();
-		// map_printer();
+		map_printer();
 	}
 
 	map_request getRequest() { return (map_head); }

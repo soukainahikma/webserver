@@ -172,7 +172,7 @@ class Response
 			std::string		extension;
 			std::string		file_to_send = "";
 			
-			content_type = "";
+			content_type = "Content-Type: text/html";
 			if (status == "301")
 				location_string = "Location: " + location_string;
 			else if (this->filename != "") {
@@ -184,8 +184,9 @@ class Response
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 				content_type = "Content-Type: text/" + extension + "\r\n\n\n";
 			}
-			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
+			std::cout << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
+			std::string cookieResponse = "Set-Cookie: \n";
+			return(version + status + " " + status_map[this->status] + cookieResponse + location_string + content_type + file_to_send);
 		}
-
 };
 #endif

@@ -27,14 +27,17 @@ OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ) 
+$(NAME): $(OBJ)
+	@echo "\n\033[36m◊◊◊ Producin' object files done! ◊◊◊\033[0m\n"
 	@$(CC) $(OBJ) -o $(NAME)
+	@echo "\n\033[32m◊◊◊ ------- $(NAME) has been created successfully ------- ◊◊◊\033[0m\n"
 
 %.o: %.cpp $(INC)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	@rm -rf $(OBJ)
+	@echo "\n\033[36m◊◊◊ Cleanin' object files done! ◊◊◊\033[0m\n"
 
 fclean: clean
 	@rm -rf $(NAME)

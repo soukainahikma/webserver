@@ -25,6 +25,7 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 	setenv("PATH_TRANSLATED", path.c_str(), 1);
 	setenv("QUERY_STRING", req.getBodyString().c_str(), 1);
 	setenv("SERVER_NAME", split(req.getRequest()["Host"], ':')[0].c_str(), 1);
+	setenv("HTTP_COOKIE", req.getRequest()["Cookie"].c_str(), 1);
 	setenv("SERVER_PORT", std::to_string(req.get_port()).c_str(), 1);
 	setenv("SERVER_PROTOCOL", "\"HTTP/1.1\"", 1);
 	extern char **environ;
