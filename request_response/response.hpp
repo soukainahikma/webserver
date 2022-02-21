@@ -152,7 +152,7 @@ class Response
 			// file.open(filename, std::ios::binary);
 			// while (getline(file, line))
 			// 	buffer = buffer + line;
-			std::cout << filename << std::endl;
+			// return (buffer);
 
 			std::ifstream    indexFile(filename, std::ios::binary);
 			std::ostringstream buffer;
@@ -162,10 +162,6 @@ class Response
 			out << buffer.str();
 			return(buffer.str());
 		}
-
-		// std::string extension_extractor(std::string extension) {
-			
-		// }
 
 		std::string get_content_type () {
 			std::string content_type;
@@ -199,7 +195,6 @@ class Response
 				{
 					file_to_send = get_file();
 					// content_type = "Content-Type: text/" + extension + "\r\n\n\n";
-					std::cout << file_to_send << std::endl;
 					content_type = "Content-Type: */*\r\n\n\n";
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
