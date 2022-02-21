@@ -89,7 +89,7 @@ std::string unchunk_data(std::string files)
 				// std::cout<< result << std::endl;
 				return(result);
 			}
-			result.append(files.substr(end+2,size+2));
+			result.append(files.substr(end+2,size));
 			start = end+2+size+2;
 		}
 	}
