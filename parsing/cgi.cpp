@@ -7,7 +7,27 @@
 #include "../parsing/Server.hpp"
 #include "../request_response/request.hpp"
 
-char	**init_env(std::string status, std::string path, std::string page, Request &req)
+std::string	getdata(Request &req)
+{
+	std::string newdata = req.getBodyString();
+
+	if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
+	{
+		newdata = "";
+		for (size_t i = 0; i < req.getBodyStructs().size(); i++)
+		{
+			if(req.getBodyStructs()[i].filename == "")
+			{
+				if (i != 0)
+					newdata += "&";
+				newdata += req.getBodyStructs()[i].name + "=" + req.getBodyStructs()[i].body;
+			}
+		}
+	}
+	return newdata;
+}
+
+char	**init_env(std::string status, std::string path, std::string page, Request &req, std::string &newdata)
 {
 
 	setenv("REDIRECT_STATUS", status.c_str(), 1);
@@ -50,29 +70,23 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 {
 	int pipefd[2];
 	int pipefd_data[2];
+	int fd_old[2];
 	char **args;
 	std::string body = "";
 	int size_read = 1024;
+	std::string newdata = "";
 	char buffer[size_read];
 	std::string root_c;
 	if (size_read < 6)
 		return NULL;
-	char **env = init_env(status, path, page, req);
+	newdata = getdata(req);
+	char **env = init_env(status, path, page, req, newdata);
+	fd_old[0] = dup(0);
+	fd_old[1] = dup(1);
 	pipe(pipefd_data);
-	body = req.getBodyString().c_str();
-	if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
-	{
-		body = "";
-		for (size_t i = 0; i < req.getBodyStructs().size(); i++)
-		{
-			if (i != 0)
-				body += "&";
-			body += req.getBodyStructs()[i].name + "=" + req.getBodyStructs()[i].body;
-		}
-	}
-	
-	write(pipefd_data[1], body.c_str(), req.getBodyString().size());
-	// std::cerr << "++++++++++++++|" << req.getBodyString() << "|+++++++++hna\n";
+	if (req.getRequest()["Method"] != "GET")
+		write(pipefd_data[1], newdata.c_str(), newdata.size());
+	close(pipefd_data[1]);
 	if (page.find(".py") != std::string::npos)
 	{
 		args = new char*[3];
@@ -83,7 +97,6 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 	else
 	{
 		args = new char*[2];
-		// write(pipefd_data[1], req.getBodyString().c_str(), req.getBodyString().size());
 		root_c = get_root(page) + "/parsing/php-cgi";
 		args[0] = (char*)(root_c.c_str());
 		args[1] = NULL;
@@ -93,30 +106,32 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 	if (!pid)
 	{
 		dup2(pipefd[1], 1);
-		close(pipefd_data[1]);
+		close(pipefd[1]);
+		close(pipefd[0]);
+
 		dup2(pipefd_data[0], 0);
 		close(pipefd_data[0]);
-		close(pipefd[0]);
-		close(pipefd[1]);
+
 		execve(args[0], args, (char **)env);
 		status = "500";
 	}
 	else
 	{
 		close(pipefd_data[0]);
-		close(pipefd_data[1]);
-		wait(&pid);
-		int r;
-		bzero(buffer, size_read);
-		while ((r = read(pipefd[0], buffer, size_read - 1)))
-		{
-			body += buffer;
-			if (r < size_read - 1)
-				break;
-			bzero(buffer, size_read);
-		}
+
 		close(pipefd[1]);
+
+		bzero(buffer, size_read);
+		int r;
+		while ((r = read(pipefd[0], buffer, size_read - 1)))
+			body.append(buffer, r);
+
+		wait(&pid);
 		close(pipefd[0]);
+
+		dup2(fd_old[0], 0);
+		dup2(fd_old[1], 1);
+
 		delete [] args;
 	}
 	body.erase(0, body.find("\r\n\r\n"));
