@@ -31,7 +31,7 @@
 #define NOT_AUTHORIZED 405
 
 int			fileCheck(std::string fileName, std::string req_type);
-std::string runCgi(std::string root, std::string path, std::string page, std::string &status, Request &req);
+std::string runCgi(t_cgi &cgi, std::string &status, Request &req);
 
 class Response
 {
@@ -152,8 +152,7 @@ class Response
 		{
 			std::ifstream file;
 			std::string line;
-			std::string buffer;
-
+			std::string	buffer;
 			file.open(filename);
 			while (getline(file, line))
 			{
@@ -171,21 +170,33 @@ class Response
 		{
 			std::string		extension;
 			std::string		file_to_send = "";
+			t_cgi			cgi;
+			std::string cookieResponse = "";
+
 			
-			content_type = "";
+			content_type = "Content-Type: text/html";
 			if (status == "301")
 				location_string = "Location: " + location_string;
 			else if (this->filename != "") {
 				extension = get_extension(this->filename);
 				if (extension == "py" || extension == "php")
-					file_to_send = runCgi(this->root, this->path, this->filename, status, request);
+				{
+					cgi.root = this->root;
+					cgi.path = this->path;
+					cgi.page = this->filename;
+					file_to_send = runCgi(cgi, status, request);
+					content_type = "";
+				}
 				else
+				{
 					file_to_send = get_file();
+					content_type = "Content-Type: text/" + extension + "\r\n\n\n";
+				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
-				content_type = "Content-Type: text/" + extension + "\r\n\n\n";
 			}
-			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
+			std::cout << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
+			// std::string cookieResponse = "Set-Cookie: \n";
+			return(version + status + " " + status_map[this->status] + location_string + file_to_send);
 		}
-
 };
 #endif

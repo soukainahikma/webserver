@@ -25,6 +25,12 @@ struct body_struct
 	std::string body;
 };
 
+typedef struct s_cgi {
+	std::string root;
+	std::string path;
+	std::string page;
+}				t_cgi;
+
 class Request
 {
 public:
@@ -66,6 +72,10 @@ public:
 	{
 		vector_request vec = split_buffer(buffer, '\r');
 		vector_request head = split_buffer(vec[0].c_str(), ' ');
+		this->query_var = "";
+		if (head[1].find("?") != std::string::npos)
+			this->query_var = head[1].substr(head[1].find("?") + 1);
+		std::cout << (this->query_var + "\n").c_str();
 		map_head["Method"] = head[0];
 		map_head["URL"] = head[1];
 		map_head["Protocol_version"] = head[2];
@@ -147,11 +157,11 @@ public:
 					start = body.find(boundary, start + 1);
 					myfiles.push_back(info);
 				}
-				std::cout<< "body : |" << myfiles[0].body<<"|" <<std::endl;
-				std::cout<< "Content_Disposition : |" << myfiles[0].Content_Disposition<<"|" <<std::endl;
-				std::cout<< "content_type : |" << myfiles[0].content_type<<"|" <<std::endl;
-				std::cout<< "filename : |" << myfiles[0].filename<<"|" <<std::endl;
-				std::cout<< "name : |" << myfiles[0].name<<"|" <<std::endl;
+				// std::cout<< "body : |" << myfiles[0].body<<"|" <<std::endl;
+				// std::cout<< "Content_Disposition : |" << myfiles[0].Content_Disposition<<"|" <<std::endl;
+				// std::cout<< "content_type : |" << myfiles[0].content_type<<"|" <<std::endl;
+				// std::cout<< "filename : |" << myfiles[0].filename<<"|" <<std::endl;
+				// std::cout<< "name : |" << myfiles[0].name<<"|" <<std::endl;
 			}
 		}
 	}
@@ -172,6 +182,10 @@ public:
 			fill_header(s);
 		// vec_printer();
 		// map_printer();
+	}
+
+	std::string getQueryVar() {
+		return (this->query_var);
 	}
 
 	map_request getRequest() { return (map_head); }
@@ -213,6 +227,7 @@ public:
 	}
 
 private:
+	std::string query_var;
 	map_request map_head;
 	std::string body;
 	int port;

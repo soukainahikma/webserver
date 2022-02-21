@@ -7,10 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-<?php if ($_POST) { ?>
-    <h1><?php echo $_POST["data"] ?></h1>
-<? } else { ?>
-    <h1>NO POST REQUEST</h1>
-<? } ?>
+    <div><?php var_dump($_POST); ?></div>
+    <div><?php var_dump($_GET); ?></div>
 </body>
 </html>
