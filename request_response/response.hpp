@@ -113,11 +113,11 @@ class Response
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
 			if (true && this->request.getRequest()["Method"] == "DELETE" && (stats == OK))
 			{
-				is_deleted = remove(this->filename.c_str());
-				if (is_deleted != 0) {
-					this->status = "500";
-				}
-				this->filename = "";
+				// is_deleted = remove(this->filename.c_str());
+				// if (is_deleted != 0) {
+				// 	this->status = "500";
+				// }
+				// this->filename = "";
 			}
 		}
 
