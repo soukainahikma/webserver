@@ -125,7 +125,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		execve(args[0], args, (char **)env);
 		status = "400";
-		std::cerr << "error+++++++++++++++++\n\n";
 		exit(1);
 	}
 	else
@@ -139,7 +138,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		bzero(buffer, size_read);
 		int r;
-		std::cerr << "sfgsgs\n";
 		while ((r = read(pipefd[0], buffer, size_read - 1)))
 			body.append(buffer, r);
 		close(pipefd[0]);

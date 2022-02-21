@@ -199,7 +199,6 @@ class Response
 				{
 					file_to_send = get_file();
 					// content_type = "Content-Type: text/" + extension + "\r\n\n\n";
-					std::cout << file_to_send << std::endl;
 					content_type = "Content-Type: */*\r\n\n\n";
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
