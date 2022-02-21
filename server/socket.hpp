@@ -38,6 +38,7 @@ class server_socket
 typedef struct map_info
 {
 	int content_length;
+	int transfer_encoding;
 	std::string body;
 }map_info;
 

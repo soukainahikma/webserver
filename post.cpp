@@ -1,3 +1,8 @@
+
+
+
+
+
 #include "./request_response/request.hpp"
 #include <iostream>
 #include<map>
@@ -53,3 +58,12 @@ if(tmp[i+1].find("Content-Type")!= std::string::npos)
 	info.content_type = tmp[++i].substr(12);
 }
 				} */
+
+
+
+
+
+
+
+
+

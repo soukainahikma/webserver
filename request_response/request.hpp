@@ -147,11 +147,11 @@ public:
 					start = body.find(boundary, start + 1);
 					myfiles.push_back(info);
 				}
-				std::cout<< "body : |" << myfiles[0].body<<"|" <<std::endl;
-				std::cout<< "Content_Disposition : |" << myfiles[0].Content_Disposition<<"|" <<std::endl;
-				std::cout<< "content_type : |" << myfiles[0].content_type<<"|" <<std::endl;
-				std::cout<< "filename : |" << myfiles[0].filename<<"|" <<std::endl;
-				std::cout<< "name : |" << myfiles[0].name<<"|" <<std::endl;
+				// std::cout<< "body : |" << myfiles[0].body<<"|" <<std::endl;
+				// std::cout<< "Content_Disposition : |" << myfiles[0].Content_Disposition<<"|" <<std::endl;
+				// std::cout<< "content_type : |" << myfiles[0].content_type<<"|" <<std::endl;
+				// std::cout<< "filename : |" << myfiles[0].filename<<"|" <<std::endl;
+				// std::cout<< "name : |" << myfiles[0].name<<"|" <<std::endl;
 			}
 		}
 	}
