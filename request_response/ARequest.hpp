@@ -81,6 +81,11 @@ class ARequest
         ~ARequest() {
 
         };
+
+    std::string getQuery() {
+        return (this->req.getQueryVar());
+    }
+
     protected:
         Request req;
         std::vector<Server> servs;

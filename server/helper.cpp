@@ -30,7 +30,8 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 				{
 					std::string str = files.substr(found + 16, end - found - 16);
 					it->second->content_length = atoi(str.c_str());
-
+					if (files.length() - start - 4 == it->second->content_length)
+						return (1);
 					return (0);
 				}
 				return (1);

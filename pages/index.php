@@ -7,13 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-<?php 
-    echo "COOOKIE <br>";
-    var_dump($_COOKIE);
-if ($_POST) { ?>
-    <h1><?php var_dump($_POST) ?></h1>
-<? } else { ?>
-    <h1>NO POST REQUEST</h1>
-<? } ?>
+    <div><?php var_dump($_POST); ?></div>
+    <div><?php var_dump($_GET); ?></div>
 </body>
 </html>

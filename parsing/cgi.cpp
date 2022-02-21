@@ -43,9 +43,10 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 		setenv("CONTENT_TYPE", req.getRequest()["Content-Type"].c_str(), 1);
 	setenv("PATH_INFO", path.c_str(), 1);
 	setenv("PATH_TRANSLATED", path.c_str(), 1);
-	setenv("QUERY_STRING", req.getBodyString().c_str(), 1);
+	setenv("QUERY_STRING", req.getQueryVar().c_str(), 1);
 	setenv("SERVER_NAME", split(req.getRequest()["Host"], ':')[0].c_str(), 1);
 	setenv("HTTP_COOKIE", req.getRequest()["Cookie"].c_str(), 1);
+	// setenv("HTTP_COOKIE", "test=value; test2=value2", 1);
 	setenv("SERVER_PORT", std::to_string(req.get_port()).c_str(), 1);
 	setenv("SERVER_PROTOCOL", "\"HTTP/1.1\"", 1);
 	extern char **environ;
@@ -97,7 +98,7 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 	else
 	{
 		args = new char*[2];
-		root_c = get_root(page) + "/parsing/php-cgi";
+		root_c = "/goinfre/aboulbaz/.brew/bin/php-cgi";
 		args[0] = (char*)(root_c.c_str());
 		args[1] = NULL;
 	}

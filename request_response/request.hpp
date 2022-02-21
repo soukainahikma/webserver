@@ -66,6 +66,10 @@ public:
 	{
 		vector_request vec = split_buffer(buffer, '\r');
 		vector_request head = split_buffer(vec[0].c_str(), ' ');
+		this->query_var = "";
+		if (head[1].find("?") != std::string::npos)
+			this->query_var = head[1].substr(head[1].find("?") + 1);
+		std::cout << (this->query_var + "\n").c_str();
 		map_head["Method"] = head[0];
 		map_head["URL"] = head[1];
 		map_head["Protocol_version"] = head[2];
@@ -171,7 +175,11 @@ public:
 		else
 			fill_header(s);
 		// vec_printer();
-		map_printer();
+		// map_printer();
+	}
+
+	std::string getQueryVar() {
+		return (this->query_var);
 	}
 
 	map_request getRequest() { return (map_head); }
@@ -213,6 +221,7 @@ public:
 	}
 
 private:
+	std::string query_var;
 	map_request map_head;
 	std::string body;
 	int port;
