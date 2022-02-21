@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "iosfwd": "cpp"
+        "string": "cpp",
+        "array": "cpp",
+        "iterator": "cpp",
+        "string_view": "cpp",
+        "vector": "cpp",
+        "iosfwd": "cpp",
+        "ostream": "cpp"
     }
 }

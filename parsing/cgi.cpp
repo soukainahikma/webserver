@@ -10,20 +10,25 @@
 std::string	getdata(Request &req)
 {
 	std::string newdata = req.getBodyString();
-
+	size_t pos = 0;
+	// std::cerr << newdata << "|\n";
+	if ((pos = newdata.find_first_of("\n\n")) != std::string::npos)
+		newdata.erase(0, pos + 3);
 	if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
 	{
 		newdata = "";
-		for (size_t i = 0; i < req.getBodyStructs().size(); i++)
+		for (size_t i = 0; i < req.getBodyStructs().size() - 1; i++)
 		{
 			if(req.getBodyStructs()[i].filename == "")
 			{
 				if (i != 0)
 					newdata += "&";
+				req.getBodyStructs()[i].body = req.getBodyStructs()[i].body.erase(req.getBodyStructs()[i].body.size() - 2);
 				newdata += req.getBodyStructs()[i].name + "=" + req.getBodyStructs()[i].body;
 			}
 		}
 	}
+	std::cerr << newdata << "|" << pos << "|\n";
 	return newdata;
 }
 
@@ -82,10 +87,6 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 	char **env = init_env(status, path, page, req, newdata);
 	fd_old[0] = dup(0);
 	fd_old[1] = dup(1);
-	pipe(pipefd_data);
-	if (req.getRequest()["Method"] != "GET")
-		write(pipefd_data[1], newdata.c_str(), newdata.size());
-	close(pipefd_data[1]);
 	if (page.find(".py") != std::string::npos)
 	{
 		args = new char*[3];
@@ -100,6 +101,7 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 		args[0] = (char*)(root_c.c_str());
 		args[1] = NULL;
 	}
+	pipe(pipefd_data);
 	pipe(pipefd);
 	int pid = fork();
 	if (!pid)
@@ -110,12 +112,16 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 
 		dup2(pipefd_data[0], 0);
 		close(pipefd_data[0]);
+		close(pipefd_data[1]);
 
 		execve(args[0], args, (char **)env);
 		status = "500";
 	}
 	else
 	{
+		if (req.getRequest()["Method"] != "GET")
+			write(pipefd_data[1], newdata.c_str(), newdata.size());
+		close(pipefd_data[1]);
 		close(pipefd_data[0]);
 
 		close(pipefd[1]);
@@ -125,8 +131,8 @@ std::string runCgi(std::string root, std::string path, std::string page, std::st
 		while ((r = read(pipefd[0], buffer, size_read - 1)))
 			body.append(buffer, r);
 
-		wait(&pid);
 		close(pipefd[0]);
+		wait(&pid);
 
 		dup2(fd_old[0], 0);
 		dup2(fd_old[1], 1);
