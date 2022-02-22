@@ -99,7 +99,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	int pipefd_data[2];
 	int fd_old[2];
 	char **args;
-
 	std::string body = "";
 	int size_read = 1024;
 	std::string newdata = "";

@@ -43,7 +43,7 @@ public:
 					if(!(fileStat.st_mode & S_IWUSR))
         				return Response(server, server.get_root() + server.get_error_page()["403"], this->method, "403", req);
 					std::cout << RED << (server.get_root() + "/" + upload_path + "/" + body[i].filename) << RESET << std::endl;
-					int fd = open((server.get_root() + "/" + upload_path + "/" + body[i].filename).c_str(), O_CREAT | O_RDWR, 0644);
+					int fd = open((server.get_root() + "/" + upload_path + body[i].filename).c_str(), O_CREAT | O_RDWR, 0644);
 					write(fd, body[i].body.c_str(), body[i].body.length());
 
 				}
