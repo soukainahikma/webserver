@@ -1,5 +1,5 @@
 #include "socket.hpp"
-
+#include <string.h>
 server_socket::server_socket()
 {
 	option = 1;

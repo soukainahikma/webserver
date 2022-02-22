@@ -4,8 +4,14 @@
 #include "response.hpp"
 #include "../server/socket.hpp"
 #include "../parsing/Server.hpp"
+#include "GETRequest.hpp"
+#include "POSTRequest.hpp"
+#include "DELETERequest.hpp"
 #include <vector>
 #include <map>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 class RequestHandler
 {
@@ -24,40 +30,14 @@ public:
 		this->req = req;
 	}
 
-	Response generateResponse () {
-		return Response();
-	}
-
-	Response GETRequesHandler () {
-		Request::map_request req_map = req.getRequest();
-		size_t found;
-		std::string server_name;
-		std::map<std::string, int> server_names;
-		size_t index;
-
-		server_name = req_map["Host"];
-		if ((found = server_name.find(":"))!= std::string::npos)
-				server_name = server_name.substr(0,found);	
-		for (size_t i = 0; i < Servs.size(); i++)
-		{
-			server_names = Servs[i].get_server_name();
-			if (server_names[server_name]) {
-				std::vector<Location> locations = Servs[i].get_location();
-				for (size_t j = 0; j < locations.size(); j++)
-				{
-					if (req_map["URL"] == locations[j].get_path())
-						return Response(Servs[i].get_root() + locations[j].get_path() +"/index.html");
-				}
-			}
-		}
-		std::map<std::string, std::string> errorPages = Servs[Servs.size() - 1].get_error_page();
-		return Response(502, Servs[Servs.size() - 1].get_root() + errorPages["502"]);
-	}
-
 	Response Bootstrap() {	
 		if (req.getRequest()["Method"] == "GET")
-			return GETRequesHandler();
-		return GETRequesHandler();
+			return GETRequest(req, Servs).returnedResponse();
+		if (req.getRequest()["Method"] == "POST")
+			return POSTRequest(req, Servs).returnedResponse();
+		if (req.getRequest()["Method"] == "DELETE")
+			return DELETERequest(req, Servs).returnedResponse();
+		return GETRequest(req, Servs).returnedResponse();
 	}
 
 	~RequestHandler()

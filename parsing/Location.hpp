@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 class Location
 {
@@ -14,6 +15,7 @@ class Location
 	std::vector<std::string>	_request_method;
 	std::string					_fastcgi_pass;
 	std::string					_upload_enable;
+	std::string					_enable_delete;
 	std::string					_upload_store;
 	bool						_equal;
 	public:
@@ -23,24 +25,27 @@ class Location
 		void	set_path(std::string);
 		void	set_equal(bool);
 		void	set_autoindex(std::string);
-		void	set_index(std::vector<std::string>);
-		void	set_return(std::vector<std::string>);
+		void	set_index(std::vector<std::string>&);
+		void	set_return(std::vector<std::string>&);
 		void	set_request_method(std::string);
 		void	set_fastcgi_pass(std::string);
 		void	set_upload_enable(std::string);
+		void	set_enable_delete(std::string);
 		void	set_upload_store(std::string);
 		//		get
-		std::string					get_path();
-		std::string					get_autoindex();
-		std::vector<std::string>	get_index();
-		std::vector<std::string>	get_return();
-		std::vector<std::string>	get_request_method();
-		std::string					get_fastcgi_pass();
-		std::string					get_upload_enable();
-		std::string					get_upload_store();
+		std::string					&get_path();
+		std::string					&get_autoindex();
+		std::vector<std::string>	&get_index();
+		std::vector<std::string>	&get_return();
+		std::vector<std::string>	&get_request_method();
+		std::string					&get_fastcgi_pass();
+		std::string					&get_upload_enable();
+		std::string					&get_enable_delete();
+		std::string					&get_upload_store();
 		bool						get_equal();
 };
 void						print_error(int i, std::string v);
-std::vector<std::string>	split(std::string str, char c);
+std::vector<std::string>	split(std::string &str, char c);
 std::string					trim(const std::string &s);
+
 #endif

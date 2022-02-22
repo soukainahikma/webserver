@@ -34,4 +34,12 @@ class server_socket
 		int get_port() const;
 		fd_set &get_set_socket();
 };
+
+typedef struct map_info
+{
+	int content_length;
+	int transfer_encoding;
+	std::string body;
+}map_info;
+
 #endif

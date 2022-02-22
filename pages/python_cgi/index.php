@@ -1,0 +1,6 @@
+<h1> Great </h1>
+<?php 
+	var_dump($_GET);
+	var_dump($_POST);
+	var_dump($_FILES);
+?>
