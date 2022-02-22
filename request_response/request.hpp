@@ -51,7 +51,8 @@ public:
 			port = r.port;
 			body = r.body;
 			myfiles = r.myfiles;
-			this->query_var = r.query_var;
+			query_var = r.query_var;
+			boundary = r.boundary;
 		}
 		return (*this);
 	}
@@ -77,6 +78,7 @@ public:
 		if (head[1].find("?") != std::string::npos)
 		{
 			this->query_var = head[1].substr(head[1].find("?") + 1);
+			std::cout << "QUERY_var ===> " << this->query_var << std::endl;
 			head[1] = head[1].substr(0, head[1].find("?"));
 		}
 		// std::cout << (head[1] + "\n").c_str();
@@ -230,6 +232,11 @@ public:
 	std::string &get_query() {
 		return (query); 
 	}
+
+	std::string get_boundary () {
+		return this->boundary;
+	}
+
 
 private:
 	std::string query_var;
