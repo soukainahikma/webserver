@@ -75,16 +75,16 @@ class Response
 			url = req.getRequest()["URL"];
 			this->request = req;
 	
-			filename = "";
+			this->filename = "";
 			std::vector<std::string> indexes = location.get_index();
-			// std::cout<< MAGENTA << "here" << RESET << std::endl;
+			std::cout<< MAGENTA << "here" << RESET << std::endl;
 			for (i = 0; i < indexes.size(); i++)
 			{
 				stats = fileCheck(root + path + "/" + indexes[i], this->request.getRequest()["Method"]);
 				if (stats == OK || stats == CREATED)
 					break;
 			}
-			// std::cout<< BLUE << "here" << RESET << std::endl;
+			std::cout<< BLUE << "here" << RESET << std::endl;
 			method = this->request.getRequest()["Method"];
 			version = "HTTP/1.1 ";
 			location_string = "";
@@ -96,7 +96,8 @@ class Response
 			else
 				status = ((stats == OK || stats == CREATED) ? (stats == OK ? "200" : "201"):( (stats == FORBIDDEN) ? "403" : "404"));
 			if (indexes.size() > 0)
-				filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + server.get_error_page()[std::to_string(stats)];
+				this->filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + server.get_error_page()[std::to_string(stats)];
+			
 		}
 
 		Response(Server server, std::string filename, std::string req_type, std::string status, Request &req)
@@ -105,6 +106,7 @@ class Response
 			std::string extension;
 			int is_deleted;
 
+			std::cout << indexes.size() << std::endl;
 			generate_status_map();
 			this->request = req;
 			this->root = "";
@@ -184,7 +186,7 @@ class Response
 			
 			content_type = "Content-Type: text/html";
 			if (status == "301")
-				location_string = "Location: " + location_string;
+				location_string = "Location: " + location_string +"\n";
 			else if (this->filename != "") {
 				get_content_type();
 				extension = get_extension(this->filename);
