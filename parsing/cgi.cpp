@@ -53,11 +53,7 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 		setenv("REQUEST_URI", path.c_str(), 1);
 	setenv("SERVER_SOFTWARE", "webserv/1.0", 1);
 	setenv("CONTENT_LENGTH", req.getRequest()["Content-Length"].c_str(), 1);
-	// if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
-	// 	setenv("CONTENT_TYPE", "application/x-www-form-urlencoded", 1);
-	// else
-	setenv("CONTENT_TYPE", (req.getRequest()["Content-Type"]).c_str(), 1);// Missing boundary in multipart/form-data POST data
-
+	setenv("CONTENT_TYPE", (req.getRequest()["Content-Type"]).c_str(), 1);
 	setenv("PATH_INFO", path.c_str(), 1);
 	setenv("REDIRECT_STATUS", status.c_str(), 1);
 	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
