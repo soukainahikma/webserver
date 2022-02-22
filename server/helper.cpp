@@ -80,13 +80,11 @@ std::string unchunk_data(std::string files)
 	{
 		result = files.substr(0, found + 4);
 		start = found + 4;
-		// found = files.find("\r\n",found);
 		while ((end = files.find("\r\n",start)) != std::string::npos)
 		{
 			size = get_size(files.substr(start,end-start));
 			if(size == 0)
 			{
-				// std::cout<< result << std::endl;
 				return(result);
 			}
 			result.append(files.substr(end+2,size));
@@ -135,6 +133,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	std::cout<< files << std::endl;
 	if (it->second->transfer_encoding == 1)
 		files = unchunk_data(files);
+		// std::cout<< files << std::endl;
 	if (!files.empty())
 	{
 		Request req(files, port);
@@ -143,7 +142,10 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		const char *hello = resp.get_header().c_str();
 		if (FD_ISSET(i, &write_fds))
 		{
-			send(i, hello, strlen(hello), 0);
+			size_t n;
+			n = send(i, hello, strlen(hello), 0);
+			// std::cout<<YELLOW <<n << std::endl;
+
 			map_of_req.erase(i);
 			FD_CLR(i, &write_fds);
 			close(i);
