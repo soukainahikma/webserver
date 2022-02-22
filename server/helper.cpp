@@ -3,9 +3,17 @@
 #include "../request_response/request.hpp"
 #include "../request_response/request_handler.hpp"
 #include <sys/ioctl.h>
+#include <dirent.h>
 
 int fileCheck(std::string fileName, std::string req_type)
 {
+	DIR *pDir;
+	pDir = opendir (fileName.c_str());
+    if (pDir != NULL)
+	{
+		closedir (pDir);
+        return NOT_FOUND;
+	}
 	if (!access(fileName.c_str(), F_OK))
 	{
 		if (!access(fileName.c_str(), R_OK	))
@@ -144,9 +152,8 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		if (FD_ISSET(i, &write_fds))
 		{
 			size_t n;
-
-			std::cout << BLUE << hello << RESET << std::endl;
 			n =send(i, hello, strlen(hello), 0);
+			// std::cerr << BLUE << n << RESET << std::endl;
 			// std::cout<<MAGENTA<< resp.get_header().length()<<std::endl;
 			// std::cout<< YELLOW << n << std::endl;
 			map_of_req.erase(i);

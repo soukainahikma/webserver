@@ -53,6 +53,7 @@ public:
 			myfiles = r.myfiles;
 			query_var = r.query_var;
 			boundary = r.boundary;
+			contentType = r.contentType;
 		}
 		return (*this);
 	}
@@ -78,7 +79,6 @@ public:
 		if (head[1].find("?") != std::string::npos)
 		{
 			this->query_var = head[1].substr(head[1].find("?") + 1);
-			std::cout << "QUERY_var ===> " << this->query_var << std::endl;
 			head[1] = head[1].substr(0, head[1].find("?"));
 		}
 		// std::cout << (head[1] + "\n").c_str();
@@ -124,19 +124,25 @@ public:
 		info.filename = "";
 		return(info);
 	}
+
+	std::string get_content_type () {
+		return (this->contentType);
+	}
+
 	void fill_body(/* std::string body */)
 	{
 		body_struct info;
 
 		size_t found = 0;
 		std::map<std::string,std::string>::iterator it= map_head.find("Content-Type");
+		this->contentType = "";
 		if(it !=map_head.end())
 		{
 			// std::cout<< body << std::endl;
 			if((found = it->second.find("; boundary="))!= std::string::npos)
 			{
 				boundary = "--" + it->second.substr(found+11);
-				it->second = it->second.substr(0,found);
+				this->contentType = it->second.substr(0,found);
 				std::string tmp;
 				size_t start;
 				size_t end;
@@ -245,6 +251,7 @@ private:
 	int port;
 	std::string boundary;
 	std::string query;
+	std::string contentType;
 	std::vector<body_struct> myfiles; // if (|Content-Type| => multipart/form-data) myfiles| myfiles.size() != 0 
 };
 #endif

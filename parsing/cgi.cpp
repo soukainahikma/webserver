@@ -2,6 +2,7 @@
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <fstream>
 #include "../parsing/Server.hpp"
@@ -10,12 +11,14 @@
 std::string	getdata(Request &req)
 {
 	// std::string newdata = req.getBodyString();
+
 	std::string newdata = req.getBodyString();
 	if (req.getRequest()["Method"] == "GET")
 		newdata = req.getQueryVar();
-	else {		
+	if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
+		newdata = req.getBodyString();
+	else {
 		size_t pos = 0;
-		// std::cerr << newdata << "|\n";
 		if ((pos = newdata.find_first_of("\n\n")) != std::string::npos)
 			newdata.erase(0, pos + 3);
 		if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
@@ -27,56 +30,67 @@ std::string	getdata(Request &req)
 				{
 					if (i != 0)
 						newdata += "&";
-					req.getBodyStructs()[i].body = req.getBodyStructs()[i].body.erase(req.getBodyStructs()[i].body.size() - 2);
 					newdata += req.getBodyStructs()[i].name + "=" + req.getBodyStructs()[i].body;
 				}
 			}
 		}
-		// std::cerr << newdata << "|" << pos << "|\n";
 	}
 	return newdata;
 }
 
 char	**init_env(std::string status, std::string path, std::string page, Request &req, std::string &newdata)
 {
-
-	
-
+	setenv("SCRIPT_FILENAME", page.c_str(), 1);
+	setenv("SCRIPT_NAME", (page.erase(0, page.find_last_of("/") + 1)).c_str(), 1);
+	setenv("REMOTEaddr", std::to_string(req.get_port()).c_str(), 1);
+	setenv("REQUEST_METHOD", req.getRequest()["Method"].c_str(), 1);
+	if (req.getRequest()["Method"] == "GET")
+	{
+		setenv("QUERY_STRING", newdata.c_str(), 1);
+		setenv("REQUEST_URI", (path + newdata).c_str(), 1);
+	}
+	else
+		setenv("REQUEST_URI", path.c_str(), 1);
+	setenv("SERVER_SOFTWARE", "webserv/1.0", 1);
+	setenv("CONTENT_LENGTH", req.getRequest()["Content-Length"].c_str(), 1);
+	setenv("CONTENT_TYPE", (req.getRequest()["Content-Type"]).c_str(), 1);
+	setenv("PATH_INFO", path.c_str(), 1);
 	setenv("REDIRECT_STATUS", status.c_str(), 1);
 	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
-	setenv("SCRIPT_NAME", page.c_str(), 1);
-	setenv("SCRIPT_FILENAME", page.c_str(), 1);
-	setenv("CONTENT_LENGTH", req.getRequest()["Content-Length"].c_str(), 1);
-	// setenv("name=chb&tele=dsfsdf", "19", 1);
-	setenv("REQUEST_METHOD", req.getRequest()["Method"].c_str(), 1);
-	if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
-		setenv("CONTENT_TYPE", "application/x-www-form-urlencoded", 1);
-	else
-		setenv("CONTENT_TYPE", req.getRequest()["Content-Type"].c_str(), 1);
-	setenv("PATH_INFO", path.c_str(), 1);
 	setenv("PATH_TRANSLATED", path.c_str(), 1);
-	setenv("QUERY_STRING", newdata.c_str(), 1);
 	setenv("SERVER_NAME", split(req.getRequest()["Host"], ':')[0].c_str(), 1);
 	setenv("HTTP_COOKIE", req.getRequest()["Cookie"].c_str(), 1);
-	// setenv("HTTP_COOKIE", "test=value; test2=value2", 1);
-	setenv("SERVER_PORT", std::to_string(req.get_port()).c_str(), 1);
-	setenv("SERVER_PROTOCOL", "\"HTTP/1.1\"", 1);
+	setenv("SERVER_PORT", NumberToString(req.get_port()).c_str() , 1);
 	extern char **environ;
 	return (environ);
 }
 
-std::string get_root(std::string root)
+std::string get_root()
 {
 	int r = 0;
 
-	if ((r = root.find("Desktop/")) != std::string::npos)
+	char path[256];
+	getcwd(path, 256);
+	return path;
+}
+
+void	fill_binary_cgi(t_cgi &cgi, char **&args)
+{
+	if (cgi.page.find(".py") != std::string::npos)
 	{
-		r += 10;
-		while (root[r] != '/')
-			r++;
-		root.erase(r, root.length());
+		args = new char*[3];
+		args[0] = (char*)"/usr/bin/python";
+		args[1] = (char*)(cgi.page).c_str();
+		args[2] = NULL;
 	}
-	return root;
+	else if (cgi.page.find(".php") != std::string::npos)
+	{
+		args = new char*[2];
+		args[0] = "/Users/aboulbaz/goinfre/.brew/bin/php-cgi";
+		args[1] = NULL;
+	}
+	else
+		throw ;// ma3raftch hno ndir
 }
 
 std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
@@ -96,20 +110,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	char **env = init_env(status, cgi.path, cgi.page, req, newdata);
 	fd_old[0] = dup(0);
 	fd_old[1] = dup(1);
-	if (cgi.page.find(".py") != std::string::npos)
-	{
-		args = new char*[3];
-		args[0] = (char*)"/usr/bin/python";
-		args[1] = (char*)(cgi.page).c_str();
-		args[2] = NULL;
-	}
-	else
-	{
-		args = new char*[2];
-		root_c = get_root(cgi.page) + "/parsing/php-cgi";
-		args[0] = (char*)(root_c.c_str());
-		args[1] = NULL;
-	}
+	fill_binary_cgi(cgi, args);
 	pipe(pipefd_data);
 	pipe(pipefd);
 	int pid = fork();
@@ -125,7 +126,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		execve(args[0], args, (char **)env);
 		status = "400";
-		std::cerr << "error+++++++++++++++++\n\n";
 		exit(1);
 	}
 	else
@@ -139,7 +139,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		bzero(buffer, size_read);
 		int r;
-		std::cerr << "sfgsgs\n";
 		while ((r = read(pipefd[0], buffer, size_read - 1)))
 			body.append(buffer, r);
 		close(pipefd[0]);
@@ -150,7 +149,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		delete [] args;
 	}
-	// std::cerr << body << "\n";
-	// body.erase(0, body.find("\r\n\r\n"));
+	// std::cerr << "hello\n";
+	// std::cerr << MAGENTA << body << RESET << "\n";
 	return (body);
 }

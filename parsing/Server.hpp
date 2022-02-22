@@ -2,6 +2,7 @@
 #define  SERVER_HPP
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <map>
 #include <fstream>
@@ -52,5 +53,13 @@ void						print_error(int i, std::string v);
 std::string					get_key(std::string &line, int &idx);
 std::string					get_value(std::string &line, int &idx);
 void						print_all(std::vector<Server> &vec_serv, std::map<int,int> &m);
+
+template <typename T>
+std::string	NumberToString( T Number )
+{
+	std::ostringstream ss;
+	ss << Number;
+	return ss.str();
+}
 
 #endif
