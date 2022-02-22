@@ -206,7 +206,8 @@ class Response
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 			}
-			std::cout << RED << "+++++++++++++++ {  } ++++++++++++++"<< RESET << std::endl << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
+			std::cout << RED << request.get_boundary() << RESET << std::endl;
+			// std::cout << RED << "+++++++++++++++ {  } ++++++++++++++"<< RESET << std::endl << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
 			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 };

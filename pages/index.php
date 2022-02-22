@@ -7,7 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-    <div><?php var_dump($_POST); ?></div>
+    <!-- <div><?php var_dump($_POST); ?></div> -->
     <div><?php var_dump($_GET); ?></div>
 </body>
 </html>

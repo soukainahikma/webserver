@@ -46,7 +46,7 @@ public:
 					write(fd, body[i].body.c_str(), body[i].body.length());
 
 				}
-				else if (location.get_upload_enable() != "on")
+				else if (location.get_upload_enable() != "on" && body[i].filename != "")
 					return Response(server, server.get_root() + server.get_error_page()["405"], this->method, "405", req);
 			}
 		}
