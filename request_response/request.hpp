@@ -78,7 +78,6 @@ public:
 		if (head[1].find("?") != std::string::npos)
 		{
 			this->query_var = head[1].substr(head[1].find("?") + 1);
-			std::cout << "QUERY_var ===> " << this->query_var << std::endl;
 			head[1] = head[1].substr(0, head[1].find("?"));
 		}
 		// std::cout << (head[1] + "\n").c_str();
@@ -136,7 +135,7 @@ public:
 			if((found = it->second.find("; boundary="))!= std::string::npos)
 			{
 				boundary = "--" + it->second.substr(found+11);
-				it->second = it->second.substr(0,found);
+				// it->second = it->second.substr(0,found);
 				std::string tmp;
 				size_t start;
 				size_t end;

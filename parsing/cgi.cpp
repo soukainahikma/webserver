@@ -2,6 +2,7 @@
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <fstream>
 #include "../parsing/Server.hpp"
@@ -11,7 +12,6 @@ std::string	getdata(Request &req)
 {
 	// std::string newdata = req.getBodyString();
 
-	std::cerr << req.getQueryVar() << "|+++++\n";
 	std::string newdata = req.getBodyString();
 	if (req.getRequest()["Method"] == "GET")
 		newdata = req.getQueryVar();
@@ -43,24 +43,28 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 	setenv("SCRIPT_FILENAME", page.c_str(), 1);
 	setenv("SCRIPT_NAME", (page.erase(0, page.find_last_of("/") + 1)).c_str(), 1);
 	setenv("REMOTEaddr", std::to_string(req.get_port()).c_str(), 1);
-	setenv("REQUEST_URI", (path + newdata).c_str(), 1);
+	setenv("REQUEST_METHOD", req.getRequest()["Method"].c_str(), 1);
+	if (req.getRequest()["Method"] == "GET")
+	{
+		setenv("QUERY_STRING", newdata.c_str(), 1);
+		setenv("REQUEST_URI", (path + newdata).c_str(), 1);
+	}
+	else
+		setenv("REQUEST_URI", path.c_str(), 1);
 	setenv("SERVER_SOFTWARE", "webserv/1.0", 1);
 	setenv("CONTENT_LENGTH", req.getRequest()["Content-Length"].c_str(), 1);
-	setenv("REQUEST_METHOD", req.getRequest()["Method"].c_str(), 1);
 	// if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
 	// 	setenv("CONTENT_TYPE", "application/x-www-form-urlencoded", 1);
 	// else
-		setenv("CONTENT_TYPE", (req.getRequest()["Content-Type"]).c_str(), 1);// Missing boundary in multipart/form-data POST data
+	setenv("CONTENT_TYPE", (req.getRequest()["Content-Type"]).c_str(), 1);// Missing boundary in multipart/form-data POST data
+
 	setenv("PATH_INFO", path.c_str(), 1);
 	setenv("REDIRECT_STATUS", status.c_str(), 1);
 	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
 	setenv("PATH_TRANSLATED", path.c_str(), 1);
-	setenv("QUERY_STRING", newdata.c_str(), 1);
-	std::cerr << newdata << "|\n";
 	setenv("SERVER_NAME", split(req.getRequest()["Host"], ':')[0].c_str(), 1);
 	setenv("HTTP_COOKIE", req.getRequest()["Cookie"].c_str(), 1);
-	setenv("SERVER_PORT", std::to_string(req.get_port()).c_str(), 1);
-	setenv("SERVER_PROTOCOL", "\"HTTP/1.1\"", 1);
+	setenv("SERVER_PORT", NumberToString(req.get_port()).c_str() , 1);
 	extern char **environ;
 	return (environ);
 }
@@ -85,6 +89,8 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	int pipefd_data[2];
 	int fd_old[2];
 	char **args;
+
+	std::cout << req.getRequest()["Content-Type"]<< std::endl;
 	std::string body = "";
 	int size_read = 1024;
 	std::string newdata = "";
@@ -130,7 +136,14 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	else
 	{
 		if (req.getRequest()["Method"] != "GET")
+		{
+			if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
+			{
+				newdata = req.getBodyString();
+			}
 			write(pipefd_data[1], newdata.c_str(), newdata.size());
+			// std::cerr << MAGENTA << "{" <<  newdata << "}\n" << RESET;
+		}
 		close(pipefd_data[1]);
 		close(pipefd_data[0]);
 

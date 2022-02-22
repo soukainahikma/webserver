@@ -77,14 +77,14 @@ class Response
 	
 			this->filename = "";
 			std::vector<std::string> indexes = location.get_index();
-			std::cout<< MAGENTA << "here" << RESET << std::endl;
+			// std::cout<< MAGENTA << "here" << RESET << std::endl;
 			for (i = 0; i < indexes.size(); i++)
 			{
 				stats = fileCheck(root + path + "/" + indexes[i], this->request.getRequest()["Method"]);
 				if (stats == OK || stats == CREATED)
 					break;
 			}
-			std::cout<< BLUE << "here" << RESET << std::endl;
+			// std::cout<< BLUE << "here" << RESET << std::endl;
 			method = this->request.getRequest()["Method"];
 			version = "HTTP/1.1 ";
 			location_string = "";
@@ -106,7 +106,7 @@ class Response
 			std::string extension;
 			int is_deleted;
 
-			std::cout << indexes.size() << std::endl;
+			// std::cout << indexes.size() << std::endl;
 			generate_status_map();
 			this->request = req;
 			this->root = "";
@@ -206,7 +206,7 @@ class Response
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 			}
-			std::cout << RED << request.get_boundary() << RESET << std::endl;
+			// std::cout << RED << request.get_boundary() << RESET << std::endl;
 			// std::cout << RED << "+++++++++++++++ {  } ++++++++++++++"<< RESET << std::endl << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
 			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
