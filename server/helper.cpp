@@ -145,7 +145,8 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		{
 			size_t n;
 
-			n =send(i, hello, resp.get_header().length(), 0);
+			std::cout << BLUE << hello << RESET << std::endl;
+			n =send(i, hello, strlen(hello), 0);
 			// std::cout<<MAGENTA<< resp.get_header().length()<<std::endl;
 			// std::cout<< YELLOW << n << std::endl;
 			map_of_req.erase(i);
