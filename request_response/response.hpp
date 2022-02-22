@@ -165,8 +165,13 @@ class Response
 
 		std::string get_content_type () {
 			std::string content_type;
+			std::string extension = get_extension(this->filename);
 
-			return content_type;
+			if (extension == "html" || extension == "css")
+				return "text/" + extension;
+			else if (extension == "js")
+				return "text/javascript";
+			return "*/*";
 		}
 
 		std::string get_header()
@@ -195,10 +200,11 @@ class Response
 				{
 					file_to_send = get_file();
 					// content_type = "Content-Type: text/" + extension + "\r\n\n\n";
-					content_type = "Content-Type: */*\r\n\n\n";
+					content_type = "Content-Type: " +  get_content_type() + "\r\n\n\n";
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 			}
+			std::cout << RED << "+++++++++++++++ {  } ++++++++++++++"<< RESET << std::endl << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
 			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 };
