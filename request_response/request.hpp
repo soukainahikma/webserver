@@ -51,6 +51,7 @@ public:
 			port = r.port;
 			body = r.body;
 			myfiles = r.myfiles;
+			this->query_var = r.query_var;
 		}
 		return (*this);
 	}
