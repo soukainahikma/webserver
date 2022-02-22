@@ -15,9 +15,10 @@ std::string	getdata(Request &req)
 	std::string newdata = req.getBodyString();
 	if (req.getRequest()["Method"] == "GET")
 		newdata = req.getQueryVar();
-	else {		
+	if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
+		newdata = req.getBodyString();
+	else {
 		size_t pos = 0;
-		// std::cerr << newdata << "|\n";
 		if ((pos = newdata.find_first_of("\n\n")) != std::string::npos)
 			newdata.erase(0, pos + 3);
 		if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
@@ -33,7 +34,6 @@ std::string	getdata(Request &req)
 				}
 			}
 		}
-		// std::cerr << newdata << "|" << pos << "|\n";
 	}
 	return newdata;
 }
@@ -65,18 +65,32 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 	return (environ);
 }
 
-std::string get_root(std::string root)
+std::string get_root()
 {
 	int r = 0;
 
-	if ((r = root.find("Desktop/")) != std::string::npos)
+	char path[256];
+	getcwd(path, 256);
+	return path;
+}
+
+void	fill_binary_cgi(t_cgi &cgi, char **&args)
+{
+	if (cgi.page.find(".py") != std::string::npos)
 	{
-		r += 10;
-		while (root[r] != '/')
-			r++;
-		root.erase(r, root.length());
+		args = new char*[3];
+		args[0] = (char*)"/usr/bin/python";
+		args[1] = (char*)(cgi.page).c_str();
+		args[2] = NULL;
 	}
-	return root;
+	else if (cgi.page.find(".php") != std::string::npos)
+	{
+		args = new char*[2];
+		args[0] = "/Users/cabouelw/goinfre/.brew/bin/php-cgi";
+		args[1] = NULL;
+	}
+	else
+		throw ;// ma3raftch hno ndir
 }
 
 std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
@@ -86,7 +100,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	int fd_old[2];
 	char **args;
 
-	std::cout << req.getRequest()["Content-Type"]<< std::endl;
 	std::string body = "";
 	int size_read = 1024;
 	std::string newdata = "";
@@ -98,20 +111,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	char **env = init_env(status, cgi.path, cgi.page, req, newdata);
 	fd_old[0] = dup(0);
 	fd_old[1] = dup(1);
-	if (cgi.page.find(".py") != std::string::npos)
-	{
-		args = new char*[3];
-		args[0] = (char*)"/usr/bin/python";
-		args[1] = (char*)(cgi.page).c_str();
-		args[2] = NULL;
-	}
-	else
-	{
-		args = new char*[2];
-		root_c = get_root(cgi.page) + "/parsing/php-cgi";
-		args[0] = (char*)(root_c.c_str());
-		args[1] = NULL;
-	}
+	fill_binary_cgi(cgi, args);
 	pipe(pipefd_data);
 	pipe(pipefd);
 	int pid = fork();
@@ -132,14 +132,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	else
 	{
 		if (req.getRequest()["Method"] != "GET")
-		{
-			if (req.getRequest()["Content-Type"].find("multipart/form-data") != std::string::npos)
-			{
-				newdata = req.getBodyString();
-			}
 			write(pipefd_data[1], newdata.c_str(), newdata.size());
-			// std::cerr << MAGENTA << "{" <<  newdata << "}\n" << RESET;
-		}
 		close(pipefd_data[1]);
 		close(pipefd_data[0]);
 
@@ -157,7 +150,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		delete [] args;
 	}
-	// std::cerr << body << "\n";
-	// body.erase(0, body.find("\r\n\r\n"));
+	// std::cerr << "hello\n";
+	// std::cerr << MAGENTA << body << RESET << "\n";
 	return (body);
 }
