@@ -74,8 +74,11 @@ public:
 		vector_request head = split_buffer(vec[0].c_str(), ' ');
 		this->query_var = "";
 		if (head[1].find("?") != std::string::npos)
+		{
 			this->query_var = head[1].substr(head[1].find("?") + 1);
-		std::cout << (this->query_var + "\n").c_str();
+			head[1] = head[1].substr(0, head[1].find("?"));
+		}
+		// std::cout << (head[1] + "\n").c_str();
 		map_head["Method"] = head[0];
 		map_head["URL"] = head[1];
 		map_head["Protocol_version"] = head[2];

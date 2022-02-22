@@ -57,6 +57,7 @@ class ARequest
                         k = i;
                         defaultErrorPages = servs[k].get_error_page();
                     }
+                    // std::cout << RED << req.getRequest()["Method"] << RESET << std::endl;
                     if (req.getRequest()["Method"] != "GET" && this->method == "GET")
                         return Response(servs[k], servs[k].get_root() + defaultErrorPages["400"], this->method, "400", req);
                     std::vector<Location> locations = servs[i].get_location();
