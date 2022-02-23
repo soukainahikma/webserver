@@ -23,6 +23,7 @@ public:
 		std::string upload_path = location.get_upload_store() != "" ? location.get_upload_store() : location.get_path();
 	
 		
+			std::cerr<< RED << req.getBodyString().length()<< RESET << std::endl;
 		if (req.getBodyString().length() > server.get_client_max_body_size())
 			return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
 		if (req.get_content_type() == "multipart/form-data" && location.get_upload_enable() == "on")

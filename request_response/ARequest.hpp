@@ -57,7 +57,6 @@ class ARequest
                         k = i;
                         defaultErrorPages = servs[k].get_error_page();
                     }
-                    
                     if (req.getRequest()["Method"] != "GET" && this->method == "GET")
                         return Response(servs[k], servs[k].get_root() + defaultErrorPages["400"], this->method, "400", req);
                     std::vector<Location> locations = servs[i].get_location();
@@ -72,18 +71,14 @@ class ARequest
                             return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
                         }
                     }
-                    
                     return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, this->method == "POST" ? "201" : "200", req);
                 }
             }
             k = k == -1 ? 0 : k;
             return Response(servs[k], servs[k].get_root() + defaultErrorPages["404"], this->method, "404", req);
         }
-
         ~ARequest() {
-
         };
-
     std::string getQuery() {
         return (this->req.getQueryVar());
     }
