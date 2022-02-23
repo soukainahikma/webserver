@@ -14,15 +14,12 @@ int fileCheck(std::string fileName, std::string req_type)
 		closedir(pDir);
 		return IS_NOT_AUTO_INDEXED;
 	}
-	std::cout << RED << fileName << RESET << std::endl;
 	if (!access(fileName.c_str(), F_OK))
 	{
-		std::cout << GREEN << "here" << std::endl;
 		if (!access(fileName.c_str(), R_OK))
 			return req_type == "GET" || req_type == "DELETE" ? OK : CREATED;
 		return FORBIDDEN;
 	}
-
 	return NOT_FOUND;
 }
 int check_body(std::string files, std::map<int, map_info *>::iterator &it)
@@ -112,7 +109,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	std::string files;
 	map_info *info = new map_info();
 	std::map<int, map_info *>::iterator it;
-	char *buffer = (char *)malloc(sizeof(char) * 100);
+	char buffer[100];
 	bzero(buffer, 100);
 	int rd = recv(i, buffer, 99, 0);
 	if (rd > 0)

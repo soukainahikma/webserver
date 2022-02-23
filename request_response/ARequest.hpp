@@ -73,7 +73,6 @@ class ARequest
                             return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
                         }
                     }
-                    std::cout << servs[i].get_root() + req_map["URL"] << std::endl;
                     return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, this->method == "POST" ? "201" : "200", req);
                 }
             }

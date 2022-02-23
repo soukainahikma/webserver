@@ -31,7 +31,7 @@ public:
 			std::vector<body_struct> body = req.getBodyStructs();
 			for (size_t i = 0; i < body.size(); i++)
 			{
-				if (body[i].filename != ""/*  && location.get_upload_enable() == "on" */)
+				if (body[i].filename != "" && location.get_upload_enable() == "on")
 				{					
 					if(stat((server.get_root() + upload_path).c_str(), &fileStat) < 0)    
         				return Response(server, server.get_root() + server.get_error_page()["500"], this->method, "500", req);

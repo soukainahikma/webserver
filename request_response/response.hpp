@@ -100,7 +100,6 @@ class Response
 				
 				if (location.get_return().size() != 0 || !(url.c_str()[url.size() - 1] == '/'))
 				{
-					std::cout << RED << location.get_return().size() << RESET << std::endl;
 					status = location.get_return().size() != 0 ?location.get_return()[0] : "301";
 					location_string = location.get_return().size() != 0 ? location.get_return()[1] : url + "/";
 				}
@@ -130,7 +129,6 @@ class Response
 			if (stats == IS_NOT_AUTO_INDEXED)
 				generate_autoindex(server);
 			else {
-				std::cout << status << " ====== " << stats << std::endl;
 				this->status = (stats == OK || stats == CREATED) ? status :( (stats == FORBIDDEN) ? "403" : "404");
 				this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
 			}
@@ -238,7 +236,6 @@ class Response
 			
 			content_type = "Content-type: text/html; charset=UTF-8\r\n\r\n";
 			if (is_autoindex) {
-				std::cout << GREEN << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << RESET << std::endl;
 				return (version + status + " " + status_map[this->status] + content_type + auto_index_content_page);
 			}
 			if (status == "301")
@@ -262,7 +259,6 @@ class Response
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 			}
-			std::cout << YELLOW << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << RESET << std::endl;
 			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 };
