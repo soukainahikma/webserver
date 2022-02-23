@@ -156,7 +156,5 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		delete [] args;
 	}
-	std::cerr << MAGENTA << "kmal" << RESET << "\n";
-	std::cerr << BLUE << body << RESET << "\n";
 	return (body);
 }

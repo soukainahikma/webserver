@@ -240,6 +240,7 @@ class Response
 					cgi.root = this->root;
 					cgi.path = this->path;
 					cgi.page = this->filename;
+					// if (request.getBodyString().length() <= server.get_client_max_body_size())
 					file_to_send = runCgi(cgi, status, request);
 					content_type = "";
 				}
