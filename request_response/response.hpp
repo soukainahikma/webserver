@@ -12,6 +12,8 @@
 #include <sstream>
 #include "request.hpp"
 #include <dirent.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 /* ************ Successful responses ******** */
 
@@ -188,22 +190,21 @@ class Response
 
 		std::string get_file()
 		{
-			// std::ifstream file;
-			// std::string line;
-			// std::string	buffer;
+			std::ifstream file;
+			std::string line;
+			std::string	buffer;
+			std::ostringstream streambuff;
 
-			// file.open(filename, std::ios::binary);
-			// while (getline(file, line))
-			// 	buffer = buffer + line;
-			// return (buffer);
-
-			std::ifstream    indexFile(filename, std::ios::binary);
-			std::ostringstream buffer;
-
-			buffer << indexFile.rdbuf();
-			std::ofstream out ("test_art.jpeg");
-			out << buffer.str();
-			return(buffer.str());
+			file.open(filename, std::ios::binary);
+			if (file.is_open())
+			{
+				streambuff << file.rdbuf();
+				buffer = streambuff.str();
+				file.close();
+			}
+			else
+				std::cout << RED << "NOT OPEN \n"  << RESET;
+			return (buffer);
 		}
 
 		std::string get_content_type () {
@@ -225,9 +226,8 @@ class Response
 			std::string cookieResponse = "";
 
 			
-			content_type = "Content-Type: text/html\r\n\n\n";
+			content_type = "Content-Type: text/html\r\n\r\n";
 			if (is_autoindex) {
-				std::cout << YELLOW << (version + status + " " + status_map[this->status] + content_type + auto_index_content_page) << RESET << std::endl;
 				return (version + status + " " + status_map[this->status] + content_type + auto_index_content_page);
 			}
 			if (status == "301")
@@ -240,18 +240,21 @@ class Response
 					cgi.root = this->root;
 					cgi.path = this->path;
 					cgi.page = this->filename;
+					std::cout<< MAGENTA<< "here" << RESET<<std::endl; 
+					std::cout << GREEN << request.getBodyString() << RESET << std::endl;
+					std::cerr << RED << "**************1**************" << RESET << "\n";
 					file_to_send = runCgi(cgi, status, request);
+					std::cerr << RED << "*************2***************" << RESET << "\n";
 					content_type = "";
 				}
 				else
 				{
 					file_to_send = get_file();
-					content_type = "Content-Type: " +  get_content_type() + "\r\n\n\n";
+					content_type = "Content-Type: " +  get_content_type() + "\r\n\r\n";
 				}
 				extension = (extension == "py" || extension == "php") ? "html" : extension;
 			}
-			// std::cout << RED << request.get_boundary() << RESET << std::endl;
-			// std::cout << RED << "+++++++++++++++ {  } ++++++++++++++"<< RESET << std::endl << version + status + " " + status_map[this->status] + location_string + content_type + file_to_send << std::endl;
+			std::cout << GREEN << "HERE {}" << RESET << std::endl;
 			return(version + status + " " + status_map[this->status] + location_string + content_type + file_to_send);
 		}
 };

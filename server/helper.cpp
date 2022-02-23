@@ -141,7 +141,6 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	}
 	else
 		return;
-	// std::cout << files << std::endl;
 	if (it->second->transfer_encoding == 1)
 		files = unchunk_data(files);
 	if (!files.empty())
@@ -149,19 +148,18 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		Request req(files, port);
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
-		const char *hello = resp.get_header().c_str();
-			std::cout<<BLUE<< hello << RESET << std::endl;  
+		
+		char *hello = (char *) malloc(sizeof(char) * resp.get_header().length());
+		resp.get_header().copy(hello,resp.get_header().length(),0);
 		if (FD_ISSET(i, &write_fds))
 		{
 			size_t n;
-			n =send(i, hello, strlen(hello), 0);
-			// std::cerr << BLUE << n << RESET << std::endl;
-			// std::cout<<MAGENTA<< resp.get_header().length()<<std::endl;
-			// std::cout<< YELLOW << n << std::endl;
+			n =send(i, hello, resp.get_header().length(), 0);
 			map_of_req.erase(i);
 			FD_CLR(i, &write_fds);
 			close(i);
 		}
 	}
-	free(buffer);
+	// if (buffer)
+	// free(buffer);
 }
