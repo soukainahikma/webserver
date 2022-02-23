@@ -50,13 +50,17 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 		setenv("REQUEST_URI", (path + newdata).c_str(), 1);
 	}
 	else
+	{
 		setenv("REQUEST_URI", path.c_str(), 1);
+		setenv("QUERY_STRING", "", 1);
+	}
 	setenv("SERVER_SOFTWARE", "webserv/1.0", 1);
 	setenv("CONTENT_LENGTH", req.getRequest()["Content-Length"].c_str(), 1);
 	setenv("CONTENT_TYPE", (req.getRequest()["Content-Type"]).c_str(), 1);
 	setenv("PATH_INFO", path.c_str(), 1);
 	setenv("REDIRECT_STATUS", status.c_str(), 1);
 	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
+	setenv("SERVER_PROTOCOL", req.getRequest()["Protocol_version"].c_str(), 1);
 	setenv("PATH_TRANSLATED", path.c_str(), 1);
 	setenv("SERVER_NAME", split(req.getRequest()["Host"], ':')[0].c_str(), 1);
 	setenv("HTTP_COOKIE", req.getRequest()["Cookie"].c_str(), 1);
@@ -86,7 +90,9 @@ void	fill_binary_cgi(t_cgi &cgi, char **&args)
 	else if (cgi.page.find(".php") != std::string::npos)
 	{
 		args = new char*[2];
-		args[0] = "/Users/cabouelw/goinfre/.brew/bin/php-cgi";
+		std::string user = getenv("USER");
+		user = "/Users/" + user + "/goinfre/.brew/bin/php-cgi";
+		args[0] = (char*)user.c_str();
 		args[1] = NULL;
 	}
 	else
@@ -150,7 +156,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 
 		delete [] args;
 	}
-	// std::cerr << "hello\n";
-	// std::cerr << MAGENTA << body << RESET << "\n";
+	std::cerr << MAGENTA << "kmal" << RESET << "\n";
+	std::cerr << BLUE << body << RESET << "\n";
 	return (body);
 }
