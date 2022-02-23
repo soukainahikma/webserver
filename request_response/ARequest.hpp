@@ -66,6 +66,8 @@ class ARequest
                         if (req_map["URL"] == locations[j].get_path() || req_map["URL"] == locations[j].get_path() + "/")
                         {
                             if (checkAllowedMethods(locations[j].get_request_method(), this->method))
+                                if (req.getBodyString().length() > servs[i].get_client_max_body_size())
+			                        return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["413"], this->method, "413", req);
                                 return logic_function(servs[i], locations[j]);
                             return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
                         }

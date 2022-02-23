@@ -8,18 +8,19 @@
 int fileCheck(std::string fileName, std::string req_type)
 {
 	DIR *pDir;
-	pDir = opendir (fileName.c_str());
-    if (pDir != NULL)
+	pDir = opendir(fileName.c_str());
+	if (pDir != NULL)
 	{
-		closedir (pDir);
-        return NOT_FOUND;
+		closedir(pDir);
+		return IS_NOT_AUTO_INDEXED;
 	}
 	if (!access(fileName.c_str(), F_OK))
 	{
-		if (!access(fileName.c_str(), R_OK	))
+		if (!access(fileName.c_str(), R_OK))
 			return req_type == "GET" || req_type == "DELETE" ? OK : CREATED;
 		return FORBIDDEN;
 	}
+
 	return NOT_FOUND;
 }
 int check_body(std::string files, std::map<int, map_info *>::iterator &it)
@@ -70,11 +71,11 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 }
 size_t get_size(std::string str)
 {
-	size_t x;   
+	size_t x;
 	std::stringstream ss;
 	ss << std::hex << str;
 	ss >> x;
-	return(x);
+	return (x);
 }
 std::string unchunk_data(std::string files)
 {
@@ -89,16 +90,16 @@ std::string unchunk_data(std::string files)
 		result = files.substr(0, found + 4);
 		start = found + 4;
 		// found = files.find("\r\n",found);
-		while ((end = files.find("\r\n",start)) != std::string::npos)
+		while ((end = files.find("\r\n", start)) != std::string::npos)
 		{
-			size = get_size(files.substr(start,end-start));
-			if(size == 0)
+			size = get_size(files.substr(start, end - start));
+			if (size == 0)
 			{
 				// std::cout<< result << std::endl;
-				return(result);
+				return (result);
 			}
-			result.append(files.substr(end+2,size));
-			start = end+2+size+2;
+			result.append(files.substr(end + 2, size));
+			start = end + 2 + size + 2;
 		}
 	}
 	// std::cout<< result << std::endl;
@@ -128,6 +129,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 			info->body.append(buffer, rd);
 			info->content_length = -1;
 			info->transfer_encoding = 0;
+			info->number = 0;
 			it = map_of_req.insert(std::pair<int, map_info *>(i, info)).first;
 			files = info->body;
 			if (check_body(files, it) == 0)
@@ -148,17 +150,24 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		Request req(files, port);
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
-		const char *hello = resp.get_header().c_str();
+		std::string res = resp.get_header();
+		// char *hello = (char *) malloc(sizeof(char) * resp.get_header().length());
+		// resp.get_header().copy(hello,resp.get_header().length(),0);
+		// std::cout << YELLOW << res.c_str() << RESET << std::endl;
+			std::cout<< res << std::endl;
 		if (FD_ISSET(i, &write_fds))
 		{
-			size_t n;
-			n =send(i, hello, strlen(hello), 0);
-			// std::cerr << BLUE << n << RESET << std::endl;
-			// std::cout<<MAGENTA<< resp.get_header().length()<<std::endl;
-			// std::cout<< YELLOW << n << std::endl;
-			map_of_req.erase(i);
-			FD_CLR(i, &write_fds);
-			close(i);
+			std::map<int, map_info *>::iterator it_send = map_of_req.find(i);
+			size_t n = it_send->second->number;
+			n = send(i, res.c_str() + n, res.length(), 0);
+			it_send->second->number += n;
+			// std::cout<< GREEN << res.length() << RESET << std::endl;
+			if (n == res.length())
+			{
+				map_of_req.erase(i);
+				FD_CLR(i, &write_fds);
+				close(i);
+			}
 		}
 	}
 	free(buffer);

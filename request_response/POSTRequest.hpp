@@ -24,10 +24,7 @@ public:
 	
 		
 		if (req.getBodyString().length() > server.get_client_max_body_size())
-		{
 			return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
-		}
-		std::cout << YELLOW << req.get_content_type() << RESET << std::endl;
 		if (req.get_content_type() == "multipart/form-data" && location.get_upload_enable() == "on")
 		{
 			
@@ -35,14 +32,11 @@ public:
 			for (size_t i = 0; i < body.size(); i++)
 			{
 				if (body[i].filename != ""/*  && location.get_upload_enable() == "on" */)
-				{
-					std::cout << RED << " +++ { IT IS A FILE } +++" << RESET << std::endl;
-					
+				{					
 					if(stat((server.get_root() + upload_path).c_str(), &fileStat) < 0)    
         				return Response(server, server.get_root() + server.get_error_page()["500"], this->method, "500", req);
 					if(!(fileStat.st_mode & S_IWUSR))
         				return Response(server, server.get_root() + server.get_error_page()["403"], this->method, "403", req);
-					std::cout << RED << (server.get_root() + "/" + upload_path + "/" + body[i].filename) << RESET << std::endl;
 					int fd = open((server.get_root() + "/" + upload_path + body[i].filename).c_str(), O_CREAT | O_RDWR, 0644);
 					write(fd, body[i].body.c_str(), body[i].body.length());
 
