@@ -40,6 +40,7 @@ typedef struct map_info
 	int content_length;
 	int transfer_encoding;
 	std::string body;
+	size_t number;
 }map_info;
 
 #endif

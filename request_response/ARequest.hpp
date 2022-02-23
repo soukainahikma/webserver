@@ -57,7 +57,6 @@ class ARequest
                         k = i;
                         defaultErrorPages = servs[k].get_error_page();
                     }
-                    
                     if (req.getRequest()["Method"] != "GET" && this->method == "GET")
                         return Response(servs[k], servs[k].get_root() + defaultErrorPages["400"], this->method, "400", req);
                     std::vector<Location> locations = servs[i].get_location();
@@ -66,24 +65,23 @@ class ARequest
                         if (req_map["URL"] == locations[j].get_path() || req_map["URL"] == locations[j].get_path() + "/")
                         {
                             if (checkAllowedMethods(locations[j].get_request_method(), this->method))
+                            {
                                 if (req.getBodyString().length() > servs[i].get_client_max_body_size())
 			                        return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["413"], this->method, "413", req);
                                 return logic_function(servs[i], locations[j]);
+                            }
                             return Response(servs[i], servs[i].get_root() + servs[i].get_error_page()["405"], this->method, "405", req);
                         }
                     }
-                    
+                    std::cout << servs[i].get_root() + req_map["URL"] << std::endl;
                     return Response(servs[i], servs[i].get_root() + req_map["URL"], this->method, this->method == "POST" ? "201" : "200", req);
                 }
             }
             k = k == -1 ? 0 : k;
             return Response(servs[k], servs[k].get_root() + defaultErrorPages["404"], this->method, "404", req);
         }
-
         ~ARequest() {
-
         };
-
     std::string getQuery() {
         return (this->req.getQueryVar());
     }

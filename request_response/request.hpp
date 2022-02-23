@@ -81,7 +81,6 @@ public:
 			this->query_var = head[1].substr(head[1].find("?") + 1);
 			head[1] = head[1].substr(0, head[1].find("?"));
 		}
-		// std::cout << (head[1] + "\n").c_str();
 		map_head["Method"] = head[0];
 		map_head["URL"] = head[1];
 		map_head["Protocol_version"] = head[2];
