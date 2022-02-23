@@ -24,17 +24,13 @@ public:
 	
 		
 		if (req.getBodyString().length() > server.get_client_max_body_size())
-		{
 			return Response(server, server.get_root() + server.get_error_page()["413"], this->method, "413", req);
-		}
-		std::cout << YELLOW << req.get_content_type() << RESET << std::endl;
 		if (req.get_content_type() == "multipart/form-data" && location.get_upload_enable() == "on")
 		{
-			
 			std::vector<body_struct> body = req.getBodyStructs();
 			for (size_t i = 0; i < body.size(); i++)
 			{
-				if (body[i].filename != ""/*  && location.get_upload_enable() == "on" */)
+				if (body[i].filename != "")
 				{
 					std::cout << RED << " +++ { IT IS A FILE } +++" << RESET << std::endl;
 					

@@ -121,7 +121,7 @@ class Response
 			this->path = "";
 			method = req_type;
 			version = "HTTP/1.1 ";
-			std::cout << GREEN << filename << RESET << std::endl;
+			// std::cout << GREEN << filename << RESET << std::endl;
 			stats = fileCheck(filename, this->request.getRequest()["Method"]);
 			this->status = (stats == OK || stats == CREATED) ? status :( (stats == FORBIDDEN) ? "403" : "404");
 			this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];

@@ -114,6 +114,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	int rd = recv(i, buffer, 99, 0);
 	if (rd > 0)
 	{
+		// std::cout<< GREEN << buffer << RESET << std::endl;
 		// std::cout<< buffer << std::endl;
 		if ((it = map_of_req.find(i)) != map_of_req.end())
 		{
@@ -149,6 +150,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
 		const char *hello = resp.get_header().c_str();
+			std::cout<<BLUE<< hello << RESET << std::endl;  
 		if (FD_ISSET(i, &write_fds))
 		{
 			size_t n;

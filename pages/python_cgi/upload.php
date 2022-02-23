@@ -22,7 +22,8 @@
         if ((isset($_FILES[$key]['tmp_name'])&&($_FILES[$key]['error'] == UPLOAD_ERR_OK))) {    
             $name = $_FILES[$key]['name'];    
             echo $name;
-            move_uploaded_file($_FILES[$key]['tmp_name'], "$name");
+            $dir = './../upload/';
+            move_uploaded_file($_FILES[$key]['tmp_name'], $dir . "$name");
             echo "L'image à été uploadé !";  
         } else {
             echo "L'image n'as pas été uploadé";
