@@ -118,6 +118,7 @@ class Response
 			int is_deleted;
 
 			is_autoindex = false;
+			this->errorPages = server.get_error_page();
 			url = req.getRequest()["URL"];
 			generate_status_map();
 			this->request = req;
@@ -144,7 +145,6 @@ class Response
 			if (pDir == NULL) {
 				this->status = "403";
 				this->filename =  server.get_root() + server.get_error_page()["403"];
-				std::cout << RED << this->filename << RESET << std::endl;
 				is_autoindex = false;
 				return ;
 			}
@@ -210,8 +210,13 @@ class Response
 				buffer = streambuff.str();
 				file.close();
 			}
-			else
-				std::cout << RED << "NOT OPEN \n"  << RESET;
+			else{
+				status = "500";
+				file.open(this->errorPages["500"], std::ios::binary);
+				streambuff << file.rdbuf();
+				buffer = streambuff.str();
+				file.close();
+			}
 			return (buffer);
 		}
 
