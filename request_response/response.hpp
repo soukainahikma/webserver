@@ -76,7 +76,9 @@ class Response
 			size_t i;
 			int stats;
 			std::string extension;
+
 			generate_status_map();
+			this->errorPages = server.get_error_page();
 			root = server.get_root();
 			server_root = server.get_root();
 			path = location.get_path();
@@ -87,7 +89,6 @@ class Response
 	
 			this->filename = "";
 			std::vector<std::string> indexes = location.get_index();
-			this->errorPages = server.get_error_page();
 			is_autoindex = false;
 			version = req.getRequest()["Protocol_version"] + " ";
 			if ((location.get_return().size() == 0 && location.get_autoindex() != "on") && this->request.getRequest()["Method"] == "GET" && location.get_upload_enable() != "on")
@@ -109,7 +110,7 @@ class Response
 				else
 					status = ((stats == OK || stats == CREATED) ? (stats == OK ? "200" : "201"):( (stats == FORBIDDEN) ? "403" : "404"));
 				if (indexes.size() > 0)
-					this->filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + server.get_error_page()[std::to_string(stats)];
+					this->filename = (status == "301") ? "" : (stats == OK || stats == CREATED) ? root + path + "/" + indexes[i] : root + get_error_page(std::to_string(stats));
 
 			}
 		}
@@ -120,8 +121,8 @@ class Response
 			std::string extension;
 			int is_deleted;
 
-			is_autoindex = false;
 			this->errorPages = server.get_error_page();
+			is_autoindex = false;
 			url = req.getRequest()["URL"];
 			generate_status_map();
 			this->request = req;
@@ -135,8 +136,15 @@ class Response
 				generate_autoindex(server);
 			else {
 				this->status = (stats == OK || stats == CREATED) ? status :( (stats == FORBIDDEN) ? "403" : "404");
-				this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + server.get_error_page()[std::to_string(stats)];
+				this->filename = (stats == OK || stats == CREATED) ? filename : server.get_root() + get_error_page(std::to_string(stats));
+				std::cout << server.get_root() + get_error_page(std::to_string(stats)) << std::endl;
 			}
+		}
+
+		std::string get_error_page(std::string status) {
+			if (this->errorPages.find(status) != this->errorPages.end())
+				return  this->errorPages.find(status)->second;
+			return "/default_error_pages/" + status + ".html";
 		}
 
 		void generate_autoindex(Server &server) {
@@ -148,14 +156,14 @@ class Response
 			pDir = opendir ((server.get_root() + url).c_str());
 			if (pDir == NULL) {
 				this->status = "403";
-				this->filename =  server.get_root() + server.get_error_page()["403"];
+				this->filename = server.get_root() + get_error_page(this->status);
 				is_autoindex = false;
 				return ;
 			}
 			else if (this->request.getRequest()["Method"] != "GET")
 			{
 				this->status = "405";
-				this->filename =  server.get_root() + server.get_error_page()["405"];
+				this->filename = server.get_root() + get_error_page(this->status);
 				is_autoindex = false;
 				return ;
 			}
@@ -264,10 +272,9 @@ class Response
 					if (status == "500")
 					{
 						std::cout << MAGENTA << status << RESET << std::endl;
-						this->filename = this->server_root + errorPages["500"];
+						this->filename = this->server_root + get_error_page("500");
 						content_type = "Content-type: text/html; charset=UTF-8\r\n\r\n";
 						file_to_send = get_file();
-						std::cout << errorPages["500"] << std::endl;
 					}
 				}
 				else
