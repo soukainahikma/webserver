@@ -7,10 +7,10 @@
 #include <exception>
 
 void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds,
-					fd_set &curent_socket, std::map<int, map_info *> &map_of_req);
+					fd_set &curent_socket, std::map<int, map_info > &map_of_req);
 
 std::vector<Server> parsing(std::string file, std::map<int, int> &m);
-std::map<int, map_info *> map_of_req;
+std::map<int, map_info > map_of_req;
 int main()
 {
 	try

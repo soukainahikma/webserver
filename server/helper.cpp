@@ -22,17 +22,17 @@ int fileCheck(std::string fileName, std::string req_type)
 	}
 	return NOT_FOUND;
 }
-int check_body(std::string files, std::map<int, map_info *>::iterator &it)
+int check_body(std::string files, std::map<int, map_info>::iterator &it)
 {
 	size_t found;
 	size_t end;
 	size_t start;
-	int content_length = it->second->content_length;
+	int content_length = it->second.content_length;
 	if ((start = files.find("\r\n\r\n")) != std::string::npos)
 	{
 		if ((found = files.find("Transfer-Encoding: chunked")) != std::string::npos)
 		{
-			it->second->transfer_encoding = 1;
+			it->second.transfer_encoding = 1;
 			if ((end = files.find("0\r\n\r\n", found)) != std::string::npos)
 				return (1);
 			return (0);
@@ -44,8 +44,8 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 				if ((end = files.find("\r\n", found)))
 				{
 					std::string str = files.substr(found + 16, end - found - 16);
-					it->second->content_length = atoi(str.c_str());
-					if (files.length() - start - 4 == it->second->content_length)
+					it->second.content_length = atoi(str.c_str());
+					if (files.length() - start - 4 == it->second.content_length)
 						return (1);
 					else
 						return (0);
@@ -54,7 +54,7 @@ int check_body(std::string files, std::map<int, map_info *>::iterator &it)
 			}
 			else
 			{
-				if (files.length() - start - 4 == it->second->content_length)
+				if (files.length() - start - 4 == it->second.content_length)
 					return (1);
 				else
 					return (0);
@@ -104,11 +104,11 @@ std::string unchunk_data(std::string files)
 	// std::cout<< result << std::endl;
 	return (result);
 }
-void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds, fd_set &current_socket, std::map<int, map_info *> &map_of_req)
+void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds, fd_set &current_socket, std::map<int, map_info> &map_of_req)
 {
 	std::string files;
-	map_info *info = new map_info();
-	std::map<int, map_info *>::iterator it;
+	map_info info ;
+	std::map<int, map_info>::iterator it;
 	char buffer[100];
 	bzero(buffer, 100);
 	int rd = recv(i, buffer, 99, 0);
@@ -118,20 +118,20 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		// std::cout<< buffer << std::endl;
 		if ((it = map_of_req.find(i)) != map_of_req.end())
 		{
-			it->second->body.append(buffer, rd);
-			files = it->second->body;
+			it->second.body.append(buffer, rd);
+			files = it->second.body;
 			if (check_body(files, it) == 0)
 				return;
 			FD_CLR(i, &current_socket);
 		}
 		else
 		{
-			info->body.append(buffer, rd);
-			info->content_length = -1;
-			info->transfer_encoding = 0;
-			info->number = 0;
-			it = map_of_req.insert(std::pair<int, map_info *>(i, info)).first;
-			files = info->body;
+			info.body.append(buffer, rd);
+			info.content_length = -1;
+			info.transfer_encoding = 0;
+			info.number = 0;
+			it = map_of_req.insert(std::pair<int, map_info>(i, info)).first;
+			files = info.body;
 			if (check_body(files, it) == 0)
 				return;
 		}
@@ -142,7 +142,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	}
 	else
 		return;
-	if (it->second->transfer_encoding == 1)
+	if (it->second.transfer_encoding == 1)
 		files = unchunk_data(files);
 	if (!files.empty())
 	{
@@ -156,10 +156,10 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 			// std::cout<< RED << res << RESET << std::endl;
 		if (FD_ISSET(i, &write_fds))
 		{
-			std::map<int, map_info *>::iterator it_send = map_of_req.find(i);
-			size_t n = it_send->second->number;
+			std::map<int, map_info>::iterator it_send = map_of_req.find(i);
+			size_t n = it_send->second.number;
 			n = send(i, res.c_str() + n, res.length(), 0);
-			it_send->second->number += n;
+			it_send->second.number += n;
 			if (n == res.length())
 			{
 				map_of_req.erase(i);
