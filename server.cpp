@@ -8,11 +8,16 @@
 
 void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds,
 					fd_set &curent_socket, std::map<int, map_info > &map_of_req);
-
 std::vector<Server> parsing(std::string file, std::map<int, int> &m);
 std::map<int, map_info > map_of_req;
-int main()
+
+int main(int argc, char *argv[])
 {
+	if (argc != 2)
+	{
+		printf ("Usage: testprog <dirname>\n");
+		return 1;
+	}
 	try
 	{
 		std::map<int, int> ports;
