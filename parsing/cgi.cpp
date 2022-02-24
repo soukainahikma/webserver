@@ -111,8 +111,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	std::string newdata = "";
 	char buffer[size_read];
 	std::string root_c;
-	if (size_read < 6)
-		return NULL;
 	newdata = getdata(req);
 	char **env = init_env(status, cgi.path, cgi.page, req, newdata);
 	fd_old[0] = dup(0);
