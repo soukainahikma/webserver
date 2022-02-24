@@ -91,7 +91,8 @@ void	fill_binary_cgi(t_cgi &cgi, char **&args)
 	{
 		args = new char*[2];
 		std::string user = getenv("USER");
-		user = "/Users/" + user + "/goinfre/.brew/bin/php-cgi";
+		user = "/Users/" + user + "/goinfre/.brew/bin/php-cjg";
+		// args[0] = (char*)user.c_str();
 		args[0] = (char*)user.c_str();
 		args[1] = NULL;
 	}
@@ -130,7 +131,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 		close(pipefd_data[1]);
 
 		execve(args[0], args, (char **)env);
-		status = "400";
 		exit(1);
 	}
 	else
@@ -147,8 +147,14 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 		while ((r = read(pipefd[0], buffer, size_read - 1)))
 			body.append(buffer, r);
 		close(pipefd[0]);
-		wait(&pid);
-
+		// wait(&pid);
+		int test;
+		waitpid(pid, &test, 0);
+		if (WIFEXITED(test))
+		{
+			test = WEXITSTATUS(test);
+			status = (test) ? "500" : status;
+		}
 		dup2(fd_old[0], 0);
 		dup2(fd_old[1], 1);
 
