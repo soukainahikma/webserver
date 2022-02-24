@@ -57,6 +57,7 @@ class Response
 		std::string content_length;
 		std::string response_page;
 		std::string root;
+		std::string server_root;
 		std::string path;
 		std::string filename;
 		std::string location_string;
@@ -77,6 +78,7 @@ class Response
 			std::string extension;
 			generate_status_map();
 			root = server.get_root();
+			server_root = server.get_root();
 			path = location.get_path();
 			url = req.getRequest()["URL"];
 			method = this->request.getRequest()["Method"];
@@ -85,6 +87,7 @@ class Response
 	
 			this->filename = "";
 			std::vector<std::string> indexes = location.get_index();
+			this->errorPages = server.get_error_page();
 			is_autoindex = false;
 			version = req.getRequest()["Protocol_version"] + " ";
 			if ((location.get_return().size() == 0 && location.get_autoindex() != "on") && this->request.getRequest()["Method"] == "GET" && location.get_upload_enable() != "on")
@@ -118,10 +121,12 @@ class Response
 			int is_deleted;
 
 			is_autoindex = false;
+			this->errorPages = server.get_error_page();
 			url = req.getRequest()["URL"];
 			generate_status_map();
 			this->request = req;
 			this->root = "";
+			this->server_root = server.get_root();
 			this->path = "";
 			method = req_type;
 			version = req.getRequest()["Protocol_version"] + " ";
@@ -144,7 +149,6 @@ class Response
 			if (pDir == NULL) {
 				this->status = "403";
 				this->filename =  server.get_root() + server.get_error_page()["403"];
-				std::cout << RED << this->filename << RESET << std::endl;
 				is_autoindex = false;
 				return ;
 			}
@@ -210,8 +214,13 @@ class Response
 				buffer = streambuff.str();
 				file.close();
 			}
-			else
-				std::cout << RED << "NOT OPEN \n"  << RESET;
+			else{
+				status = "500";
+				file.open(this->errorPages["500"], std::ios::binary);
+				streambuff << file.rdbuf();
+				buffer = streambuff.str();
+				file.close();
+			}
 			return (buffer);
 		}
 
@@ -251,6 +260,15 @@ class Response
 					file_to_send = runCgi(cgi, status, request);
 					if (file_to_send != "")
 						content_type = "";
+					std::cout << RED << status << RESET << std::endl;
+					if (status == "500")
+					{
+						std::cout << MAGENTA << status << RESET << std::endl;
+						this->filename = this->server_root + errorPages["500"];
+						content_type = "Content-type: text/html; charset=UTF-8\r\n\r\n";
+						file_to_send = get_file();
+						std::cout << errorPages["500"] << std::endl;
+					}
 				}
 				else
 				{
