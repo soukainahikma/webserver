@@ -107,7 +107,6 @@ int find_last(std::string s)
 				return (1);
 			else
 				return (0);
-			std::cout << "|" << s[idx] << "|\n";
 		}
 		idx--;
 	}
@@ -212,22 +211,7 @@ std::vector<Server> parsing(std::string file, std::map<int,int> &m)
 	else
 	{
 		std::cout << "Error file: ";
-		throw file;
+		throw std::runtime_error(file);
 	}
 	return (vec_serv);
 }
-
-// int main()
-// {
-// 	try
-// 	{
-// 		std::map<int,int> m;
-// 		std::vector<Server> vec_serv = parsing("webserv.conf", m);
-// 		print_all(vec_serv, m);
-
-// 	}
-// 	catch(std::string e)
-// 	{
-// 		std::cerr << e << '\n';
-// 	}
-// }

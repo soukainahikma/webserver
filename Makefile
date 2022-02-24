@@ -1,5 +1,4 @@
 
-
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = webserv
@@ -11,6 +10,13 @@ SRC =	./server.cpp\
 		./parsing/cgi.cpp\
 		./server/socket.cpp\
 		./server/helper.cpp\
+		request_response/request.cpp\
+		request_response/response.cpp\
+		request_response/request_handler.cpp\
+		request_response/ARequest.cpp\
+		request_response/DELETERequest.cpp\
+		request_response/GETRequest.cpp\
+		request_response/POSTRequest.cpp\
 
 INC = parsing/Location.hpp\
 		request_response/request.hpp\

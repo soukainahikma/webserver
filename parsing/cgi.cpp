@@ -40,7 +40,7 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 {
 	setenv("SCRIPT_FILENAME", page.c_str(), 1);
 	setenv("SCRIPT_NAME", (page.erase(0, page.find_last_of("/") + 1)).c_str(), 1);
-	setenv("REMOTEaddr", std::to_string(req.get_port()).c_str(), 1);
+	setenv("REMOTEaddr", NumberToString(req.get_port()).c_str(), 1);
 	setenv("REQUEST_METHOD", req.getRequest()["Method"].c_str(), 1);
 	if (req.getRequest()["Method"] == "GET")
 	{
@@ -90,7 +90,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	char **args;
 
 	std::string body = "";
-	std::cerr << "dkhal\n";
 	int size_read = 1024;
 	std::string newdata = "";
 	char buffer[size_read];
@@ -145,6 +144,5 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 		delete args[1];
 		delete [] args;
 	}
-	std::cerr << body << "|khraj\n";
 	return (body);
 }

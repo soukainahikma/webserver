@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
 		{
 			ready_sockets = current_sockets;
 			int select_ret = select(max_fd_so_far + 1, &ready_sockets, &write_fds, NULL, NULL);
+			if(select_ret <=0)
+				throw std::runtime_error("Select failed");
 			if (select_ret > 0)
 			{
 				for (int i = 0; i <= max_fd_so_far; i++)
@@ -60,7 +62,9 @@ int main(int argc, char *argv[])
 							}
 						}
 						if (check == false)
+						{
 							connection_handler(i, req_handler, port, write_fds, current_sockets, map_of_req);
+						}
 					}
 				}
 			}
@@ -69,7 +73,12 @@ int main(int argc, char *argv[])
 	}
 	catch (const std::exception &e)
 	{
-		perror(e.what());
+		std::cerr << RED << e.what()<< RESET <<std::endl;;
 		return (1);
 	}
 }
+
+
+/* 
+	curl http://www.example.com:5000 --resolve www.example.com:5000:127.0.0.1
+ */

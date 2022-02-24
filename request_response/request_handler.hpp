@@ -20,28 +20,18 @@ private:
 	std::vector<Server> Servs;
 	
 public:
-	RequestHandler(std::vector<Server> &Servs) { this->Servs = Servs;};
-	RequestHandler(Request &req, std::vector<Server> &Serv) {
-		this->req = req;
-		this->Servs = Serv;
-	};
+	RequestHandler(std::vector<Server> &Servs);
+	RequestHandler(Request &req, std::vector<Server> &Serv);
 
-	void setRequest(Request &req) {
-		this->req = req;
-	}
+	void setRequest(Request &req) ;
 
-	Response Bootstrap() {	
-		if (req.getRequest()["Method"] == "GET")
-			return GETRequest(req, Servs).returnedResponse();
-		if (req.getRequest()["Method"] == "POST")
-			return POSTRequest(req, Servs).returnedResponse();
-		if (req.getRequest()["Method"] == "DELETE")
-			return DELETERequest(req, Servs).returnedResponse();
-		return GETRequest(req, Servs).returnedResponse();
-	}
+	std::vector<Server> get_servers() const;
 
-	~RequestHandler()
-	{};
+	size_t get_default_index(int port);
+
+	Response Bootstrap();
+
+	~RequestHandler();
 };
 
 #endif

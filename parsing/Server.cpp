@@ -127,8 +127,6 @@ void Server::set_server_name(std::vector<std::string> &server_name)
 			_server_name[server_name[idx]] = 1;
 		idx++;
 	}
-	// std::cout << _server_name[server_name[0]] << "|" << _server_name[server_name[1]] << "|\n";
-	// exit(0);
 }
 
 void Server::set_error_page(std::string &str_num, std::string &str_path)

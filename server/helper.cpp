@@ -88,34 +88,30 @@ std::string unchunk_data(std::string files)
 	{
 		result = files.substr(0, found + 4);
 		start = found + 4;
-		// found = files.find("\r\n",found);
 		while ((end = files.find("\r\n", start)) != std::string::npos)
 		{
 			size = get_size(files.substr(start, end - start));
 			if (size == 0)
-			{
-				// std::cout<< result << std::endl;
 				return (result);
-			}
 			result.append(files.substr(end + 2, size));
 			start = end + 2 + size + 2;
 		}
 	}
-	// std::cout<< result << std::endl;
 	return (result);
 }
+
 void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &write_fds, fd_set &current_socket, std::map<int, map_info> &map_of_req)
 {
 	std::string files;
 	map_info info ;
 	std::map<int, map_info>::iterator it;
-	char buffer[100]; // NOTE time to get Request (3 m 30.42 s ****** 1024 = 26.56 s)
+	std::string res = "";
+
+	char buffer[100];
 	bzero(buffer, 100);
 	int rd = recv(i, buffer, 99, 0);
 	if (rd > 0)
 	{
-		// std::cout<< GREEN << buffer << RESET << std::endl;
-		// std::cout<< buffer << std::endl;
 		if ((it = map_of_req.find(i)) != map_of_req.end())
 		{
 			it->second.body.append(buffer, rd);
@@ -141,7 +137,10 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		FD_CLR(i, &current_socket);
 	}
 	else
+	{
+		FD_CLR(i, &current_socket);
 		return;
+	}
 	if (it->second.transfer_encoding == 1)
 		files = unchunk_data(files);
 	if (!files.empty())
@@ -149,26 +148,29 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		Request req(files, port);
 		req_handler.setRequest(req);
 		Response resp = req_handler.Bootstrap();
-		std::string res = resp.get_header();
-		// char *hello = (char *) malloc(sizeof(char) * resp.get_header().length());
-		// resp.get_header().copy(hello,resp.get_header().length(),0);
-		std::cout << YELLOW << res.c_str() << RESET << std::endl;
-			// std::cout<< RED << res << RESET << std::endl;
+		res = resp.get_header();
 		if (FD_ISSET(i, &write_fds))
 		{
 			std::map<int, map_info>::iterator it_send = map_of_req.find(i);
 			size_t n = it_send->second.number;
 			n = send(i, res.c_str() + n, res.length(), 0);
-			std::cout<< n <<std::endl;
-			it_send->second.number += n;
+			if(n <=0)
+			{
+				map_of_req.erase(i);
+				FD_CLR(i, &current_socket);
+				FD_CLR(i, &write_fds);
+				close(i);
+				return;
+			}
+			it_send->second.number += n; // NOTE Check on 0 AND -1 
+
 			if (n == res.length())
 			{
 				map_of_req.erase(i);
+				FD_CLR(i, &current_socket);
 				FD_CLR(i, &write_fds);
 				close(i);
 			}
 		}
 	}
-	// if (buffer)
-	// free(buffer);
 }

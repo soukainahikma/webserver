@@ -51,7 +51,6 @@ std::string get_key(std::string &line, int &idx)
 	int end = 0;
 	std::string str;
 
-	// std::cout << line << "|" << idx << "|hna\n";
 	if (!line[idx])
 		return ("");
 	while (line[idx] == ' ' || line[idx] == '\t')
@@ -87,7 +86,7 @@ void	print_all(std::vector<Server> &vec_serv, std::map<int,int> &m)
 	size_t idx = 0;
 	size_t i = 0;
 	size_t r = 0;
-	// std::cout << vec_serv.size() << "\n";
+
 	while (i < vec_serv.size())
 	{
 		std::cout << "\n\n------------ server " << i + 1 << "---------------\n";
