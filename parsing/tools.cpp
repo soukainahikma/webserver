@@ -21,7 +21,7 @@ void print_error(int i, std::string v)
 		"syntax Error: somthing missing in '" + v + "'",// 14
 		"syntax Error: duplicated location '" + v + "'"// 15
 	};
-	throw err[i];
+	throw std::runtime_error(err[i]);
 }
 
 std::vector<std::string> split(std::string &str, char c)

@@ -118,8 +118,8 @@ void fill_server(std::string key, std::string value, Server &serv, Location &loc
 {
 	if (serv.get_server_open() == 2)
 	{
-		// if (!key.empty() && find_last(line))
-		// 	print_error(3, line);
+		if (!key.empty() && find_last(line))
+			print_error(3, line);
 		if (serv.get_location_open() == 2 && line.find("}") != std::string::npos)
 		{
 			serv.set_location_open(0);

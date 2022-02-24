@@ -10,8 +10,6 @@
 
 std::string	getdata(Request &req)
 {
-	// std::string newdata = req.getBodyString();
-
 	std::string newdata = req.getBodyString();
 	if (req.getRequest()["Method"] == "GET")
 		newdata = req.getQueryVar();
@@ -69,34 +67,19 @@ char	**init_env(std::string status, std::string path, std::string page, Request 
 	return (environ);
 }
 
-std::string get_root()
-{
-	int r = 0;
-
-	char path[256];
-	getcwd(path, 256);
-	return path;
-}
-
 void	fill_binary_cgi(t_cgi &cgi, char **&args)
 {
+	args = new char*[3];
+	args[1] = strdup(cgi.page.c_str());
 	if (cgi.page.find(".py") != std::string::npos)
-	{
-		args = new char*[3];
-		args[0] = (char*)"/usr/bin/python";
-		args[1] = (char*)(cgi.page).c_str();
-		args[2] = NULL;
-	}
+		args[0] = strdup("/usr/bin/python");
 	else if (cgi.page.find(".php") != std::string::npos)
 	{
-		args = new char*[2];
 		std::string user = getenv("USER");
 		user = "/Users/" + user + "/goinfre/.brew/bin/php-cgi";
-		args[0] = (char*)user.c_str();
-		args[1] = NULL;
+		args[0] = strdup(user.c_str());
 	}
-	else
-		throw ;// ma3raftch hno ndir
+	args[2] = NULL;
 }
 
 std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
@@ -110,7 +93,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	int size_read = 1024;
 	std::string newdata = "";
 	char buffer[size_read];
-	std::string root_c;
 	newdata = getdata(req);
 	char **env = init_env(status, cgi.path, cgi.page, req, newdata);
 	fd_old[0] = dup(0);
@@ -130,7 +112,9 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 		close(pipefd_data[1]);
 
 		execve(args[0], args, (char **)env);
-		status = "400";
+		delete args[0];
+		delete args[1];
+		delete [] args;
 		exit(1);
 	}
 	else
@@ -147,11 +131,17 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 		while ((r = read(pipefd[0], buffer, size_read - 1)))
 			body.append(buffer, r);
 		close(pipefd[0]);
-		wait(&pid);
-
+		int sts;
+		waitpid(pid, &sts, 0);
+		if (WIFEXITED(sts))
+		{
+			sts = WEXITSTATUS(sts);
+			status = (sts) ? "500" : status;
+		}
 		dup2(fd_old[0], 0);
 		dup2(fd_old[1], 1);
-
+		delete args[0];
+		delete args[1];
 		delete [] args;
 	}
 	return (body);
