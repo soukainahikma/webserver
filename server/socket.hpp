@@ -27,7 +27,7 @@ class server_socket
 		sockaddr_in set_add_struct(int port);
 		// server_socket prepare_socket(Server server);
 		server_socket prepare_socket(int port);
-		std::vector<server_socket> fill_list_socket(std::vector<Server> servers, std::map<int,int> &ports);
+		std::vector<server_socket> fill_list_socket( std::map<int,int> &ports);
 		int accept_socket(int fd);
 		int get_max_fd_so_far() const;
 		int get_server_fd() const;
@@ -37,7 +37,7 @@ class server_socket
 
 typedef struct map_info
 {
-	int content_length;
+	size_t content_length;
 	int transfer_encoding;
 	std::string body;
 	size_t number;

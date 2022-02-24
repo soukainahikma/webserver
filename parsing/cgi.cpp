@@ -90,6 +90,7 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 	char **args;
 
 	std::string body = "";
+	std::cerr << "dkhal\n";
 	int size_read = 1024;
 	std::string newdata = "";
 	char buffer[size_read];
@@ -144,5 +145,6 @@ std::string runCgi(t_cgi &cgi, std::string &status, Request &req)
 		delete args[1];
 		delete [] args;
 	}
+	std::cerr << body << "|khraj\n";
 	return (body);
 }

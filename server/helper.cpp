@@ -109,7 +109,7 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 	std::string files;
 	map_info info ;
 	std::map<int, map_info>::iterator it;
-	char buffer[100];
+	char buffer[100]; // NOTE time to get Request (3 m 30.42 s ****** 1024 = 26.56 s)
 	bzero(buffer, 100);
 	int rd = recv(i, buffer, 99, 0);
 	if (rd > 0)
@@ -152,13 +152,14 @@ void connection_handler(int i, RequestHandler &req_handler, int port, fd_set &wr
 		std::string res = resp.get_header();
 		// char *hello = (char *) malloc(sizeof(char) * resp.get_header().length());
 		// resp.get_header().copy(hello,resp.get_header().length(),0);
-		// std::cout << YELLOW << res.c_str() << RESET << std::endl;
+		std::cout << YELLOW << res.c_str() << RESET << std::endl;
 			// std::cout<< RED << res << RESET << std::endl;
 		if (FD_ISSET(i, &write_fds))
 		{
 			std::map<int, map_info>::iterator it_send = map_of_req.find(i);
 			size_t n = it_send->second.number;
 			n = send(i, res.c_str() + n, res.length(), 0);
+			std::cout<< n <<std::endl;
 			it_send->second.number += n;
 			if (n == res.length())
 			{

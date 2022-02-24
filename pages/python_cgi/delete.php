@@ -8,4 +8,5 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE")
     var_dump($myEntireBody["test"]);
     unlink($myEntireBody["test"]);
 }
+// in the same folder
 ?>

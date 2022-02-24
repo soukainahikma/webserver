@@ -73,6 +73,7 @@ class Response
 	public:
 		Response(Server server, Location location, std::string req_type, Request &req)
 		{
+			(void)req_type;
 			size_t i;
 			int stats;
 			std::string extension;
@@ -118,7 +119,7 @@ class Response
 		{
 			int stats;
 			std::string extension;
-			int is_deleted;
+			// int is_deleted;
 
 			is_autoindex = false;
 			this->errorPages = server.get_error_page();
@@ -260,14 +261,11 @@ class Response
 					file_to_send = runCgi(cgi, status, request);
 					if (file_to_send != "")
 						content_type = "";
-					std::cout << RED << status << RESET << std::endl;
 					if (status == "500")
 					{
-						std::cout << MAGENTA << status << RESET << std::endl;
 						this->filename = this->server_root + errorPages["500"];
 						content_type = "Content-type: text/html; charset=UTF-8\r\n\r\n";
 						file_to_send = get_file();
-						std::cout << errorPages["500"] << std::endl;
 					}
 				}
 				else

@@ -1,11 +1,14 @@
 
-# f = open("myfile.txt", "w")
 
-# f.write("Woops! I have deleted the content!")
-
-# f.close()
+print "Content-type:text/html\r\n\r\n"
 
 
-f = open("demofile.txt", "r")
-print(f.readline())
+f = open("myfile.txt", "w")
+
+f.write("Woops! I have deleted the content!")
+
 f.close()
+
+# f = open("demofile.txt", "r")
+# print(f.readline())
+# f.close()

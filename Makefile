@@ -1,7 +1,7 @@
 
 
-CC = clang++
-# CFLAGS = -Wall -Wextra -Werror -std=c++98
+CC = c++
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = webserv
 SRC =	./server.cpp\
 		./parsing/Location.cpp\

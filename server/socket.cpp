@@ -87,16 +87,14 @@ server_socket server_socket::prepare_socket(int port)
 	return(mysocket);
 }
 
-std::vector<server_socket> server_socket::fill_list_socket(std::vector<Server> servers, std::map<int,int> &ports)
+std::vector<server_socket> server_socket::fill_list_socket(std::map<int,int> &ports)
 {
 	server_socket sock;
 	FD_ZERO(&set_socket);
 	max_fd_so_far = 0;
 	std::vector<server_socket> sockets;
 	for (std::map<int, int>::iterator i = ports.begin(); i != ports.end(); i++)
-	// for (size_t i = 0; i < ports.size(); i++)
 	{
-		// sock = prepare_socket(servers[0]);
 		sock = prepare_socket(i->first);
 		sockets.push_back(sock);
 		FD_SET(sock.server_fd,&set_socket);

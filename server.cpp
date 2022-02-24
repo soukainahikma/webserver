@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 	try
 	{
 		std::map<int, int> ports;
-		std::vector<Server> parse = parsing("./webserv.conf", ports);
+		std::vector<Server> parse = parsing(argv[1], ports);
 		server_socket info;
 		RequestHandler req_handler(parse);
-		std::vector<server_socket> socket_list = info.fill_list_socket(parse, ports);
+		std::vector<server_socket> socket_list = info.fill_list_socket(ports);
 		int max_fd_so_far = info.get_max_fd_so_far(); // getter of the max;
 		fd_set current_sockets;
 		fd_set write_fds;
